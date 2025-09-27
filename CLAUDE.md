@@ -64,7 +64,7 @@ The `bundle` module depends on `domain` through the parent POM structure, allowi
 
 **IMPORTANT**: Always read these files for complete project context:
 
-- **README.md** - Complete project overview, architecture, roadmap, and technical specifications for the Synapse AI-powered note-taking application
+- **README.md** - Complete project overview, architecture, roadmap, and technical specifications for the application
 - **DATA-MODEL.md** - Comprehensive database schema, entity relationships, and SQL queries for the hybrid search and directory hierarchy system
 
 These files contain critical information about:
