@@ -15,7 +15,8 @@ public class NoteEmbedding {
 
     Note note;
 
-    List<Float> embedding;
+    @Builder.Default
+    List<Float> embedding = List.of();
 
     String model;
 

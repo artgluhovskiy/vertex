@@ -25,11 +25,7 @@ public class User {
     // Version for the Optimistic Lock check
     Integer version;
 
-    public static User create(
-        String email,
-        String passwordHash,
-        LocalDateTime ts
-    ) {
+    public static User create(String email, String passwordHash, LocalDateTime ts) {
         return User.builder()
             .id(UUID.randomUUID())
             .email(email)

@@ -3,9 +3,11 @@ package org.art.vertex.domain.model.note;
 import lombok.Builder;
 import lombok.Value;
 import org.art.vertex.domain.model.directory.Directory;
+import org.art.vertex.domain.model.tag.Tag;
 import org.art.vertex.domain.model.user.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,11 +25,13 @@ public class Note {
 
     String content;
 
-    String summary; // AI-generated summary
+    String summary;
 
-    Map<String, Object> metadata; // YAML frontmatter
+    @Builder.Default
+    List<Tag> tags = List.of();
 
-    String fullTextVector; // For search indexing
+    @Builder.Default
+    Map<String, Object> metadata = Map.of();
 
     LocalDateTime updatedTs;
 

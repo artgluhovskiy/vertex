@@ -17,7 +17,8 @@ public class NoteFullTextSearch {
 
     String searchableText;
 
-    Map<String, Object> searchMetadata;
+    @Builder.Default
+    Map<String, Object> searchMetadata = Map.of();
 
     LocalDateTime createdTs;
 
