@@ -59,3 +59,17 @@ Commented dependencies suggest future features for:
 ## Module Dependencies
 
 The `bundle` module depends on `domain` through the parent POM structure, allowing the application to use domain classes while keeping concerns separated.
+
+## Project Documentation
+
+**IMPORTANT**: Always read these files for complete project context:
+
+- **README.md** - Complete project overview, architecture, roadmap, and technical specifications for the Synapse AI-powered note-taking application
+- **DATA-MODEL.md** - Comprehensive database schema, entity relationships, and SQL queries for the hybrid search and directory hierarchy system
+
+These files contain critical information about:
+- Product vision and differentiation
+- Technical architecture (Spring Boot + PostgreSQL + pgvector)
+- Data model with directory hierarchy and graph relationships
+- Development roadmap and implementation phases
+- API endpoints and performance requirements
