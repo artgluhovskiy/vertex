@@ -76,3 +76,31 @@ These files contain critical information about:
 - Domain module organization and package structure
 - Development roadmap and implementation phases
 - API endpoints and performance requirements
+
+## Conditional Rule Loading
+
+**IMPORTANT**: Apply relevant rules based on user's request context. Rules are organized by concern:
+
+**Always Apply:**
+- `.claude/0-rules-mandatory.md` - MANDATORY rules for all development tasks
+
+**Apply When Relevant to User Request:**
+- `.claude/1-rules-common.md` - General development practices (constructor injection, etc.)
+- `.claude/2-rules-design.md` - Architecture and design decisions (package organization, DDD)
+- `.claude/4-rules-spring.md` - Spring Boot specific patterns and configurations
+- `.claude/6-rules-messaging.md` - Message handling and communication patterns
+- `.claude/7-rules-build.md` - Build system, Maven, compilation rules
+- `.claude/8-rules-observability.md` - Logging, monitoring, metrics guidelines
+- `.claude/9-rules-testing.md` - Testing strategies and patterns
+
+**How to Apply:**
+1. **Identify request context** - What is the user asking for?
+2. **Load mandatory rules** - Always read `.claude/0-rules-mandatory.md`
+3. **Load relevant rules** - Only read rule files that match the request context
+4. **Apply rules** - Follow the loaded rules during implementation
+
+**Examples:**
+- User asks about "Spring configuration" → Load mandatory + spring + common rules
+- User asks about "testing" → Load mandatory + testing + common rules
+- User asks about "domain model" → Load mandatory + design + common rules
+- User asks about "build issues" → Load mandatory + build + common rules
