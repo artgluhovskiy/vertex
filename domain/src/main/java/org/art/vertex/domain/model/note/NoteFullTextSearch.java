@@ -4,41 +4,37 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Value
 @Builder
-public class NoteEmbedding {
+public class NoteFullTextSearch {
 
     UUID id;
 
     Note note;
 
-    List<Float> embedding;
+    String searchableText;
 
-    String model;
-
-    Integer dim;
+    Map<String, Object> searchMetadata;
 
     LocalDateTime createdTs;
 
     LocalDateTime updatedTs;
 
-    public static NoteEmbedding create(
+    public static NoteFullTextSearch create(
         UUID id,
         Note note,
-        List<Float> embedding,
-        String model,
-        Integer dimension,
+        String searchableText,
+        Map<String, Object> searchMetadata,
         LocalDateTime ts
     ) {
-        return NoteEmbedding.builder()
+        return NoteFullTextSearch.builder()
             .id(id)
             .note(note)
-            .embedding(embedding)
-            .model(model)
-            .dim(dimension)
+            .searchableText(searchableText)
+            .searchMetadata(searchMetadata)
             .createdTs(ts)
             .updatedTs(ts)
             .build();
