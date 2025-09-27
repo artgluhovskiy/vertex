@@ -64,12 +64,15 @@ The `bundle` module depends on `domain` through the parent POM structure, allowi
 
 **IMPORTANT**: Always read these files for complete project context:
 
-- **README.md** - Complete project overview, architecture, roadmap, and technical specifications for the application
+- **README.md** - Complete project overview, architecture, roadmap, and technical specifications for the Synapse AI-powered note-taking application
 - **DATA-MODEL.md** - Comprehensive database schema, entity relationships, and SQL queries for the hybrid search and directory hierarchy system
+- **DDD.md** - Domain-Driven Design architecture, aggregate boundaries, entity patterns, and implementation strategy
 
 These files contain critical information about:
-- Product vision and differentiation
+- Product vision and differentiation (Zettelkasten + AI + local-first)
 - Technical architecture (Spring Boot + PostgreSQL + pgvector)
 - Data model with directory hierarchy and graph relationships
+- DDD design patterns (controlled mutable entities, aggregates, services)
+- Domain module organization and package structure
 - Development roadmap and implementation phases
 - API endpoints and performance requirements
