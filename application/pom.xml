@@ -10,11 +10,15 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>domain</artifactId>
-    <name>Vertex - Domain</name>
+    <artifactId>application</artifactId>
+    <name>Vertex - Application</name>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.art.vertex</groupId>
+            <artifactId>domain</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
