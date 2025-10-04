@@ -1,7 +1,7 @@
 package org.art.vertex.domain.note;
 
-import org.art.vertex.domain.note.Note;
-import org.art.vertex.domain.note.NoteLink;
+import org.art.vertex.domain.note.model.Note;
+import org.art.vertex.domain.note.model.NoteLink;
 import org.art.vertex.domain.user.User;
 
 import java.util.List;

@@ -1,7 +1,5 @@
 package org.art.vertex.domain.user;
 
-import org.art.vertex.domain.user.User;
-
 import java.util.Optional;
 import java.util.UUID;
 

@@ -1,7 +1,7 @@
 package org.art.vertex.domain.note;
 
-import org.art.vertex.domain.directory.Directory;
-import org.art.vertex.domain.note.Note;
+import org.art.vertex.domain.directory.model.Directory;
+import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.tag.Tag;
 import org.art.vertex.domain.user.User;
 

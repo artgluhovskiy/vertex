@@ -2,7 +2,7 @@ package org.art.vertex.domain.note.event;
 
 import lombok.Value;
 import org.art.vertex.domain.shared.event.DomainEvent;
-import org.art.vertex.domain.note.LinkType;
+import org.art.vertex.domain.note.model.LinkType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -1,26 +1,26 @@
-package org.art.vertex.domain.note.event;
+package org.art.vertex.domain.note.sync.event;
 
 import lombok.Value;
+import org.art.vertex.domain.note.sync.model.SyncResult;
 import org.art.vertex.domain.shared.event.DomainEvent;
-import org.art.vertex.domain.note.enrichment.model.EnrichmentResult;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Value
-public class NoteEnrichedEvent implements DomainEvent {
+public class SyncCompletedEvent implements DomainEvent {
 
-    UUID noteId;
-    EnrichmentResult result;
+    UUID userId;
+    SyncResult result;
     LocalDateTime occurredAt;
 
     @Override
     public UUID getAggregateId() {
-        return noteId;
+        return userId;
     }
 
     @Override
     public String getEventType() {
-        return "NOTE_ENRICHED";
+        return "SYNC_COMPLETED";
     }
 }

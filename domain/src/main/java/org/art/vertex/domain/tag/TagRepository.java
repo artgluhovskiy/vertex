@@ -1,6 +1,5 @@
 package org.art.vertex.domain.tag;
 
-import org.art.vertex.domain.tag.Tag;
 import org.art.vertex.domain.user.User;
 
 import java.util.List;

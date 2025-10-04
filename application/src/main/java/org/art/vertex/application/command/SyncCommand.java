@@ -2,7 +2,7 @@ package org.art.vertex.application.command;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.domain.shared.model.sync.SyncDirection;
+import org.art.vertex.domain.note.sync.model.SyncDirection;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package org.art.vertex.domain.directory;
 
-import org.art.vertex.domain.directory.Directory;
+import org.art.vertex.domain.directory.model.Directory;
 
 import java.util.ArrayList;
 import java.util.List;

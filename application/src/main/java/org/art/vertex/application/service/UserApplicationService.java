@@ -7,12 +7,12 @@ import org.art.vertex.application.command.RegisterUserCommand;
 import org.art.vertex.application.dto.AuthenticationResponse;
 import org.art.vertex.application.dto.UserDto;
 import org.art.vertex.application.mapper.UserMapper;
-import org.art.vertex.domain.user.DuplicateEmailException;
-import org.art.vertex.domain.shared.exception.InvalidCredentialsException;
-import org.art.vertex.domain.user.UserNotFoundException;
+import org.art.vertex.domain.user.exception.DuplicateEmailException;
+import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
+import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.User;
-import org.art.vertex.domain.shared.port.security.JwtTokenProvider;
-import org.art.vertex.domain.shared.port.security.PasswordEncoder;
+import org.art.vertex.domain.user.security.JwtTokenProvider;
+import org.art.vertex.domain.user.security.PasswordEncoder;
 import org.art.vertex.domain.user.UserRepository;
 
 import java.time.LocalDateTime;

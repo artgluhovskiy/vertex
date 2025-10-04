@@ -1,6 +1,6 @@
 package org.art.vertex.domain.directory;
 
-import org.art.vertex.domain.directory.Directory;
+import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.user.User;
 
 import java.util.List;
