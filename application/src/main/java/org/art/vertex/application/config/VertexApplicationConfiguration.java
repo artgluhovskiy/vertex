@@ -2,9 +2,9 @@ package org.art.vertex.application.config;
 
 import org.art.vertex.application.mapper.UserMapper;
 import org.art.vertex.application.service.UserApplicationService;
-import org.art.vertex.domain.port.security.JwtTokenProvider;
-import org.art.vertex.domain.port.security.PasswordEncoder;
-import org.art.vertex.domain.repository.UserRepository;
+import org.art.vertex.domain.shared.port.security.JwtTokenProvider;
+import org.art.vertex.domain.shared.port.security.PasswordEncoder;
+import org.art.vertex.domain.user.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -1,7 +1,7 @@
 package org.art.vertex.infrastructure.security;
 
 import lombok.RequiredArgsConstructor;
-import org.art.vertex.domain.port.security.PasswordEncoder;
+import org.art.vertex.domain.shared.port.security.PasswordEncoder;
 
 @RequiredArgsConstructor
 public class BCryptPasswordEncoderAdapter implements PasswordEncoder {

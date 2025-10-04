@@ -1,8 +1,8 @@
 package org.art.vertex.infrastructure.config;
 
-import org.art.vertex.domain.port.security.JwtTokenProvider;
-import org.art.vertex.domain.port.security.PasswordEncoder;
-import org.art.vertex.domain.repository.UserRepository;
+import org.art.vertex.domain.shared.port.security.JwtTokenProvider;
+import org.art.vertex.domain.shared.port.security.PasswordEncoder;
+import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.persistence.repository.UserJpaRepository;
 import org.art.vertex.infrastructure.security.BCryptPasswordEncoderAdapter;
 import org.art.vertex.infrastructure.security.DefaultJwtTokenProvider;

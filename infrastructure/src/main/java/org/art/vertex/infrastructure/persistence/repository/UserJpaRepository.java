@@ -1,8 +1,8 @@
 package org.art.vertex.infrastructure.persistence.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.art.vertex.domain.model.user.User;
-import org.art.vertex.domain.repository.UserRepository;
+import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.UserRepository;
 
 import java.util.Optional;
 import java.util.UUID;

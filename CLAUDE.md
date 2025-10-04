@@ -23,6 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `DDD.md`
 - `SYS_DESIGN.md`
 - `SEARCH.md`
+- `IMPLEMENTATION_PLAN.md`
 
 ## Project Structure
 

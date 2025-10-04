@@ -1,8 +1,8 @@
 package org.art.vertex.infrastructure.security;
 
 import lombok.RequiredArgsConstructor;
-import org.art.vertex.domain.model.user.User;
-import org.art.vertex.domain.port.security.JwtTokenProvider;
+import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.shared.port.security.JwtTokenProvider;
 
 @RequiredArgsConstructor
 public class DefaultJwtTokenProvider implements JwtTokenProvider {

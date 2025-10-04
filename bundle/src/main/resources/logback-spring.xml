@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.art.moviefinder" level="INFO" additivity="false">
+    <logger name="org.art.vertex" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 
