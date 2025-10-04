@@ -1,4 +1,4 @@
-package org.art.vertex.application.note.graph;
+package org.art.vertex.application.note.graph.dto;
 
 import lombok.Builder;
 import lombok.Value;

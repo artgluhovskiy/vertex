@@ -1,6 +1,6 @@
 package org.art.vertex.domain.user.security;
 
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.model.User;
 
 public interface JwtTokenProvider {
 

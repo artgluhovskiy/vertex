@@ -1,7 +1,7 @@
 package org.art.vertex.application.note.search;
 
-import org.art.vertex.application.note.search.SearchCommand;
-import org.art.vertex.application.note.search.SearchResultDto;
+import org.art.vertex.application.note.search.command.SearchCommand;
+import org.art.vertex.application.note.search.dto.SearchResultDto;
 
 public interface SearchApplicationService {
 

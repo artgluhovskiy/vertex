@@ -1,4 +1,4 @@
-package org.art.vertex.application.note.search;
+package org.art.vertex.application.note.search.command;
 
 import lombok.Builder;
 import lombok.Value;

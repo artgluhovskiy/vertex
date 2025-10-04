@@ -3,8 +3,8 @@ package org.art.vertex.domain.note.search.model;
 import lombok.Builder;
 import lombok.Value;
 import org.art.vertex.domain.directory.model.Directory;
-import org.art.vertex.domain.tag.Tag;
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.tag.model.Tag;
+import org.art.vertex.domain.user.model.User;
 
 import java.util.List;
 import java.util.Map;

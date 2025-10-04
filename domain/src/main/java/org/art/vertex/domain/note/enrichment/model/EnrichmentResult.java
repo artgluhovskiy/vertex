@@ -3,7 +3,7 @@ package org.art.vertex.domain.note.enrichment.model;
 import lombok.Builder;
 import lombok.Value;
 import org.art.vertex.domain.note.model.NoteLink;
-import org.art.vertex.domain.tag.Tag;
+import org.art.vertex.domain.tag.model.Tag;
 
 import java.time.LocalDateTime;
 import java.util.List;

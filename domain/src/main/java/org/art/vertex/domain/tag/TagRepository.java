@@ -1,6 +1,7 @@
 package org.art.vertex.domain.tag;
 
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.tag.model.Tag;
+import org.art.vertex.domain.user.model.User;
 
 import java.util.List;
 import java.util.Optional;

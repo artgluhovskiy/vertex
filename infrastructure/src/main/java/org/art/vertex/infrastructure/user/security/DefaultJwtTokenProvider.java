@@ -1,7 +1,7 @@
 package org.art.vertex.infrastructure.user.security;
 
 import lombok.RequiredArgsConstructor;
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 
 @RequiredArgsConstructor

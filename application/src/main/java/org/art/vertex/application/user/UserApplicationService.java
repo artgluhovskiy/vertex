@@ -10,7 +10,7 @@ import org.art.vertex.application.user.mapper.UserMapper;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
 import org.art.vertex.domain.user.UserRepository;

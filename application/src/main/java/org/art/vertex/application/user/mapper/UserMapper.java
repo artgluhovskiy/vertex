@@ -1,7 +1,7 @@
 package org.art.vertex.application.user.mapper;
 
 import org.art.vertex.application.user.dto.UserDto;
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.model.User;
 
 public class UserMapper {
 

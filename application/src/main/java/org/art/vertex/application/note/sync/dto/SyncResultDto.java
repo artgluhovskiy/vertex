@@ -1,4 +1,4 @@
-package org.art.vertex.application.note.sync;
+package org.art.vertex.application.note.sync.dto;
 
 import lombok.Builder;
 import lombok.Value;

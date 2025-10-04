@@ -1,7 +1,7 @@
 package org.art.vertex.application.note.graph;
 
-import org.art.vertex.application.note.graph.GraphQueryCommand;
-import org.art.vertex.application.note.graph.GraphDto;
+import org.art.vertex.application.note.graph.command.GraphQueryCommand;
+import org.art.vertex.application.note.graph.dto.GraphDto;
 
 import java.util.List;
 import java.util.UUID;

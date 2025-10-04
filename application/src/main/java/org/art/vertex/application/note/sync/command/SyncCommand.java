@@ -1,4 +1,4 @@
-package org.art.vertex.application.note.sync;
+package org.art.vertex.application.note.sync.command;
 
 import lombok.Builder;
 import lombok.Value;

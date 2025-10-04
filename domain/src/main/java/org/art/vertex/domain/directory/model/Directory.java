@@ -2,7 +2,7 @@ package org.art.vertex.domain.directory.model;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

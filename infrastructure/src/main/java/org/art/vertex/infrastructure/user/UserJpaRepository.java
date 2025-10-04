@@ -1,7 +1,7 @@
 package org.art.vertex.infrastructure.user;
 
 import lombok.RequiredArgsConstructor;
-import org.art.vertex.domain.user.User;
+import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.UserRepository;
 
 import java.util.Optional;

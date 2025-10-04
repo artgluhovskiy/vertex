@@ -1,4 +1,4 @@
-package org.art.vertex.domain.user;
+package org.art.vertex.domain.user.model;
 
 import lombok.Builder;
 import lombok.Value;
