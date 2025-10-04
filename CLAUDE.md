@@ -16,6 +16,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Before ANY task:** Review `.rules/java/RULES_CHECKLIST.md` and load all applicable rules from `.rules/java/rules.md`.
 
+## Project Documentation
+- `PRD.md`
+- `ROADMAP.md`
+- `DATA-MODEL.md`
+- `DDD.md`
+- `SYS_DESIGN.md`
+- `SEARCH.md`
+
 ## Project Structure
 
 This is a Spring Boot 3.5.6 multi-module Maven project with Java 21:
