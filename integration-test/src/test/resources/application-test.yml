@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: vertex-integration-test
+
+  datasource:
+    # Will be overridden by @DynamicPropertySource in BaseIntegrationTest
+    url: jdbc:postgresql://localhost:5432/vertex
+    username: vertex
+    password: vertex
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false  # Disable for cleaner test output
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+logging:
+  level:
+    org.art.vertex: INFO
+    org.testcontainers: INFO
+    org.springframework: WARN
+    org.hibernate: WARN

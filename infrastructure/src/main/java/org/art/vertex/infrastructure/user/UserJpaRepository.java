@@ -67,6 +67,9 @@ public class UserJpaRepository implements UserRepository {
     }
 
     private UserEntity toEntity(User user) {
+        // Check if this is a new entity (not yet persisted)
+        boolean isNew = !userEntityRepository.existsById(user.getId());
+
         return UserEntity.builder()
             .id(user.getId())
             .email(user.getEmail())
@@ -74,7 +77,9 @@ public class UserJpaRepository implements UserRepository {
             .settings(user.getSettings().getPreferences())
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
-            .version(user.getVersion())
+            // For new entities, don't set version (let JPA manage it)
+            // For existing entities, use the version from domain model
+            .version(isNew ? null : user.getVersion())
             .build();
     }
 
