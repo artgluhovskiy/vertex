@@ -1,0 +1,8 @@
+package org.art.vertex.domain.event;
+
+public interface EventHandler<T extends DomainEvent> {
+
+    void handle(T event);
+
+    Class<T> getEventType();
+}
