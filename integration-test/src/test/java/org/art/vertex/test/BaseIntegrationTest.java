@@ -1,5 +1,6 @@
 package org.art.vertex.test;
 
+import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.VertexApplication;
 import org.art.vertex.test.container.TestContainerManager;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +12,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
+/**
+ * Base class for all integration tests.
+ * Uses IntegrationTestConfiguration which scans all org.art.vertex packages,
+ * providing the same configuration as the main VertexApplication.
+ */
+@Slf4j
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     classes = VertexApplication.class
@@ -21,7 +28,7 @@ public abstract class BaseIntegrationTest {
     private static final TestContainerManager containerManager = TestContainerManager.getInstance();
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     /**
      * Configure dynamic properties for test containers.
@@ -38,32 +45,22 @@ public abstract class BaseIntegrationTest {
         registry.add("spring.datasource.password", () -> "vertex");
     }
 
-    /**
-     * Set up the integration test environment once before all tests.
-     */
     @BeforeAll
     static void setUpIntegrationTest() {
-        System.out.println("🚀 Setting up integration test environment...");
+        log.info("🚀 Setting up integration test environment...");
+
         containerManager.initializeContainers();
-        System.out.println(containerManager.getContainerStatus());
 
         if (!containerManager.areAllContainersAccessible()) {
             throw new IllegalStateException("❌ Containers are not accessible. Tests cannot proceed.");
         }
     }
 
-    /**
-     * Clean up test data after each test to ensure isolation.
-     */
     @AfterEach
     void cleanupAfterTest() {
         cleanupAllTestData();
     }
 
-    /**
-     * Truncate all tables to ensure clean state between tests.
-     * Add new tables here as they are created.
-     */
     protected void cleanupAllTestData() {
         try {
             // Disable foreign key checks temporarily for truncation
@@ -75,22 +72,8 @@ public abstract class BaseIntegrationTest {
             // Re-enable foreign key checks
             jdbcTemplate.execute("SET session_replication_role = 'origin'");
         } catch (Exception e) {
-            System.err.println("⚠️  Error during test data cleanup: " + e.getMessage());
+            log.error("⚠️  Error during test data cleanup: {}", e.getMessage(), e);
             throw e;
         }
-    }
-
-    /**
-     * Get JDBC template for custom database operations in tests.
-     */
-    protected JdbcTemplate getJdbcTemplate() {
-        return jdbcTemplate;
-    }
-
-    /**
-     * Get container manager for advanced container operations.
-     */
-    protected TestContainerManager getContainerManager() {
-        return containerManager;
     }
 }
