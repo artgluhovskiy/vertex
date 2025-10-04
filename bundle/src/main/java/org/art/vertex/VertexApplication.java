@@ -10,3 +10,4 @@ public class VertexApplication {
         SpringApplication.run(VertexApplication.class, args);
     }
 }
+
