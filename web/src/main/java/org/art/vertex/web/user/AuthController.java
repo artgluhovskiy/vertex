@@ -10,7 +10,10 @@ import org.art.vertex.application.user.model.AuthenticationResult;
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.web.user.dto.AuthenticationResponse;
 import org.art.vertex.web.user.dto.UserDto;
+import org.art.vertex.web.user.mapper.UserCommandMapper;
 import org.art.vertex.web.user.mapper.UserDtoMapper;
+import org.art.vertex.web.user.request.UserLoginRequest;
+import org.art.vertex.web.user.request.UserRegistrationRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,12 +31,15 @@ public class AuthController {
 
     private final UserApplicationService userApplicationService;
 
+    private final UserCommandMapper userCommandMapper;
+
     private final UserDtoMapper userDtoMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterUserCommand command) {
-        log.trace("Processing registration request. Email: {}", command.email());
+    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody UserRegistrationRequest request) {
+        log.trace("Processing registration request. Email: {}", request.email());
 
+        RegisterUserCommand command = userCommandMapper.toCommand(request);
         AuthenticationResult result = userApplicationService.register(command);
 
         AuthenticationResponse response = AuthenticationResponse.builder()
@@ -46,9 +52,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginCommand command) {
-        log.trace("Processing login request. Email: {}", command.email());
+    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody UserLoginRequest request) {
+        log.trace("Processing login request. Email: {}", request.email());
 
+        LoginCommand command = userCommandMapper.toCommand(request);
         AuthenticationResult result = userApplicationService.login(command);
 
         AuthenticationResponse response = AuthenticationResponse.builder()
