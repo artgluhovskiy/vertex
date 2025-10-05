@@ -5,19 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
-@Entity
-@Table(name = "users")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "users")
 public class UserEntity {
 
     @Id
@@ -30,22 +32,19 @@ public class UserEntity {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "settings", columnDefinition = "jsonb")
     private Map<String, Object> settings;
 
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     @Version
     @Column(name = "version", nullable = false)
     private Integer version;
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
