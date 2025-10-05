@@ -3,7 +3,6 @@ package org.art.vertex.infrastructure.user;
 import lombok.RequiredArgsConstructor;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
-import org.art.vertex.domain.user.model.UserSettings;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.user.entity.UserEntity;
 import org.springframework.stereotype.Component;
@@ -17,13 +16,14 @@ import java.util.UUID;
 public class UserJpaRepository implements UserRepository {
 
     private final UserEntityRepository userEntityRepository;
+    private final UserEntityMapper userMapper;
 
     @Override
     @Transactional
     public User save(User user) {
-        UserEntity entity = toEntity(user);
+        UserEntity entity = userMapper.toEntity(user);
         UserEntity savedEntity = userEntityRepository.save(entity);
-        return toDomain(savedEntity);
+        return userMapper.toDomain(savedEntity);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class UserJpaRepository implements UserRepository {
     @Transactional(readOnly = true)
     public Optional<User> findById(UUID id) {
         return userEntityRepository.findById(id)
-            .map(this::toDomain);
+            .map(userMapper::toDomain);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class UserJpaRepository implements UserRepository {
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
         return userEntityRepository.findByEmail(email)
-            .map(this::toDomain);
+            .map(userMapper::toDomain);
     }
 
     @Override
@@ -64,36 +64,5 @@ public class UserJpaRepository implements UserRepository {
     @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return userEntityRepository.existsByEmail(email);
-    }
-
-    private UserEntity toEntity(User user) {
-        // Check if this is a new entity (not yet persisted)
-        boolean isNew = !userEntityRepository.existsById(user.getId());
-
-        return UserEntity.builder()
-            .id(user.getId())
-            .email(user.getEmail())
-            .passwordHash(user.getPasswordHash())
-            .settings(user.getSettings().getPreferences())
-            .createdAt(user.getCreatedAt())
-            .updatedAt(user.getUpdatedAt())
-            // For new entities, don't set version (let JPA manage it)
-            // For existing entities, use the version from domain model
-            .version(isNew ? null : user.getVersion())
-            .build();
-    }
-
-    private User toDomain(UserEntity entity) {
-        return User.builder()
-            .id(entity.getId())
-            .email(entity.getEmail())
-            .passwordHash(entity.getPasswordHash())
-            .settings(UserSettings.builder()
-                .preferences(entity.getSettings())
-                .build())
-            .createdAt(entity.getCreatedAt())
-            .updatedAt(entity.getUpdatedAt())
-            .version(entity.getVersion())
-            .build();
     }
 }
