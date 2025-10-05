@@ -5,6 +5,7 @@ import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.infrastructure.user.entity.UserEntity;
+import org.art.vertex.infrastructure.user.jpa.UserJpaRepository;
 import org.art.vertex.infrastructure.user.mapper.UserEntityMapper;
 import org.springframework.transaction.annotation.Transactional;
 

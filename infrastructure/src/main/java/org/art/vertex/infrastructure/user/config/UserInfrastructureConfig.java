@@ -2,7 +2,7 @@ package org.art.vertex.infrastructure.user.config;
 
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.user.DefaultUserRepository;
-import org.art.vertex.infrastructure.user.UserJpaRepository;
+import org.art.vertex.infrastructure.user.jpa.UserJpaRepository;
 import org.art.vertex.infrastructure.user.entity.UserEntity;
 import org.art.vertex.infrastructure.user.mapper.UserEntityMapper;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

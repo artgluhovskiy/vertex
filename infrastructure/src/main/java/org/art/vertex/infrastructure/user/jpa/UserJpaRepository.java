@@ -1,4 +1,4 @@
-package org.art.vertex.infrastructure.user;
+package org.art.vertex.infrastructure.user.jpa;
 
 import org.art.vertex.infrastructure.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
