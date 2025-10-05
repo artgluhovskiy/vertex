@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.user.UserApplicationService;
 import org.art.vertex.application.user.command.LoginCommand;
 import org.art.vertex.application.user.command.RegisterUserCommand;
+import org.art.vertex.application.user.model.AuthenticationResult;
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.web.user.dto.AuthenticationResponse;
 import org.art.vertex.web.user.dto.UserDto;
@@ -33,7 +34,7 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterUserCommand command) {
         log.trace("Processing registration request. Email: {}", command.email());
 
-        UserApplicationService.AuthenticationResult result = userApplicationService.register(command);
+        AuthenticationResult result = userApplicationService.register(command);
 
         AuthenticationResponse response = AuthenticationResponse.builder()
             .accessToken(result.getAccessToken())
@@ -48,7 +49,7 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginCommand command) {
         log.trace("Processing login request. Email: {}", command.email());
 
-        UserApplicationService.AuthenticationResult result = userApplicationService.login(command);
+        AuthenticationResult result = userApplicationService.login(command);
 
         AuthenticationResponse response = AuthenticationResponse.builder()
             .accessToken(result.getAccessToken())

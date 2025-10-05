@@ -1,11 +1,10 @@
 package org.art.vertex.application.user;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.user.command.LoginCommand;
 import org.art.vertex.application.user.command.RegisterUserCommand;
+import org.art.vertex.application.user.model.AuthenticationResult;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
@@ -84,12 +83,5 @@ public class UserApplicationService {
 
         return userRepository.findById(UUID.fromString(userId))
             .orElseThrow(() -> new UserNotFoundException(userId));
-    }
-
-    @Value
-    @Builder
-    public static class AuthenticationResult {
-        String accessToken;
-        User user;
     }
 }
