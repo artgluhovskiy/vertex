@@ -6,15 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **BEFORE starting ANY planning or development task, you MUST:**
 
-1. Read `.rules/java/rules.md` to understand which rules apply
+1. Read `~/dev/bingo-ai-helpers/rules/java/rules.md` to understand which rules apply
 2. Load the mandatory rules (ALWAYS):
-    - `.rules/common/common.md`
-    - `.rules/java/000-rules-mandatory.md`
-3. Based on task keywords, load contextual rules from `.rules/java/rules.md`
+    - `~/dev/bingo-ai-helpers/rules/common/common.md`
+    - `~/dev/bingo-ai-helpers/rules/java/000-rules-mandatory.md`
+3. Based on task keywords, load contextual rules from `~/dev/bingo-ai-helpers/rules/java/rules.md`
 
 **This is MANDATORY for all planning, implementation, and refactoring tasks.**
 
-**Before ANY task:** Review `.rules/java/RULES_CHECKLIST.md` and load all applicable rules from `.rules/java/rules.md`.
+**Before ANY task:** Review `~/dev/bingo-ai-helpers/rules/java/RULES_CHECKLIST.md` and load all applicable rules from `~/dev/bingo-ai-helpers/rules/java/rules.md`.
 
 ## Project Documentation
 - `PRD.md`
