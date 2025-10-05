@@ -33,7 +33,7 @@ public class User {
             .settings(UserSettings.defaultSettings())
             .updatedAt(ts)
             .createdAt(ts)
-            .version(1)
+            .version(null)
             .build();
     }
 }

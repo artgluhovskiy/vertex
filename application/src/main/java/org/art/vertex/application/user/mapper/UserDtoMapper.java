@@ -3,7 +3,7 @@ package org.art.vertex.application.user.mapper;
 import org.art.vertex.application.user.dto.UserDto;
 import org.art.vertex.domain.user.model.User;
 
-public class UserMapper {
+public class UserDtoMapper {
 
     public UserDto toDto(User user) {
         return UserDto.builder()

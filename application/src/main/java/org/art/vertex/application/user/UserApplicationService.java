@@ -6,7 +6,7 @@ import org.art.vertex.application.user.command.LoginCommand;
 import org.art.vertex.application.user.command.RegisterUserCommand;
 import org.art.vertex.application.user.dto.AuthenticationResponse;
 import org.art.vertex.application.user.dto.UserDto;
-import org.art.vertex.application.user.mapper.UserMapper;
+import org.art.vertex.application.user.mapper.UserDtoMapper;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
@@ -28,7 +28,7 @@ public class UserApplicationService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private final UserMapper userMapper;
+    private final UserDtoMapper userMapper;
 
     public AuthenticationResponse register(RegisterUserCommand command) {
         log.debug("Registering new user. Email: {}", command.email());

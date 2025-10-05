@@ -1,6 +1,6 @@
-package org.art.vertex.application.config;
+package org.art.vertex.application.user.config;
 
-import org.art.vertex.application.user.mapper.UserMapper;
+import org.art.vertex.application.user.mapper.UserDtoMapper;
 import org.art.vertex.application.user.UserApplicationService;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
-public class VertexApplicationConfiguration {
+public class UserApplicationConfig {
 
     @Bean
-    public UserMapper userMapper() {
-        return new UserMapper();
+    public UserDtoMapper userDtoMapper() {
+        return new UserDtoMapper();
     }
 
     @Bean
@@ -21,9 +21,10 @@ public class VertexApplicationConfiguration {
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         JwtTokenProvider jwtTokenProvider,
-        UserMapper userMapper
+        UserDtoMapper userMapper
     ) {
-        return new UserApplicationService(userRepository, passwordEncoder, jwtTokenProvider, userMapper);
+        return new UserApplicationService(userRepository, passwordEncoder,
+            jwtTokenProvider, userMapper);
     }
 }
 

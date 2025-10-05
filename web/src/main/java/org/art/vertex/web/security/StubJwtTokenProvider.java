@@ -1,4 +1,4 @@
-package org.art.vertex.infrastructure.user.security;
+package org.art.vertex.web.security;
 
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
