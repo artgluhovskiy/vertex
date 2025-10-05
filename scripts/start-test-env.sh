@@ -9,13 +9,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
-POSTGRES_CONTAINER_NAME="vertex-postgres-test"
-POSTGRES_IMAGE="pgvector/pgvector:pg16"
-POSTGRES_PORT=5432
-POSTGRES_DB="vertex"
-POSTGRES_USER="vertex"
-POSTGRES_PASSWORD="vertex"
+COMPOSE_FILE="docker-compose.test.yml"
 
 echo -e "${BLUE}🚀 Starting Vertex Test Environment${NC}"
 echo ""
@@ -26,50 +20,33 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if container already exists
-if docker ps -a --format '{{.Names}}' | grep -q "^${POSTGRES_CONTAINER_NAME}$"; then
-    echo -e "${YELLOW}📦 Container '${POSTGRES_CONTAINER_NAME}' already exists${NC}"
-
-    # Check if it's running
-    if docker ps --format '{{.Names}}' | grep -q "^${POSTGRES_CONTAINER_NAME}$"; then
-        echo -e "${GREEN}✅ Container is already running${NC}"
-    else
-        echo -e "${YELLOW}🔄 Starting existing container...${NC}"
-        docker start "${POSTGRES_CONTAINER_NAME}"
-        echo -e "${GREEN}✅ Container started${NC}"
-    fi
-else
-    echo -e "${BLUE}📦 Creating and starting PostgreSQL container...${NC}"
-    docker run -d \
-        --name "${POSTGRES_CONTAINER_NAME}" \
-        -e POSTGRES_DB="${POSTGRES_DB}" \
-        -e POSTGRES_USER="${POSTGRES_USER}" \
-        -e POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
-        -p ${POSTGRES_PORT}:5432 \
-        --health-cmd="pg_isready -U ${POSTGRES_USER}" \
-        --health-interval=10s \
-        --health-timeout=5s \
-        --health-retries=5 \
-        "${POSTGRES_IMAGE}"
-
-    echo -e "${GREEN}✅ Container created and started${NC}"
+# Check if docker-compose file exists
+if [ ! -f "${COMPOSE_FILE}" ]; then
+    echo -e "${RED}❌ ${COMPOSE_FILE} not found${NC}"
+    exit 1
 fi
 
-echo ""
-echo -e "${BLUE}⏳ Waiting for PostgreSQL to be ready...${NC}"
+echo -e "${BLUE}📦 Starting services with Docker Compose...${NC}"
+docker compose -f "${COMPOSE_FILE}" up -d
 
-# Wait for PostgreSQL to be healthy
+echo ""
+echo -e "${BLUE}⏳ Waiting for services to be healthy...${NC}"
+
+# Wait for services to be healthy
 MAX_ATTEMPTS=30
 ATTEMPT=0
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    if docker exec "${POSTGRES_CONTAINER_NAME}" pg_isready -U "${POSTGRES_USER}" > /dev/null 2>&1; then
-        echo -e "${GREEN}✅ PostgreSQL is ready!${NC}"
+    HEALTH_STATUS=$(docker compose -f "${COMPOSE_FILE}" ps --format json | jq -r '.Health' 2>/dev/null || echo "starting")
+
+    if [ "$HEALTH_STATUS" = "healthy" ]; then
+        echo -e "${GREEN}✅ All services are healthy!${NC}"
         break
     fi
 
     ATTEMPT=$((ATTEMPT + 1))
     if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-        echo -e "${RED}❌ PostgreSQL failed to start within expected time${NC}"
+        echo -e "${RED}❌ Services failed to become healthy within expected time${NC}"
+        echo -e "${YELLOW}Run 'docker compose -f ${COMPOSE_FILE} logs' to see details${NC}"
         exit 1
     fi
 
@@ -80,19 +57,12 @@ done
 echo ""
 echo -e "${GREEN}🎉 Test environment is ready!${NC}"
 echo ""
-echo -e "${BLUE}Container Details:${NC}"
-echo -e "  Name:     ${POSTGRES_CONTAINER_NAME}"
-echo -e "  Image:    ${POSTGRES_IMAGE}"
-echo -e "  Port:     ${POSTGRES_PORT}"
-echo -e "  Database: ${POSTGRES_DB}"
-echo -e "  User:     ${POSTGRES_USER}"
-echo -e "  Password: ${POSTGRES_PASSWORD}"
-echo ""
 echo -e "${BLUE}📝 Useful Commands:${NC}"
-echo -e "  Stop:    ${YELLOW}docker stop ${POSTGRES_CONTAINER_NAME}${NC}"
-echo -e "  Start:   ${YELLOW}docker start ${POSTGRES_CONTAINER_NAME}${NC}"
-echo -e "  Remove:  ${YELLOW}docker rm -f ${POSTGRES_CONTAINER_NAME}${NC}"
-echo -e "  Connect: ${YELLOW}docker exec -it ${POSTGRES_CONTAINER_NAME} psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}${NC}"
-echo -e "  Logs:    ${YELLOW}docker logs ${POSTGRES_CONTAINER_NAME}${NC}"
+echo -e "  Status:  ${YELLOW}docker compose -f ${COMPOSE_FILE} ps${NC}"
+echo -e "  Stop:    ${YELLOW}docker compose -f ${COMPOSE_FILE} stop${NC}"
+echo -e "  Start:   ${YELLOW}docker compose -f ${COMPOSE_FILE} start${NC}"
+echo -e "  Down:    ${YELLOW}docker compose -f ${COMPOSE_FILE} down${NC}"
+echo -e "  Logs:    ${YELLOW}docker compose -f ${COMPOSE_FILE} logs -f${NC}"
+echo -e "  Connect: ${YELLOW}docker exec -it vertex-postgres-test psql -U vertex -d vertex${NC}"
 echo ""
 echo -e "${GREEN}✨ You can now run integration tests with: ${YELLOW}./mvnw test -pl integration-test${NC}"

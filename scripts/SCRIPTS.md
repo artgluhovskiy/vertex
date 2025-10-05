@@ -1,16 +1,31 @@
 # Test Environment Scripts
 
-This directory contains scripts to manage the local test environment for Vertex integration tests.
+This directory contains scripts to manage the local test environment for Vertex integration tests using Docker Compose.
 
 ## Overview
 
-The test environment uses Docker containers to provide dependencies for integration tests. The `TestContainerManager` automatically detects if external containers are running on the expected ports and uses them instead of starting new TestContainers.
+The test environment uses Docker Compose to orchestrate containers required for integration tests. The `TestContainerManager` automatically detects if external containers are running on the expected ports and uses them instead of starting new TestContainers.
 
-## Scripts
+## Files
+
+### `docker-compose.test.yml`
+
+Docker Compose configuration for the test environment.
+
+**Services:**
+- **postgres**: PostgreSQL with pgvector extension
+  - Container: `vertex-postgres-test`
+  - Image: `pgvector/pgvector:pg16`
+  - Port: `5432`
+  - Database: `vertex`
+  - User: `vertex`
+  - Password: `vertex`
+  - Volume: `vertex-test-data` (persistent storage)
+  - Health check: enabled
 
 ### `start-test-env.sh`
 
-Starts the test environment with all required containers.
+Starts the test environment using Docker Compose.
 
 **Usage:**
 ```bash
@@ -19,21 +34,13 @@ Starts the test environment with all required containers.
 
 **What it does:**
 - Checks if Docker is running
-- Creates/starts PostgreSQL container (`vertex-postgres-test`)
-- Waits for PostgreSQL to be ready
-- Displays connection details
-
-**Container Configuration:**
-- **Name:** `vertex-postgres-test`
-- **Image:** `pgvector/pgvector:pg16`
-- **Port:** `5432`
-- **Database:** `vertex`
-- **User:** `vertex`
-- **Password:** `vertex`
+- Starts all services defined in `docker-compose.test.yml`
+- Waits for services to be healthy
+- Displays useful commands
 
 ### `stop-test-env.sh`
 
-Stops the test environment containers.
+Stops the test environment.
 
 **Usage:**
 ```bash
@@ -41,8 +48,9 @@ Stops the test environment containers.
 ```
 
 **What it does:**
-- Stops the PostgreSQL container
-- Does NOT remove the container (data is preserved)
+- Stops all services
+- Preserves containers and data
+- Shows restart/cleanup commands
 
 ## Integration with Tests
 
@@ -55,11 +63,11 @@ When you run integration tests, the `TestContainerManager` will:
 This means you can:
 - ✅ Run tests **without** starting containers (TestContainers starts them)
 - ✅ Run tests **with** pre-started containers (faster test execution)
-- ✅ Use the same container across multiple test runs (data persists between runs until you stop/remove it)
+- ✅ Use the same containers across multiple test runs (data persists)
 
 ## Workflow Examples
 
-### Run tests with external container (faster):
+### Run tests with external containers (faster):
 ```bash
 ./scripts/start-test-env.sh
 ./mvnw test -pl integration-test
@@ -67,73 +75,151 @@ This means you can:
 
 ### Run tests with TestContainers (no pre-setup needed):
 ```bash
-./scripts/stop-test-env.sh  # Ensure external container is stopped
+./scripts/stop-test-env.sh  # Ensure external containers are stopped
 ./mvnw test -pl integration-test
 ```
 
-### Stop and clean up:
+### Stop environment:
 ```bash
 ./scripts/stop-test-env.sh
-docker rm vertex-postgres-test  # Remove container and data
+```
+
+### Clean up completely:
+```bash
+docker compose -f docker-compose.test.yml down -v  # Removes containers and volumes
+```
+
+## Docker Compose Commands
+
+All commands should be run from the project root directory:
+
+```bash
+# Start services
+docker compose -f docker-compose.test.yml up -d
+
+# Stop services (preserve data)
+docker compose -f docker-compose.test.yml stop
+
+# Start stopped services
+docker compose -f docker-compose.test.yml start
+
+# Restart services
+docker compose -f docker-compose.test.yml restart
+
+# View status
+docker compose -f docker-compose.test.yml ps
+
+# View logs
+docker compose -f docker-compose.test.yml logs -f
+
+# Stop and remove containers (preserve volumes)
+docker compose -f docker-compose.test.yml down
+
+# Stop and remove containers and volumes (full cleanup)
+docker compose -f docker-compose.test.yml down -v
 ```
 
 ## Useful Docker Commands
 
 ```bash
-# Check container status
-docker ps -a | grep vertex-postgres-test
-
-# View container logs
-docker logs vertex-postgres-test
-
 # Connect to PostgreSQL
 docker exec -it vertex-postgres-test psql -U vertex -d vertex
 
-# Restart container
-docker restart vertex-postgres-test
+# View PostgreSQL logs
+docker logs vertex-postgres-test
 
-# Remove container (deletes data)
-docker rm -f vertex-postgres-test
+# Check container health
+docker inspect vertex-postgres-test --format='{{.State.Health.Status}}'
+
+# List volumes
+docker volume ls | grep vertex
+
+# Remove specific volume
+docker volume rm vertex-test-data
 ```
 
-## Adding New Containers
+## Adding New Services
 
-To add support for new containers (e.g., Redis, Elasticsearch):
+To add support for new services (e.g., Redis, Elasticsearch):
 
-1. Update `start-test-env.sh` to start the new container
-2. Update `stop-test-env.sh` to stop the new container
-3. Update `TestContainerManager` to detect and use the external container
-4. Document the new container configuration in this README
+1. Add service definition to `docker-compose.test.yml`:
+```yaml
+services:
+  redis:
+    container_name: vertex-redis-test
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+```
+
+2. Update `TestContainerManager` to detect and use the external service
+3. Document the new service configuration in this file
 
 ## Troubleshooting
 
-### Container won't start
+### Services won't start
 ```bash
-# Check if port is already in use
+# Check what's using the ports
 lsof -i :5432
 
-# Check Docker logs
-docker logs vertex-postgres-test
+# View detailed logs
+docker compose -f docker-compose.test.yml logs
 
-# Force remove and recreate
-docker rm -f vertex-postgres-test
-./scripts/start-test-env.sh
+# Force recreate
+docker compose -f docker-compose.test.yml down
+docker compose -f docker-compose.test.yml up -d --force-recreate
 ```
 
-### Tests don't detect external container
+### Tests don't detect external containers
 ```bash
-# Verify container is running and healthy
-docker ps --filter "name=vertex-postgres-test"
-docker exec vertex-postgres-test pg_isready -U vertex
+# Verify services are running
+docker compose -f docker-compose.test.yml ps
 
-# Check if port is accessible
+# Check service health
+docker compose -f docker-compose.test.yml ps --format json | jq '.[].Health'
+
+# Test connectivity
 nc -zv localhost 5432
 ```
 
-### Data persistence
-The container stores data in a Docker volume. To completely reset:
+### Data persistence issues
 ```bash
-docker rm -f vertex-postgres-test
-docker volume prune  # Remove all unused volumes
+# List volumes
+docker volume ls | grep vertex
+
+# Inspect volume
+docker volume inspect vertex-test-data
+
+# Complete reset (WARNING: deletes all data)
+docker compose -f docker-compose.test.yml down -v
 ./scripts/start-test-env.sh
 ```
+
+### jq not found error
+The start script uses `jq` to parse JSON output. If you get a "command not found" error:
+
+```bash
+# macOS
+brew install jq
+
+# Ubuntu/Debian
+sudo apt-get install jq
+
+# Or remove the jq check and just wait for PostgreSQL to be ready
+# The script will still work, just with less accurate health checking
+```
+
+## Benefits of Docker Compose
+
+✅ **Declarative configuration** - All services defined in one file
+✅ **Easy to extend** - Add new services with just a few lines
+✅ **Network isolation** - Services automatically get a shared network
+✅ **Volume management** - Data persists across restarts
+✅ **Health checks** - Built-in service health monitoring
+✅ **Simple commands** - `up`, `down`, `restart` - that's it
+✅ **Version control** - Configuration is part of the codebase

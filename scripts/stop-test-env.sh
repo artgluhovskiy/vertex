@@ -9,8 +9,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
-POSTGRES_CONTAINER_NAME="vertex-postgres-test"
+COMPOSE_FILE="docker-compose.test.yml"
 
 echo -e "${BLUE}🛑 Stopping Vertex Test Environment${NC}"
 echo ""
@@ -21,25 +20,20 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if container exists
-if ! docker ps -a --format '{{.Names}}' | grep -q "^${POSTGRES_CONTAINER_NAME}$"; then
-    echo -e "${YELLOW}⚠️  Container '${POSTGRES_CONTAINER_NAME}' does not exist${NC}"
-    exit 0
+# Check if docker-compose file exists
+if [ ! -f "${COMPOSE_FILE}" ]; then
+    echo -e "${RED}❌ ${COMPOSE_FILE} not found${NC}"
+    exit 1
 fi
 
-# Check if container is running
-if docker ps --format '{{.Names}}' | grep -q "^${POSTGRES_CONTAINER_NAME}$"; then
-    echo -e "${YELLOW}🔄 Stopping PostgreSQL container...${NC}"
-    docker stop "${POSTGRES_CONTAINER_NAME}"
-    echo -e "${GREEN}✅ Container stopped${NC}"
-else
-    echo -e "${YELLOW}ℹ️  Container is already stopped${NC}"
-fi
+echo -e "${YELLOW}🔄 Stopping services...${NC}"
+docker compose -f "${COMPOSE_FILE}" stop
 
 echo ""
 echo -e "${GREEN}✨ Test environment stopped${NC}"
 echo ""
 echo -e "${BLUE}📝 Useful Commands:${NC}"
 echo -e "  Start:   ${YELLOW}./scripts/start-test-env.sh${NC}"
-echo -e "  Remove:  ${YELLOW}docker rm ${POSTGRES_CONTAINER_NAME}${NC}"
-echo -e "  Restart: ${YELLOW}docker restart ${POSTGRES_CONTAINER_NAME}${NC}"
+echo -e "  Restart: ${YELLOW}docker compose -f ${COMPOSE_FILE} restart${NC}"
+echo -e "  Down:    ${YELLOW}docker compose -f ${COMPOSE_FILE} down${NC} (stops and removes containers)"
+echo -e "  Clean:   ${YELLOW}docker compose -f ${COMPOSE_FILE} down -v${NC} (removes containers and volumes)"
