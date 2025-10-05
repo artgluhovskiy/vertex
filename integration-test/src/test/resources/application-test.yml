@@ -17,7 +17,7 @@ spring:
 
 logging:
   level:
-    org.art.vertex: INFO
+    org.art.vertex: DEBUG
     org.testcontainers: INFO
     org.springframework: WARN
     org.hibernate: WARN

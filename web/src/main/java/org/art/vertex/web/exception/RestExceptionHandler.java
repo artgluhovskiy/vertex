@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "org.art.vertex.web.controller")
+@RestControllerAdvice(basePackages = "org.art.vertex.web")
 public class RestExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
