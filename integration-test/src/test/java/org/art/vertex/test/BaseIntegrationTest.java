@@ -1,26 +1,25 @@
 package org.art.vertex.test;
 
+import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.VertexApplication;
+import org.art.vertex.test.config.TestConfig;
 import org.art.vertex.test.container.TestContainerManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-/**
- * Base class for all integration tests.
- * Uses IntegrationTestConfiguration which scans all org.art.vertex packages,
- * providing the same configuration as the main VertexApplication.
- */
 @Slf4j
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = VertexApplication.class
+    classes = {VertexApplication.class, TestConfig.class}
 )
 @ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
@@ -29,6 +28,31 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
+
+    @LocalServerPort
+    private int port;
+
+    @BeforeAll
+    static void setUpIntegrationTest() {
+        log.info("🚀 Setting up integration test environment...");
+
+        containerManager.initializeContainers();
+
+        if (!containerManager.areAllContainersAccessible()) {
+            throw new IllegalStateException("❌ Containers are not accessible. Tests cannot proceed.");
+        }
+    }
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+        RestAssured.basePath = "/api/v1";
+    }
+
+    @AfterEach
+    void cleanupAfterTest() {
+        cleanupAllTestData();
+    }
 
     /**
      * Configure dynamic properties for test containers.
@@ -43,22 +67,6 @@ public abstract class BaseIntegrationTest {
                 + containerManager.getPostgresPort() + "/vertex");
         registry.add("spring.datasource.username", () -> "vertex");
         registry.add("spring.datasource.password", () -> "vertex");
-    }
-
-    @BeforeAll
-    static void setUpIntegrationTest() {
-        log.info("🚀 Setting up integration test environment...");
-
-        containerManager.initializeContainers();
-
-        if (!containerManager.areAllContainersAccessible()) {
-            throw new IllegalStateException("❌ Containers are not accessible. Tests cannot proceed.");
-        }
-    }
-
-    @AfterEach
-    void cleanupAfterTest() {
-        cleanupAllTestData();
     }
 
     protected void cleanupAllTestData() {

@@ -1,111 +1,58 @@
 package org.art.vertex.test.user;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import org.art.vertex.test.BaseIntegrationTest;
-import org.junit.jupiter.api.BeforeEach;
+import org.art.vertex.test.step.UserSteps;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 
 class UserFlowIntegrationTest extends BaseIntegrationTest {
 
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-        RestAssured.basePath = "/api/v1/auth";
-    }
+    @Autowired
+    private UserSteps userSteps;
 
     @Test
     void shouldRegisterNewUser() {
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "newuser@example.com",
-                    "password": "password123"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
-            .statusCode(201)
-            .body("accessToken", notNullValue())
-            .body("tokenType", equalTo("Bearer"))
-            .body("user.email", equalTo("newuser@example.com"))
-            .body("user.id", notNullValue())
-            .body("user.createdAt", notNullValue());
+        // WHEN
+        var response = userSteps.register("newuser@example.com", "password123");
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.accessToken()).isNotNull();
+        assertThat(response.tokenType()).isEqualTo("Bearer");
+        assertThat(response.user()).isNotNull();
+        assertThat(response.user().email()).isEqualTo("newuser@example.com");
+        assertThat(response.user().id()).isNotNull();
+        assertThat(response.user().createdAt()).isNotNull();
     }
 
     @Test
     void shouldLoginWithValidCredentials() {
-        // GIVEN - Register user
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "login@example.com",
-                    "password": "correctPassword"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
-            .statusCode(201);
+        // GIVEN
+        userSteps.register("login@example.com", "correctPassword");
 
-        // WHEN & THEN - Login with valid credentials
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "login@example.com",
-                    "password": "correctPassword"
-                }
-                """)
-        .when()
-            .post("/login")
-        .then()
-            .statusCode(200)
-            .body("accessToken", notNullValue())
-            .body("tokenType", equalTo("Bearer"))
-            .body("user.email", equalTo("login@example.com"))
-            .body("user.id", notNullValue());
+        // WHEN
+        var response = userSteps.login("login@example.com", "correctPassword");
+
+        // THEN
+        assertThat(response).isNotNull();
+        assertThat(response.accessToken()).isNotNull();
+        assertThat(response.tokenType()).isEqualTo("Bearer");
+        assertThat(response.user()).isNotNull();
+        assertThat(response.user().email()).isEqualTo("login@example.com");
+        assertThat(response.user().id()).isNotNull();
     }
 
     @Test
     void shouldFailLoginWithInvalidCredentials() {
-        // GIVEN - Register user
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "user@example.com",
-                    "password": "correctPassword"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
-            .statusCode(201);
+        // GIVEN
+        userSteps.register("user@example.com", "correctPassword");
 
-        // WHEN & THEN - Login with wrong password
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "user@example.com",
-                    "password": "wrongPassword"
-                }
-                """)
-        .when()
-            .post("/login")
-        .then()
+        // WHEN - Login with wrong password
+        // THEN - Verify error response
+        userSteps.loginAndGetResponse("user@example.com", "wrongPassword")
             .statusCode(401)
             .body("message", equalTo("Invalid email or password"))
             .body("status", equalTo(401))
@@ -114,32 +61,12 @@ class UserFlowIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldFailRegisterWithDuplicateEmail() {
-        // GIVEN - Register first user
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "duplicate@example.com",
-                    "password": "password123"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
-            .statusCode(201);
+        // GIVEN
+        userSteps.register("duplicate@example.com", "password123");
 
-        // WHEN & THEN - Try to register with same email
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "duplicate@example.com",
-                    "password": "password456"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
+        // WHEN - Try to register with same email
+        // THEN - Verify conflict error
+        userSteps.registerAndGetResponse("duplicate@example.com", "password456")
             .statusCode(409)
             .body("message", equalTo("User with this email already exists. Email: duplicate@example.com"))
             .body("status", equalTo(409))
@@ -148,17 +75,7 @@ class UserFlowIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldFailRegisterWithInvalidEmail() {
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "invalid-email",
-                    "password": "password123"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
+        userSteps.registerAndGetResponse("invalid-email", "password123")
             .statusCode(400)
             .body("status", equalTo(400))
             .body("path", equalTo("/api/v1/auth/register"));
@@ -166,17 +83,7 @@ class UserFlowIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldFailRegisterWithShortPassword() {
-        given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "valid@example.com",
-                    "password": "short"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
+        userSteps.registerAndGetResponse("valid@example.com", "short")
             .statusCode(400)
             .body("status", equalTo(400))
             .body("path", equalTo("/api/v1/auth/register"));
@@ -184,40 +91,22 @@ class UserFlowIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldGetCurrentUserWithValidToken() {
-        // GIVEN - Register and get token
-        String token = given()
-            .contentType(ContentType.JSON)
-            .body("""
-                {
-                    "email": "currentuser@example.com",
-                    "password": "password123"
-                }
-                """)
-        .when()
-            .post("/register")
-        .then()
-            .statusCode(201)
-            .extract()
-            .path("accessToken");
+        // GIVEN
+        var token = userSteps.registerAndGetToken("currentuser@example.com", "password123");
 
-        // WHEN & THEN - Get current user with token
-        given()
-            .header("Authorization", "Bearer " + token)
-        .when()
-            .get("/me")
-        .then()
-            .statusCode(200)
-            .body("email", equalTo("currentuser@example.com"))
-            .body("id", notNullValue())
-            .body("createdAt", notNullValue());
+        // WHEN
+        var user = userSteps.getCurrentUser(token);
+
+        // THEN
+        assertThat(user).isNotNull();
+        assertThat(user.email()).isEqualTo("currentuser@example.com");
+        assertThat(user.id()).isNotNull();
+        assertThat(user.createdAt()).isNotNull();
     }
 
     @Test
     void shouldFailGetCurrentUserWithoutToken() {
-        given()
-        .when()
-            .get("/me")
-        .then()
+        userSteps.getCurrentUserResponse(null)
             .statusCode(401);
     }
 }
