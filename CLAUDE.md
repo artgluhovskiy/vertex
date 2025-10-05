@@ -127,3 +127,4 @@ These files contain critical information about:
 - User asks about "testing" → Load mandatory + testing + common rules
 - User asks about "domain model" → Load mandatory + design + common rules
 - User asks about "build issues" → Load mandatory + build + common rules
+- Always create mapper class for mapping between models
