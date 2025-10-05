@@ -5,13 +5,11 @@ import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.user.entity.UserEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
 @RequiredArgsConstructor
 public class UserJpaRepository implements UserRepository {
 

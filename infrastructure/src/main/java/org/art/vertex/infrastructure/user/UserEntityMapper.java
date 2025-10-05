@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.model.UserSettings;
 import org.art.vertex.infrastructure.user.entity.UserEntity;
-import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
 public class UserEntityMapper {
 

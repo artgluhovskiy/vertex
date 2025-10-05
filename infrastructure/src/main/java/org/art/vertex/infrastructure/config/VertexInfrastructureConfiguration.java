@@ -1,7 +1,11 @@
 package org.art.vertex.infrastructure.config;
 
+import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
+import org.art.vertex.infrastructure.user.UserEntityMapper;
+import org.art.vertex.infrastructure.user.UserEntityRepository;
+import org.art.vertex.infrastructure.user.UserJpaRepository;
 import org.art.vertex.infrastructure.user.security.StubJwtTokenProvider;
 import org.art.vertex.infrastructure.user.security.StubPasswordEncoder;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -22,5 +26,18 @@ public class VertexInfrastructureConfiguration {
     @Bean
     public JwtTokenProvider jwtTokenProvider() {
         return new StubJwtTokenProvider();
+    }
+
+    @Bean
+    public UserEntityMapper userEntityMapper(UserEntityRepository userEntityRepository) {
+        return new UserEntityMapper(userEntityRepository);
+    }
+
+    @Bean
+    public UserRepository userRepository(
+        UserEntityRepository userEntityRepository,
+        UserEntityMapper userEntityMapper
+    ) {
+        return new UserJpaRepository(userEntityRepository, userEntityMapper);
     }
 }
