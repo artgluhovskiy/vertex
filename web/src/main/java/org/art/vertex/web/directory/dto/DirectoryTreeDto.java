@@ -1,8 +1,8 @@
-package org.art.vertex.application.directory.dto;
+package org.art.vertex.web.directory.dto;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.application.note.dto.NoteDto;
+import org.art.vertex.web.note.dto.NoteDto;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,15 +1,15 @@
 package org.art.vertex.application.note.sync;
 
 import org.art.vertex.application.note.sync.command.SyncCommand;
-import org.art.vertex.application.note.sync.dto.SyncResultDto;
+import org.art.vertex.domain.note.sync.model.SyncResult;
 
 import java.util.UUID;
 
 public interface SyncApplicationService {
 
-    SyncResultDto sync(SyncCommand command);
+    SyncResult sync(SyncCommand command);
 
-    SyncResultDto syncUser(UUID userId);
+    SyncResult syncUser(UUID userId);
 
-    SyncResultDto resolveConflicts(UUID userId);
+    SyncResult resolveConflicts(UUID userId);
 }

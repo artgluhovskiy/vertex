@@ -4,8 +4,8 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.art.vertex.application.user.command.LoginCommand;
 import org.art.vertex.application.user.command.RegisterUserCommand;
-import org.art.vertex.application.user.dto.AuthenticationResponse;
-import org.art.vertex.application.user.dto.UserDto;
+import org.art.vertex.web.user.dto.AuthenticationResponse;
+import org.art.vertex.web.user.dto.UserDto;
 
 import static io.restassured.RestAssured.given;
 

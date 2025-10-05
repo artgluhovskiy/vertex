@@ -1,15 +1,15 @@
 package org.art.vertex.application.note.search;
 
 import org.art.vertex.application.note.search.command.SearchCommand;
-import org.art.vertex.application.note.search.dto.SearchResultDto;
+import org.art.vertex.domain.note.search.model.SearchResult;
 
 public interface SearchApplicationService {
 
-    SearchResultDto search(SearchCommand command);
+    SearchResult search(SearchCommand command);
 
-    SearchResultDto searchSemantic(SearchCommand command);
+    SearchResult searchSemantic(SearchCommand command);
 
-    SearchResultDto searchFullText(SearchCommand command);
+    SearchResult searchFullText(SearchCommand command);
 
-    SearchResultDto searchHybrid(SearchCommand command);
+    SearchResult searchHybrid(SearchCommand command);
 }

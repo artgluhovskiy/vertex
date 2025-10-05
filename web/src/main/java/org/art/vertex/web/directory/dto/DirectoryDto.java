@@ -1,4 +1,4 @@
-package org.art.vertex.application.directory.dto;
+package org.art.vertex.web.directory.dto;
 
 import lombok.Builder;
 import lombok.Value;

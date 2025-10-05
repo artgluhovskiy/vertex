@@ -1,4 +1,4 @@
-package org.art.vertex.application.note.search.dto;
+package org.art.vertex.web.note.search.dto;
 
 import lombok.Builder;
 import lombok.Value;

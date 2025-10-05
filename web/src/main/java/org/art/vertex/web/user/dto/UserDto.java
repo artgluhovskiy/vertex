@@ -1,4 +1,4 @@
-package org.art.vertex.application.user.dto;
+package org.art.vertex.web.user.dto;
 
 import lombok.Builder;
 

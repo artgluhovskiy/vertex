@@ -1,18 +1,17 @@
 package org.art.vertex.application.user;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.user.command.LoginCommand;
 import org.art.vertex.application.user.command.RegisterUserCommand;
-import org.art.vertex.application.user.dto.AuthenticationResponse;
-import org.art.vertex.application.user.dto.UserDto;
-import org.art.vertex.application.user.mapper.UserDtoMapper;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
-import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
+import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
 import org.art.vertex.domain.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -28,9 +27,7 @@ public class UserApplicationService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    private final UserDtoMapper userMapper;
-
-    public AuthenticationResponse register(RegisterUserCommand command) {
+    public AuthenticationResult register(RegisterUserCommand command) {
         log.debug("Registering new user. Email: {}", command.email());
 
         if (userRepository.existsByEmail(command.email())) {
@@ -52,16 +49,13 @@ public class UserApplicationService {
 
         String token = jwtTokenProvider.generateToken(user);
 
-        UserDto userDto = userMapper.toDto(user);
-
-        return AuthenticationResponse.builder()
+        return AuthenticationResult.builder()
             .accessToken(token)
-            .tokenType("Bearer")
-            .user(userDto)
+            .user(user)
             .build();
     }
 
-    public AuthenticationResponse login(LoginCommand command) {
+    public AuthenticationResult login(LoginCommand command) {
         log.debug("User login attempt. Email: {}", command.email());
 
         User user = userRepository.findByEmail(command.email())
@@ -78,21 +72,24 @@ public class UserApplicationService {
         log.info("User logged in successfully. User id: {}, email: {}", user.getId(), user.getEmail());
 
         String token = jwtTokenProvider.generateToken(user);
-        UserDto userDto = userMapper.toDto(user);
 
-        return AuthenticationResponse.builder()
+        return AuthenticationResult.builder()
             .accessToken(token)
-            .tokenType("Bearer")
-            .user(userDto)
+            .user(user)
             .build();
     }
 
-    public UserDto getCurrentUser(String userId) {
+    public User getCurrentUser(String userId) {
         log.debug("Fetching current user. User id: {}", userId);
 
-        User user = userRepository.findById(UUID.fromString(userId))
+        return userRepository.findById(UUID.fromString(userId))
             .orElseThrow(() -> new UserNotFoundException(userId));
+    }
 
-        return userMapper.toDto(user);
+    @Value
+    @Builder
+    public static class AuthenticationResult {
+        String accessToken;
+        User user;
     }
 }

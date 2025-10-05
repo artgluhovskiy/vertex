@@ -1,4 +1,4 @@
-package org.art.vertex.application.tag.dto;
+package org.art.vertex.web.tag.dto;
 
 import lombok.Builder;
 import lombok.Value;

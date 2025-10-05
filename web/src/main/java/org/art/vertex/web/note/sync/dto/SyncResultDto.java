@@ -1,8 +1,8 @@
-package org.art.vertex.application.note.sync.dto;
+package org.art.vertex.web.note.sync.dto;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.application.note.dto.NoteDto;
+import org.art.vertex.web.note.dto.NoteDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

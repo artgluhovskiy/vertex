@@ -1,18 +1,18 @@
 package org.art.vertex.application.note.graph;
 
 import org.art.vertex.application.note.graph.command.GraphQueryCommand;
-import org.art.vertex.application.note.graph.dto.GraphDto;
+import org.art.vertex.domain.note.graph.model.GraphData;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface GraphApplicationService {
 
-    GraphDto getNodeGraph(UUID noteId, int depth);
+    GraphData getNodeGraph(UUID noteId, int depth);
 
-    GraphDto getUserGraph(UUID userId);
+    GraphData getUserGraph(UUID userId);
 
     List<UUID> findShortestPath(UUID sourceNoteId, UUID targetNoteId);
 
-    GraphDto executeGraphQuery(GraphQueryCommand command);
+    GraphData executeGraphQuery(GraphQueryCommand command);
 }

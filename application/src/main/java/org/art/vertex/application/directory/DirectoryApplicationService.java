@@ -3,25 +3,24 @@ package org.art.vertex.application.directory;
 import org.art.vertex.application.directory.command.CreateDirectoryCommand;
 import org.art.vertex.application.directory.command.MoveDirectoryCommand;
 import org.art.vertex.application.directory.command.RenameDirectoryCommand;
-import org.art.vertex.application.directory.dto.DirectoryDto;
-import org.art.vertex.application.directory.dto.DirectoryTreeDto;
+import org.art.vertex.domain.directory.model.Directory;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface DirectoryApplicationService {
 
-    DirectoryDto createDirectory(CreateDirectoryCommand command);
+    Directory createDirectory(CreateDirectoryCommand command);
 
-    DirectoryDto renameDirectory(UUID directoryId, RenameDirectoryCommand command);
+    Directory renameDirectory(UUID directoryId, RenameDirectoryCommand command);
 
-    DirectoryDto moveDirectory(UUID directoryId, MoveDirectoryCommand command);
+    Directory moveDirectory(UUID directoryId, MoveDirectoryCommand command);
 
-    DirectoryDto getDirectory(UUID directoryId);
+    Directory getDirectory(UUID directoryId);
 
-    List<DirectoryDto> getUserRootDirectories(UUID userId);
+    List<Directory> getUserRootDirectories(UUID userId);
 
-    DirectoryTreeDto getDirectoryTree(UUID directoryId);
+    Directory getDirectoryTree(UUID directoryId);
 
     void deleteDirectory(UUID directoryId);
 }
