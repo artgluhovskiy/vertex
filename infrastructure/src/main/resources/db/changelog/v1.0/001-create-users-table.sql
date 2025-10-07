@@ -8,7 +8,7 @@ CREATE TABLE users (
     created_at TIMESTAMPTZ NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL,
     settings JSONB DEFAULT '{}'::jsonb,
-    version INTEGER NOT NULL DEFAULT 1
+    version INTEGER NOT NULL
 );
 
 CREATE INDEX idx_users_email ON users(email);

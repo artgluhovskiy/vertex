@@ -2,6 +2,7 @@ package org.art.vertex.web.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.art.vertex.domain.note.exception.NoteNotFoundException;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
@@ -23,6 +24,18 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFound(UserNotFoundException e, HttpServletRequest request) {
         log.warn("User not found. Message: {}", e.getMessage());
+        return ErrorResponse.builder()
+            .message(e.getMessage())
+            .status(HttpStatus.NOT_FOUND.value())
+            .timestamp(LocalDateTime.now())
+            .path(request.getRequestURI())
+            .build();
+    }
+
+    @ExceptionHandler(NoteNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNoteNotFound(NoteNotFoundException e, HttpServletRequest request) {
+        log.warn("Note not found. Message: {}", e.getMessage());
         return ErrorResponse.builder()
             .message(e.getMessage())
             .status(HttpStatus.NOT_FOUND.value())

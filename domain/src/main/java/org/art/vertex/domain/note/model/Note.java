@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Note {
 
     UUID id;

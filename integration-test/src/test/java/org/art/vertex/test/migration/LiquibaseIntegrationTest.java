@@ -23,4 +23,21 @@ class LiquibaseIntegrationTest extends BaseIntegrationTest {
         // THEN
         assertThat(tableCount).isEqualTo(1);
     }
+
+    @Test
+    void shouldCreateNotesTable() {
+        // WHEN
+        var tableCount = jdbcTemplate.queryForObject(
+            """
+                SELECT COUNT(*)
+                FROM information_schema.tables
+                WHERE table_schema = 'public'
+                AND table_name = 'notes'
+                """,
+            Integer.class
+        );
+
+        // THEN
+        assertThat(tableCount).isEqualTo(1);
+    }
 }

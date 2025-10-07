@@ -1,0 +1,100 @@
+package org.art.vertex.web.note;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.art.vertex.application.note.NoteApplicationService;
+import org.art.vertex.application.note.command.CreateNoteCommand;
+import org.art.vertex.application.note.command.UpdateNoteCommand;
+import org.art.vertex.domain.note.model.Note;
+import org.art.vertex.web.note.dto.NoteDto;
+import org.art.vertex.web.note.mapper.NoteCommandMapper;
+import org.art.vertex.web.note.mapper.NoteDtoMapper;
+import org.art.vertex.web.note.request.CreateNoteRequest;
+import org.art.vertex.web.note.request.UpdateNoteRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
+
+@Slf4j
+@RestController
+@RequestMapping("/api/v1/notes")
+@RequiredArgsConstructor
+public class NoteController {
+
+    private final NoteApplicationService noteApplicationService;
+
+    private final NoteCommandMapper noteCommandMapper;
+
+    private final NoteDtoMapper noteDtoMapper;
+
+    @PostMapping
+    public ResponseEntity<NoteDto> createNote(
+        @Valid @RequestBody CreateNoteRequest request,
+        @AuthenticationPrincipal String userId
+    ) {
+        log.trace("Processing create note request. User id: {}, title: {}", userId, request.title());
+
+        CreateNoteCommand command = noteCommandMapper.toCommand(request, UUID.fromString(userId));
+        Note note = noteApplicationService.createNote(command);
+        NoteDto dto = noteDtoMapper.toDto(note);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    @GetMapping("/{noteId}")
+    public ResponseEntity<NoteDto> getNote(@PathVariable UUID noteId) {
+        log.trace("Fetching note. Note id: {}", noteId);
+
+        Note note = noteApplicationService.getNote(noteId);
+        NoteDto dto = noteDtoMapper.toDto(note);
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/{noteId}")
+    public ResponseEntity<NoteDto> updateNote(
+        @PathVariable UUID noteId,
+        @Valid @RequestBody UpdateNoteRequest request
+    ) {
+        log.trace("Processing update note request. Note id: {}", noteId);
+
+        UpdateNoteCommand command = noteCommandMapper.toCommand(request);
+        Note note = noteApplicationService.updateNote(noteId, command);
+        NoteDto dto = noteDtoMapper.toDto(note);
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping("/{noteId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteNote(@PathVariable UUID noteId) {
+        log.trace("Processing delete note request. Note id: {}", noteId);
+
+        noteApplicationService.deleteNote(noteId);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<NoteDto>> getUserNotes(@AuthenticationPrincipal String userId) {
+        log.trace("Fetching notes for user. User id: {}", userId);
+
+        List<Note> notes = noteApplicationService.getNotesByUser(UUID.fromString(userId));
+        List<NoteDto> dtos = notes.stream()
+            .map(noteDtoMapper::toDto)
+            .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+}

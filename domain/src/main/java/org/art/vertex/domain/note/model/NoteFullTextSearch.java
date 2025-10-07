@@ -1,8 +1,7 @@
-package org.art.vertex.domain.note.search.model;
+package org.art.vertex.domain.note.model;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.domain.note.model.Note;
 
 import java.time.LocalDateTime;
 import java.util.Map;
