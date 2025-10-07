@@ -13,6 +13,21 @@ public interface NoteRepository {
 
     Note save(Note note);
 
+    /**
+     * Update an existing note. This method handles all update scenarios including:
+     * - Content/title updates
+     * - Tag additions/removals
+     * - Directory changes
+     * - Metadata updates
+     *
+     * The method will manage the many-to-many relationship with tags properly,
+     * ensuring that the tag associations are correctly synchronized.
+     *
+     * @param note The updated note with new values
+     * @return The updated note from the database
+     */
+    Note update(Note note);
+
     Note getById(UUID id);
 
     Optional<Note> findById(UUID id);

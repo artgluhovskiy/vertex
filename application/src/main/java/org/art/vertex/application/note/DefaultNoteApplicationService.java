@@ -60,7 +60,7 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
             .version(note.getVersion() + 1)
             .build();
 
-        updatedNote = noteRepository.save(updatedNote);
+        updatedNote = noteRepository.update(updatedNote);
 
         log.info("Note updated successfully. Note id: {}", noteId);
 

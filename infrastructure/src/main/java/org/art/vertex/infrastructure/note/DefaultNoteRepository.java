@@ -23,12 +23,31 @@ public class DefaultNoteRepository implements NoteRepository {
 
     private final NoteEntityMapper noteMapper;
 
+    private final org.art.vertex.infrastructure.note.updater.NoteUpdater noteUpdater;
+
     @Override
     @Transactional
     public Note save(Note note) {
         NoteEntity entity = noteMapper.toEntity(note);
         NoteEntity savedEntity = noteJpaRepository.save(entity);
         return noteMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    @Transactional
+    public Note update(Note note) {
+        // Load existing entity to maintain proper JPA state management
+        NoteEntity existingEntity = noteJpaRepository.findById(note.getId())
+            .orElseThrow(() ->
+                new NoteNotFoundException("Note cannot be found. Note id: %s".formatted(note.getId().toString()))
+            );
+
+        // Delegate update logic to NoteUpdater
+        noteUpdater.updateEntity(existingEntity, note);
+
+        // JPA will automatically persist changes due to @Transactional
+        NoteEntity updatedEntity = noteJpaRepository.save(existingEntity);
+        return noteMapper.toDomain(updatedEntity);
     }
 
     @Override
@@ -78,15 +97,28 @@ public class DefaultNoteRepository implements NoteRepository {
     @Override
     @Transactional(readOnly = true)
     public List<Note> findAllByTags(User user, List<Tag> tags) {
-        // TODO: Implement tag-based search
-        return List.of();
+        if (tags == null || tags.isEmpty()) {
+            return List.of();
+        }
+        List<UUID> tagIds = tags.stream()
+            .map(Tag::getId)
+            .toList();
+        return noteJpaRepository.findAllByUserIdAndTagIds(user.getId(), tagIds)
+            .stream()
+            .map(noteMapper::toDomain)
+            .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Note> findAllByTagNames(User user, List<String> tagNames) {
-        // TODO: Implement tag name-based search
-        return List.of();
+        if (tagNames == null || tagNames.isEmpty()) {
+            return List.of();
+        }
+        return noteJpaRepository.findAllByUserIdAndTagNames(user.getId(), tagNames)
+            .stream()
+            .map(noteMapper::toDomain)
+            .toList();
     }
 
     @Override

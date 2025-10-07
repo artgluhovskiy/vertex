@@ -6,6 +6,10 @@ import org.art.vertex.infrastructure.note.DefaultNoteRepository;
 import org.art.vertex.infrastructure.note.entity.NoteEntity;
 import org.art.vertex.infrastructure.note.jpa.NoteJpaRepository;
 import org.art.vertex.infrastructure.note.mapper.NoteEntityMapper;
+import org.art.vertex.infrastructure.note.updater.NoteUpdater;
+import org.art.vertex.infrastructure.tag.entity.TagEntity;
+import org.art.vertex.infrastructure.tag.jpa.TagJpaRepository;
+import org.art.vertex.infrastructure.tag.mapper.TagEntityMapper;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,20 +17,36 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration(proxyBeanMethods = false)
 @EnableJpaRepositories(basePackageClasses = {
-    NoteJpaRepository.class
+    NoteJpaRepository.class,
+    TagJpaRepository.class
 })
 @EntityScan(basePackageClasses = {
-    NoteEntity.class
+    NoteEntity.class,
+    TagEntity.class
 })
 public class NoteInfrastructureConfig {
 
     @Bean
-    public NoteEntityMapper noteEntityMapper(UserRepository userRepository) {
-        return new NoteEntityMapper(userRepository);
+    public TagEntityMapper tagEntityMapper(UserRepository userRepository) {
+        return new TagEntityMapper(userRepository);
     }
 
     @Bean
-    public NoteRepository noteRepository(NoteJpaRepository noteJpaRepository, NoteEntityMapper noteEntityMapper) {
-        return new DefaultNoteRepository(noteJpaRepository, noteEntityMapper);
+    public NoteEntityMapper noteEntityMapper(UserRepository userRepository, TagEntityMapper tagEntityMapper) {
+        return new NoteEntityMapper(userRepository, tagEntityMapper);
+    }
+
+    @Bean
+    public NoteUpdater noteUpdater(TagEntityMapper tagEntityMapper) {
+        return new NoteUpdater(tagEntityMapper);
+    }
+
+    @Bean
+    public NoteRepository noteRepository(
+        NoteJpaRepository noteJpaRepository,
+        NoteEntityMapper noteEntityMapper,
+        NoteUpdater noteUpdater
+    ) {
+        return new DefaultNoteRepository(noteJpaRepository, noteEntityMapper, noteUpdater);
     }
 }
