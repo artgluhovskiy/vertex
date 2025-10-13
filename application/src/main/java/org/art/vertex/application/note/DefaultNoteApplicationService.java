@@ -46,10 +46,11 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
     }
 
     @Override
-    public Note updateNote(UUID noteId, UpdateNoteCommand command) {
-        log.debug("Updating note. Note id: {}", noteId);
+    public Note updateNote(UUID userId, UUID noteId, UpdateNoteCommand command) {
+        log.debug("Updating note. Note id: {}, user id: {}", noteId, userId);
 
-        Note note = noteRepository.getById(noteId);
+        User user = userRepository.getById(userId);
+        Note note = noteRepository.getByIdAndUser(noteId, user);
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -68,10 +69,11 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
     }
 
     @Override
-    public Note getNote(UUID noteId) {
-        log.debug("Fetching note. Note id: {}", noteId);
+    public Note getNote(UUID userId, UUID noteId) {
+        log.debug("Fetching note. Note id: {}, user id: {}", noteId, userId);
 
-        return noteRepository.getById(noteId);
+        User user = userRepository.getById(userId);
+        return noteRepository.getByIdAndUser(noteId, user);
     }
 
     @Override
@@ -84,10 +86,11 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
     }
 
     @Override
-    public void deleteNote(UUID noteId) {
-        log.debug("Deleting note. Note id: {}", noteId);
+    public void deleteNote(UUID userId, UUID noteId) {
+        log.debug("Deleting note. Note id: {}, user id: {}", noteId, userId);
 
-        noteRepository.deleteById(noteId);
+        User user = userRepository.getById(userId);
+        noteRepository.deleteByIdAndUser(noteId, user);
 
         log.info("Note deleted successfully. Note id: {}", noteId);
     }

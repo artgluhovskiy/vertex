@@ -61,8 +61,25 @@ public class DefaultNoteRepository implements NoteRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public Note getByIdAndUser(UUID id, User user) {
+        return findByIdAndUser(id, user)
+            .orElseThrow(() ->
+                new NoteNotFoundException("Note cannot be found. Note id: %s".formatted(id.toString()))
+            );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Note> findById(UUID id) {
         return noteJpaRepository.findById(id)
+            .map(noteMapper::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Note> findByIdAndUser(UUID id, User user) {
+        return noteJpaRepository.findById(id)
+            .filter(entity -> entity.getUserId().equals(user.getId()))
             .map(noteMapper::toDomain);
     }
 
@@ -132,5 +149,16 @@ public class DefaultNoteRepository implements NoteRepository {
     @Transactional
     public void deleteById(UUID id) {
         noteJpaRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByIdAndUser(UUID id, User user) {
+        NoteEntity entity = noteJpaRepository.findById(id)
+            .filter(e -> e.getUserId().equals(user.getId()))
+            .orElseThrow(() ->
+                new NoteNotFoundException("Note cannot be found. Note id: %s".formatted(id.toString()))
+            );
+        noteJpaRepository.delete(entity);
     }
 }

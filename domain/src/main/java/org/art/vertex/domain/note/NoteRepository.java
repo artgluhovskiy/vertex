@@ -30,7 +30,11 @@ public interface NoteRepository {
 
     Note getById(UUID id);
 
+    Note getByIdAndUser(UUID id, User user);
+
     Optional<Note> findById(UUID id);
+
+    Optional<Note> findByIdAndUser(UUID id, User user);
 
     List<Note> findAll(User user);
 
@@ -76,4 +80,6 @@ public interface NoteRepository {
     List<Note> findAllBySearchTerm(User user, String searchTerm);
 
     void deleteById(UUID id);
+
+    void deleteByIdAndUser(UUID id, User user);
 }

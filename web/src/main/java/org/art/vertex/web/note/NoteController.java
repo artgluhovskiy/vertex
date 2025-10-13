@@ -55,10 +55,13 @@ public class NoteController {
     }
 
     @GetMapping("/{noteId}")
-    public ResponseEntity<NoteDto> getNote(@PathVariable UUID noteId) {
-        log.trace("Fetching note. Note id: {}", noteId);
+    public ResponseEntity<NoteDto> getNote(
+        @PathVariable UUID noteId,
+        @AuthenticationPrincipal String userId
+    ) {
+        log.trace("Fetching note. Note id: {}, user id: {}", noteId, userId);
 
-        Note note = noteApplicationService.getNote(noteId);
+        Note note = noteApplicationService.getNote(UUID.fromString(userId), noteId);
         NoteDto dto = noteDtoMapper.toDto(note);
 
         return ResponseEntity.ok(dto);
@@ -67,12 +70,13 @@ public class NoteController {
     @PutMapping("/{noteId}")
     public ResponseEntity<NoteDto> updateNote(
         @PathVariable UUID noteId,
-        @Valid @RequestBody UpdateNoteRequest request
+        @Valid @RequestBody UpdateNoteRequest request,
+        @AuthenticationPrincipal String userId
     ) {
-        log.trace("Processing update note request. Note id: {}", noteId);
+        log.trace("Processing update note request. Note id: {}, user id: {}", noteId, userId);
 
         UpdateNoteCommand command = noteCommandMapper.toCommand(request);
-        Note note = noteApplicationService.updateNote(noteId, command);
+        Note note = noteApplicationService.updateNote(UUID.fromString(userId), noteId, command);
         NoteDto dto = noteDtoMapper.toDto(note);
 
         return ResponseEntity.ok(dto);
@@ -80,10 +84,13 @@ public class NoteController {
 
     @DeleteMapping("/{noteId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteNote(@PathVariable UUID noteId) {
-        log.trace("Processing delete note request. Note id: {}", noteId);
+    public void deleteNote(
+        @PathVariable UUID noteId,
+        @AuthenticationPrincipal String userId
+    ) {
+        log.trace("Processing delete note request. Note id: {}, user id: {}", noteId, userId);
 
-        noteApplicationService.deleteNote(noteId);
+        noteApplicationService.deleteNote(UUID.fromString(userId), noteId);
     }
 
     @GetMapping

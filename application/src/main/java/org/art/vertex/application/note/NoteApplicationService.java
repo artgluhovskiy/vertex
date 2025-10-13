@@ -11,13 +11,13 @@ public interface NoteApplicationService {
 
     Note createNote(CreateNoteCommand command);
 
-    Note updateNote(UUID noteId, UpdateNoteCommand command);
+    Note updateNote(UUID userId, UUID noteId, UpdateNoteCommand command);
 
-    Note getNote(UUID noteId);
+    Note getNote(UUID userId, UUID noteId);
 
     List<Note> getNotesByUser(UUID userId);
 
-    void deleteNote(UUID noteId);
+    void deleteNote(UUID userId, UUID noteId);
 
     Note addTagToNote(UUID noteId, UUID tagId);
 

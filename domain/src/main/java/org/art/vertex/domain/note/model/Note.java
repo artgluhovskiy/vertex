@@ -56,7 +56,7 @@ public class Note {
             .directory(directory)
             .createdTs(ts)
             .updatedTs(ts)
-            .version(1)
+            .version(null)
             .build();
     }
 }
