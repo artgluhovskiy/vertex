@@ -1,8 +1,10 @@
 package org.art.vertex.web.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.domain.note.exception.NoteNotFoundException;
+import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
@@ -17,8 +19,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice(basePackages = "org.art.vertex.web")
 public class RestExceptionHandler {
+
+    private final Clock clock;
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -27,7 +32,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message(e.getMessage())
             .status(HttpStatus.NOT_FOUND.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }
@@ -39,7 +44,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message(e.getMessage())
             .status(HttpStatus.NOT_FOUND.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }
@@ -51,7 +56,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message(e.getMessage())
             .status(HttpStatus.CONFLICT.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }
@@ -63,7 +68,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message(e.getMessage())
             .status(HttpStatus.UNAUTHORIZED.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }
@@ -75,7 +80,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message(e.getMessage())
             .status(HttpStatus.UNAUTHORIZED.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }
@@ -92,7 +97,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message("Validation failed: " + String.join(", ", errors))
             .status(HttpStatus.BAD_REQUEST.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }
@@ -104,7 +109,7 @@ public class RestExceptionHandler {
         return ErrorResponse.builder()
             .message("An unexpected error occurred")
             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
     }

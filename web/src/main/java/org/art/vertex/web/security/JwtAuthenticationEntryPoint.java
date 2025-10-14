@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.web.model.ErrorResponse;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +22,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
+    private final Clock clock;
+
     @Override
     public void commence(
         HttpServletRequest request,
@@ -35,7 +38,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         ErrorResponse errorResponse = ErrorResponse.builder()
             .message("Unauthorized")
             .status(HttpServletResponse.SC_UNAUTHORIZED)
-            .timestamp(LocalDateTime.now())
+            .timestamp(clock.now())
             .path(request.getRequestURI())
             .build();
 

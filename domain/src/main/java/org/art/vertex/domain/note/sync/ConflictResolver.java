@@ -1,9 +1,11 @@
 package org.art.vertex.domain.note.sync;
 
+import lombok.RequiredArgsConstructor;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.note.sync.model.ConflictResolution;
 import org.art.vertex.domain.note.sync.model.ResolutionStrategy;
 import org.art.vertex.domain.note.sync.model.SyncConflict;
+import org.art.vertex.domain.shared.time.Clock;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +13,10 @@ import java.time.LocalDateTime;
  * Domain service for conflict resolution logic.
  * Contains business rules for resolving synchronization conflicts.
  */
+@RequiredArgsConstructor
 public class ConflictResolver {
+
+    private final Clock clock;
 
     /**
      * Apply business rules to automatically resolve conflicts when possible.
@@ -70,7 +75,7 @@ public class ConflictResolver {
 
     private boolean canAutoMerge(Note local, Note remote) {
         // Business rule: Only auto-merge if changes are recent (within 1 hour)
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = clock.now();
         return local.getUpdatedTs().isAfter(now.minusHours(1)) &&
                remote.getUpdatedTs().isAfter(now.minusHours(1));
     }
@@ -90,7 +95,7 @@ public class ConflictResolver {
             .content(mergedContent)
             .tags(local.getTags())
             .metadata(local.getMetadata())
-            .updatedTs(LocalDateTime.now())
+            .updatedTs(clock.now())
             .createdTs(local.getCreatedTs())
             .version(Math.max(local.getVersion(), remote.getVersion()) + 1)
             .build();

@@ -34,9 +34,9 @@ public class EnrichmentResult {
 
     LocalDateTime processedAt;
 
-    public static EnrichmentResult from(EnrichmentContext context) {
+    public static EnrichmentResult from(EnrichmentContext context, LocalDateTime processedAt) {
         return EnrichmentResult.builder()
-            .processedAt(LocalDateTime.now())
+            .processedAt(processedAt)
             .metadata(context.getParameters())
             .build();
     }

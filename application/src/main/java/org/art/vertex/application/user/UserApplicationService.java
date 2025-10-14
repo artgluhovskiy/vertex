@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.user.command.LoginCommand;
 import org.art.vertex.application.user.command.RegisterUserCommand;
 import org.art.vertex.application.user.model.AuthenticationResult;
+import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
@@ -29,6 +30,8 @@ public class UserApplicationService {
 
     private final UuidGenerator uuidGenerator;
 
+    private final Clock clock;
+
     public AuthenticationResult register(RegisterUserCommand command) {
         log.debug("Registering new user. Email: {}", command.email());
 
@@ -43,7 +46,7 @@ public class UserApplicationService {
             uuidGenerator.generate(),
             command.email(),
             encodedPassword,
-            LocalDateTime.now()
+            clock.now()
         );
 
         user = userRepository.save(user);
