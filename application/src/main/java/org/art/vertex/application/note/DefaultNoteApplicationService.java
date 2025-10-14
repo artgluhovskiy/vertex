@@ -2,10 +2,17 @@ package org.art.vertex.application.note;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.art.vertex.application.note.command.CreateNoteCommand;
+import org.art.vertex.application.note.command.UpdateNoteCommand;
+import org.art.vertex.application.tag.TagApplicationService;
+import org.art.vertex.application.tag.command.UpsertTagCommand;
+import org.art.vertex.domain.directory.DirectoryRepository;
+import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.shared.uuid.UuidGenerator;
+import org.art.vertex.domain.tag.model.Tag;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.domain.user.model.User;
 
@@ -17,29 +24,51 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DefaultNoteApplicationService implements NoteApplicationService {
 
+    private final UserRepository userRepository;
+
     private final NoteRepository noteRepository;
 
-    private final UserRepository userRepository;
+    private final DirectoryRepository directoryRepository;
+
+    private final TagApplicationService tagService;
 
     private final UuidGenerator uuidGenerator;
 
     private final Clock clock;
 
     @Override
-    public Note createNote(UUID userId, Note note) {
-        log.debug("Creating note. User id: {}, title: {}", userId, note.getTitle());
-
-        User user = userRepository.getById(userId);
+    public Note createNote(UUID userId, CreateNoteCommand command) {
+        log.debug("Creating note. User id: {}, title: {}", userId, command.getTitle());
 
         LocalDateTime now = clock.now();
 
-        // TODO: Support directories and tags when implementations are available
+        User user = userRepository.getById(userId);
+
+        // Handle optional directory
+        Directory dir = null;
+        if (command.getDirId() != null) {
+            dir = directoryRepository.getById(command.getDirId());
+        }
+
+        // Handle optional tags
+        List<Tag> tags = List.of();
+        if (command.getTags() != null && !command.getTags().isEmpty()) {
+            tags = tagService.upsertTags(userId,
+                command.getTags().stream()
+                    .map(tagName -> UpsertTagCommand.builder()
+                        .name(tagName)
+                        .build())
+                    .toList()
+            );
+        }
+
         Note newNote = Note.create(
             uuidGenerator.generate(),
             user,
-            note.getTitle(),
-            note.getContent(),
-            null,  // Directory support to be implemented
+            command.getTitle(),
+            command.getContent(),
+            dir,
+            tags,
             now
         );
 
@@ -51,7 +80,7 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
     }
 
     @Override
-    public Note updateNote(UUID userId, UUID noteId, Note updatedNote) {
+    public Note updateNote(UUID userId, UUID noteId, UpdateNoteCommand command) {
         log.debug("Updating note. Note id: {}, user id: {}", noteId, userId);
 
         User user = userRepository.getById(userId);
@@ -59,18 +88,41 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
 
         LocalDateTime now = clock.now();
 
-        // TODO: Support directories and tags when implementations are available
-        Note result = existingNote.update(
-            updatedNote.getTitle(),
-            updatedNote.getContent(),
+        // Handle optional directory
+        Directory dir = null;
+        if (command.getDirId() != null) {
+            dir = directoryRepository.getById(command.getDirId());
+        }
+
+        // Handle optional tags
+        List<Tag> tags = null;
+        if (command.getTags() != null) {
+            if (command.getTags().isEmpty()) {
+                tags = List.of();
+            } else {
+                tags = tagService.upsertTags(userId,
+                    command.getTags().stream()
+                        .map(tagName -> UpsertTagCommand.builder()
+                            .name(tagName)
+                            .build())
+                        .toList()
+                );
+            }
+        }
+
+        Note updatedNote = existingNote.update(
+            command.getTitle(),
+            command.getContent(),
+            dir,
+            tags,
             now
         );
 
-        result = noteRepository.update(result);
+        updatedNote = noteRepository.update(updatedNote);
 
         log.info("Note updated successfully. Note id: {}", noteId);
 
-        return result;
+        return updatedNote;
     }
 
     @Override

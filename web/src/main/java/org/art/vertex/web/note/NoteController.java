@@ -4,9 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.note.NoteApplicationService;
+import org.art.vertex.application.note.command.CreateNoteCommand;
+import org.art.vertex.application.note.command.UpdateNoteCommand;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.web.note.dto.NoteDto;
+import org.art.vertex.web.note.mapper.NoteCommandMapper;
 import org.art.vertex.web.note.mapper.NoteDtoMapper;
+import org.art.vertex.web.note.request.CreateNoteRequest;
+import org.art.vertex.web.note.request.UpdateNoteRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,17 +36,19 @@ public class NoteController {
 
     private final NoteApplicationService noteApplicationService;
 
+    private final NoteCommandMapper noteCommandMapper;
+
     private final NoteDtoMapper noteDtoMapper;
 
     @PostMapping
     public ResponseEntity<NoteDto> createNote(
-        @Valid @RequestBody NoteDto noteDto,
-        @AuthenticationPrincipal String userId
+        @AuthenticationPrincipal String userId,
+        @Valid @RequestBody CreateNoteRequest request
     ) {
-        log.trace("Processing create note request. User id: {}, title: {}", userId, noteDto.title());
+        log.trace("Processing create note request. User id: {}, title: {}", userId, request.title());
 
-        Note note = noteDtoMapper.toDomain(noteDto, null, null, null);
-        Note createdNote = noteApplicationService.createNote(UUID.fromString(userId), note);
+        CreateNoteCommand command = noteCommandMapper.toCommand(request);
+        Note createdNote = noteApplicationService.createNote(UUID.fromString(userId), command);
         NoteDto resultDto = noteDtoMapper.toDto(createdNote);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(resultDto);
@@ -49,14 +56,14 @@ public class NoteController {
 
     @PutMapping("/{noteId}")
     public ResponseEntity<NoteDto> updateNote(
+        @AuthenticationPrincipal String userId,
         @PathVariable UUID noteId,
-        @Valid @RequestBody NoteDto noteDto,
-        @AuthenticationPrincipal String userId
+        @Valid @RequestBody UpdateNoteRequest request
     ) {
         log.trace("Processing update note request. Note id: {}, user id: {}", noteId, userId);
 
-        Note note = noteDtoMapper.toDomain(noteDto, null, null, null);
-        Note updatedNote = noteApplicationService.updateNote(UUID.fromString(userId), noteId, note);
+        UpdateNoteCommand command = noteCommandMapper.toCommand(request);
+        Note updatedNote = noteApplicationService.updateNote(UUID.fromString(userId), noteId, command);
         NoteDto resultDto = noteDtoMapper.toDto(updatedNote);
 
         return ResponseEntity.ok(resultDto);

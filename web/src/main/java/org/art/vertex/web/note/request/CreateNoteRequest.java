@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -15,6 +16,8 @@ public record CreateNoteRequest(
 
     String content,
 
-    UUID dirId
+    UUID dirId,
+
+    List<String> tags
 ) {
 }

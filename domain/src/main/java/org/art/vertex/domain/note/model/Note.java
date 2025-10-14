@@ -46,6 +46,7 @@ public class Note {
         String title,
         String content,
         Directory directory,
+        List<Tag> tags,
         LocalDateTime ts
     ) {
         if (title == null || title.isBlank()) {
@@ -61,6 +62,7 @@ public class Note {
             .title(title)
             .content(content)
             .directory(directory)
+            .tags(tags)
             .createdTs(ts)
             .updatedTs(ts)
             .version(null)
@@ -136,7 +138,7 @@ public class Note {
             .build();
     }
 
-    public Note updateWithTags(
+    public Note update(
         String newTitle,
         String newContent,
         Directory newDirectory,

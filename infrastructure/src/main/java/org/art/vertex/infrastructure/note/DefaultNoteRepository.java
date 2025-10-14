@@ -35,18 +35,18 @@ public class DefaultNoteRepository implements NoteRepository {
 
     @Override
     @Transactional
-    public Note update(Note note) {
+    public Note update(Note updatedNote) {
         // Load existing entity to maintain proper JPA state management
-        NoteEntity existingEntity = noteJpaRepository.findById(note.getId())
+        NoteEntity existingNote = noteJpaRepository.findById(updatedNote.getId())
             .orElseThrow(() ->
-                new NoteNotFoundException("Note cannot be found. Note id: %s".formatted(note.getId().toString()))
+                new NoteNotFoundException("Note cannot be found. Note id: %s".formatted(updatedNote.getId().toString()))
             );
 
         // Delegate update logic to NoteUpdater
-        noteUpdater.updateEntity(existingEntity, note);
+        noteUpdater.updateEntity(existingNote, updatedNote);
 
         // JPA will automatically persist changes due to @Transactional
-        NoteEntity updatedEntity = noteJpaRepository.save(existingEntity);
+        NoteEntity updatedEntity = noteJpaRepository.save(existingNote);
         return noteMapper.toDomain(updatedEntity);
     }
 

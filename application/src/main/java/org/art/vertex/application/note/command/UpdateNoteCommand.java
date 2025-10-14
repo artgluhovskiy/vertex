@@ -12,5 +12,5 @@ public class UpdateNoteCommand {
     String title;
     String content;
     UUID dirId;
-    List<UUID> tagIds;
+    List<String> tags;
 }

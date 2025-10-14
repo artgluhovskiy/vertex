@@ -14,8 +14,8 @@ public record UpdateNoteRequest(
 
     String content,
 
-    UUID directoryId,
+    UUID dirId,
 
-    List<UUID> tagIds
+    List<String> tags
 ) {
 }

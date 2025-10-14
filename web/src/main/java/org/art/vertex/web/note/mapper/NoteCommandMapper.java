@@ -5,16 +5,14 @@ import org.art.vertex.application.note.command.UpdateNoteCommand;
 import org.art.vertex.web.note.request.CreateNoteRequest;
 import org.art.vertex.web.note.request.UpdateNoteRequest;
 
-import java.util.UUID;
-
 public class NoteCommandMapper {
 
-    public CreateNoteCommand toCommand(CreateNoteRequest request, UUID userId) {
+    public CreateNoteCommand toCommand(CreateNoteRequest request) {
         return CreateNoteCommand.builder()
-            .userId(userId)
             .dirId(request.dirId())
             .title(request.title())
             .content(request.content())
+            .tags(request.tags())
             .build();
     }
 
@@ -22,8 +20,8 @@ public class NoteCommandMapper {
         return UpdateNoteCommand.builder()
             .title(request.title())
             .content(request.content())
-            .dirId(request.directoryId())
-            .tagIds(request.tagIds())
+            .dirId(request.dirId())
+            .tags(request.tags())
             .build();
     }
 }
