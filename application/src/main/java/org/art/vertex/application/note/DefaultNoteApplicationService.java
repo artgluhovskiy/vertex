@@ -2,8 +2,6 @@ package org.art.vertex.application.note;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.art.vertex.application.note.command.CreateNoteCommand;
-import org.art.vertex.application.note.command.UpdateNoteCommand;
 import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.shared.time.Clock;
@@ -28,45 +26,51 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
     private final Clock clock;
 
     @Override
-    public Note createNote(CreateNoteCommand command) {
-        log.debug("Creating note. User id: {}, title: {}", command.getUserId(), command.getTitle());
+    public Note createNote(UUID userId, Note note) {
+        log.debug("Creating note. User id: {}, title: {}", userId, note.getTitle());
 
-        User user = userRepository.getById(command.getUserId());
+        User user = userRepository.getById(userId);
 
         LocalDateTime now = clock.now();
 
-        Note note = Note.create(
+        // TODO: Support directories and tags when implementations are available
+        Note newNote = Note.create(
             uuidGenerator.generate(),
             user,
-            command.getTitle(),
-            command.getContent(),
-            null,
+            note.getTitle(),
+            note.getContent(),
+            null,  // Directory support to be implemented
             now
         );
 
-        note = noteRepository.save(note);
+        newNote = noteRepository.save(newNote);
 
-        log.info("Note created successfully. Note id: {}, user id: {}", note.getId(), user.getId());
+        log.info("Note created successfully. Note id: {}, user id: {}", newNote.getId(), user.getId());
 
-        return note;
+        return newNote;
     }
 
     @Override
-    public Note updateNote(UUID userId, UUID noteId, UpdateNoteCommand command) {
+    public Note updateNote(UUID userId, UUID noteId, Note updatedNote) {
         log.debug("Updating note. Note id: {}, user id: {}", noteId, userId);
 
         User user = userRepository.getById(userId);
-        Note note = noteRepository.getByIdAndUser(noteId, user);
+        Note existingNote = noteRepository.getByIdAndUser(noteId, user);
 
         LocalDateTime now = clock.now();
 
-        Note updatedNote = note.update(command.getTitle(), command.getContent(), now);
+        // TODO: Support directories and tags when implementations are available
+        Note result = existingNote.update(
+            updatedNote.getTitle(),
+            updatedNote.getContent(),
+            now
+        );
 
-        updatedNote = noteRepository.update(updatedNote);
+        result = noteRepository.update(result);
 
         log.info("Note updated successfully. Note id: {}", noteId);
 
-        return updatedNote;
+        return result;
     }
 
     @Override

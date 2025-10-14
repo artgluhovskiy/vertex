@@ -13,7 +13,11 @@ public interface DirectoryRepository {
 
     Directory getById(UUID id);
 
+    Directory getByIdAndUser(UUID id, User user);
+
     Optional<Directory> findById(UUID id);
+
+    Optional<Directory> findByIdAndUser(UUID id, User user);
 
     /**
      * Find all root directories for a user (directories with no parent).

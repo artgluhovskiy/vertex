@@ -15,6 +15,8 @@ public interface TagRepository {
 
     Optional<Tag> findById(UUID id);
 
+    List<Tag> findByIdsAndUser(List<UUID> ids, User user);
+
     Optional<Tag> findByNameAndUser(String name, User user);
 
     List<Tag> findAllByUserOrderByName(User user);

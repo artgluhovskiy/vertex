@@ -15,6 +15,6 @@ public record CreateNoteRequest(
 
     String content,
 
-    UUID directoryId
+    UUID dirId
 ) {
 }

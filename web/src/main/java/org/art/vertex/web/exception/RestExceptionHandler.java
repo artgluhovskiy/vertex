@@ -102,6 +102,18 @@ public class RestExceptionHandler {
             .build();
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalArgument(IllegalArgumentException e, HttpServletRequest request) {
+        log.warn("Invalid argument. Message: {}", e.getMessage());
+        return ErrorResponse.builder()
+            .message(e.getMessage())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .timestamp(clock.now())
+            .path(request.getRequestURI())
+            .build();
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneric(Exception e, HttpServletRequest request) {

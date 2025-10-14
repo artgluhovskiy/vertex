@@ -1,5 +1,6 @@
 package org.art.vertex.web.note.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.art.vertex.web.tag.dto.TagDto;
 
@@ -12,7 +13,8 @@ import java.util.UUID;
 public record NoteDto(
     UUID id,
     UUID userId,
-    UUID directoryId,
+    UUID dirId,
+    @Size(max = 255, message = "Title must not exceed 255 characters")
     String title,
     String content,
     String summary,

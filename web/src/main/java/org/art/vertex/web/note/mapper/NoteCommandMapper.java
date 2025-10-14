@@ -12,7 +12,7 @@ public class NoteCommandMapper {
     public CreateNoteCommand toCommand(CreateNoteRequest request, UUID userId) {
         return CreateNoteCommand.builder()
             .userId(userId)
-            .directoryId(request.directoryId())
+            .dirId(request.dirId())
             .title(request.title())
             .content(request.content())
             .build();
@@ -22,6 +22,8 @@ public class NoteCommandMapper {
         return UpdateNoteCommand.builder()
             .title(request.title())
             .content(request.content())
+            .dirId(request.directoryId())
+            .tagIds(request.tagIds())
             .build();
     }
 }

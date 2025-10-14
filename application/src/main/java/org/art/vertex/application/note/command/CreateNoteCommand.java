@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 public class CreateNoteCommand {
     UUID userId;
-    UUID directoryId;
+    UUID dirId;
     String title;
     String content;
     List<UUID> tagIds;

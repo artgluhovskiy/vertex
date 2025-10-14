@@ -3,8 +3,6 @@ package org.art.vertex.test.step;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.art.vertex.web.note.dto.NoteDto;
-import org.art.vertex.web.note.request.CreateNoteRequest;
-import org.art.vertex.web.note.request.UpdateNoteRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +12,7 @@ import static io.restassured.RestAssured.given;
 public class NoteSteps {
 
     public NoteDto createNote(String accessToken, String title, String content) {
-        var request = CreateNoteRequest.builder()
+        var request = NoteDto.builder()
             .title(title)
             .content(content)
             .build();
@@ -32,10 +30,10 @@ public class NoteSteps {
     }
 
     public NoteDto createNote(String accessToken, String title, String content, UUID directoryId) {
-        var request = CreateNoteRequest.builder()
+        var request = NoteDto.builder()
             .title(title)
             .content(content)
-            .directoryId(directoryId)
+            .dirId(directoryId)
             .build();
 
         return given()
@@ -51,7 +49,7 @@ public class NoteSteps {
     }
 
     public ValidatableResponse createNoteAndGetResponse(String accessToken, String title, String content) {
-        var request = CreateNoteRequest.builder()
+        var request = NoteDto.builder()
             .title(title)
             .content(content)
             .build();
@@ -101,7 +99,7 @@ public class NoteSteps {
     }
 
     public NoteDto updateNote(String accessToken, UUID noteId, String title, String content) {
-        var request = UpdateNoteRequest.builder()
+        var request = NoteDto.builder()
             .title(title)
             .content(content)
             .build();
@@ -119,7 +117,7 @@ public class NoteSteps {
     }
 
     public ValidatableResponse updateNoteAndGetResponse(String accessToken, UUID noteId, String title, String content) {
-        var request = UpdateNoteRequest.builder()
+        var request = NoteDto.builder()
             .title(title)
             .content(content)
             .build();
