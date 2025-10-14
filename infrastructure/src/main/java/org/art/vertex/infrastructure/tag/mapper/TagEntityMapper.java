@@ -26,7 +26,6 @@ public class TagEntityMapper {
             .id(entity.getId())
             .user(userRepository.getById(entity.getUserId()))
             .name(entity.getName())
-            .description(entity.getDescription())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .version(entity.getVersion())

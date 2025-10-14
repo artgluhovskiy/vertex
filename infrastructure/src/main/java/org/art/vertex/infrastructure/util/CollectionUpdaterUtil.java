@@ -6,6 +6,7 @@
 package org.art.vertex.infrastructure.util;
 
 import lombok.experimental.UtilityClass;
+import org.art.vertex.infrastructure.shared.BaseEntity;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -31,8 +32,7 @@ public class CollectionUpdaterUtil {
      * @param <T>                collection element type
      */
     @SuppressWarnings("java:S2175")
-    // TODO: Let's T extend BaseEntity
-    public static <T> void updateCollection(Collection<T> existingCollection, Collection<T> newCollection) {
+    public static <T extends BaseEntity> void updateCollection(Collection<T> existingCollection, Collection<T> newCollection) {
         Objects.requireNonNull(existingCollection, "Existing collection should not be null");
         Objects.requireNonNull(newCollection, "New collection should not be null");
 

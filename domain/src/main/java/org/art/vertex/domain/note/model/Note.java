@@ -7,8 +7,8 @@ import org.art.vertex.domain.tag.model.Tag;
 import org.art.vertex.domain.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Value
@@ -19,7 +19,7 @@ public class Note {
 
     User user;
 
-    Directory directory;
+    Directory dir;
 
     String title;
 
@@ -28,7 +28,7 @@ public class Note {
     String summary;
 
     @Builder.Default
-    List<Tag> tags = List.of();
+    Set<Tag> tags = Set.of();
 
     @Builder.Default
     Map<String, Object> metadata = Map.of();
@@ -46,22 +46,15 @@ public class Note {
         String title,
         String content,
         Directory directory,
-        List<Tag> tags,
+        Set<Tag> tags,
         LocalDateTime ts
     ) {
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Title cannot be empty");
-        }
-        if (title.length() > 255) {
-            throw new IllegalArgumentException("Title too long (max 255 characters)");
-        }
-
         return Note.builder()
             .id(id)
             .user(user)
             .title(title)
             .content(content)
-            .directory(directory)
+            .dir(directory)
             .tags(tags)
             .createdTs(ts)
             .updatedTs(ts)
@@ -69,111 +62,32 @@ public class Note {
             .build();
     }
 
-    public Note updateTitle(String newTitle, LocalDateTime updatedTs) {
-        validateTitle(newTitle);
-        return this.toBuilder()
-            .title(newTitle)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
-    public Note updateContent(String newContent, LocalDateTime updatedTs) {
-        return this.toBuilder()
-            .content(newContent)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
-    public Note update(String newTitle, String newContent, LocalDateTime updatedTs) {
-        String effectiveTitle = newTitle != null ? newTitle : this.title;
-        String effectiveContent = newContent != null ? newContent : this.content;
-
-        if (newTitle != null) {
-            validateTitle(newTitle);
-        }
-
-        return this.toBuilder()
-            .title(effectiveTitle)
-            .content(effectiveContent)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
-    public Note updateDirectory(Directory newDirectory, LocalDateTime updatedTs) {
-        return this.toBuilder()
-            .directory(newDirectory)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
-    public Note addTags(List<Tag> tagsToAdd, LocalDateTime updatedTs) {
-        List<Tag> updatedTags = new java.util.ArrayList<>(this.tags);
-
-        for (Tag tag : tagsToAdd) {
-            if (!containsTag(tag.getId())) {
-                updatedTags.add(tag);
-            }
-        }
-
-        return this.toBuilder()
-            .tags(updatedTags)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
-    public Note removeTags(List<UUID> tagIdsToRemove, LocalDateTime updatedTs) {
-        List<Tag> updatedTags = this.tags.stream()
-            .filter(tag -> !tagIdsToRemove.contains(tag.getId()))
-            .toList();
-
-        return this.toBuilder()
-            .tags(updatedTags)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
     public Note update(
         String newTitle,
         String newContent,
-        Directory newDirectory,
-        List<Tag> newTags,
-        LocalDateTime updatedTs
+        Directory newDir,
+        Set<Tag> newTags,
+        LocalDateTime ts
     ) {
-        String effectiveTitle = newTitle != null ? newTitle : this.title;
-        String effectiveContent = newContent != null ? newContent : this.content;
-        Directory effectiveDirectory = newDirectory != null ? newDirectory : this.directory;
-        List<Tag> effectiveTags = newTags != null ? newTags : this.tags;
+        NoteBuilder noteBuilder = toBuilder()
+            .updatedTs(ts);
 
         if (newTitle != null) {
-            validateTitle(newTitle);
+            noteBuilder.title(newTitle);
         }
 
-        return this.toBuilder()
-            .title(effectiveTitle)
-            .content(effectiveContent)
-            .directory(effectiveDirectory)
-            .tags(effectiveTags)
-            .updatedTs(updatedTs)
-            .version(version + 1)
-            .build();
-    }
-
-    private boolean containsTag(UUID tagId) {
-        return this.tags.stream().anyMatch(tag -> tag.getId().equals(tagId));
-    }
-
-    private void validateTitle(String title) {
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Title cannot be empty");
+        if (newContent != null) {
+            noteBuilder.content(newContent);
         }
-        if (title.length() > 255) {
-            throw new IllegalArgumentException("Title too long (max 255 characters)");
+
+        if (newDir != null) {
+            noteBuilder.dir(newDir);
         }
+
+        if (newTags != null) {
+            noteBuilder.tags(newTags);
+        }
+
+        return noteBuilder.build();
     }
 }

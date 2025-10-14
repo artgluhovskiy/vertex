@@ -1,25 +1,15 @@
 package org.art.vertex.test.note;
 
 import org.art.vertex.test.BaseIntegrationTest;
-import org.art.vertex.test.step.NoteSteps;
-import org.art.vertex.test.step.UserSteps;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
 class NoteFlowIntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private UserSteps userSteps;
-
-    @Autowired
-    private NoteSteps noteSteps;
 
     // ========== HAPPY PATH TESTS ==========
 
@@ -39,7 +29,6 @@ class NoteFlowIntegrationTest extends BaseIntegrationTest {
         assertThat(note.userId()).isNotNull();
         assertThat(note.createdAt()).isNotNull();
         assertThat(note.updatedAt()).isNotNull();
-        assertThat(note.version()).isEqualTo(0);
     }
 
     @Test
@@ -56,7 +45,6 @@ class NoteFlowIntegrationTest extends BaseIntegrationTest {
         assertThat(retrievedNote.id()).isEqualTo(createdNote.id());
         assertThat(retrievedNote.title()).isEqualTo("Note Title");
         assertThat(retrievedNote.content()).isEqualTo("Note Content");
-        assertThat(retrievedNote.version()).isEqualTo(0);
     }
 
     @Test
@@ -73,7 +61,6 @@ class NoteFlowIntegrationTest extends BaseIntegrationTest {
         assertThat(updatedNote.id()).isEqualTo(createdNote.id());
         assertThat(updatedNote.title()).isEqualTo("Updated Title");
         assertThat(updatedNote.content()).isEqualTo("Original Content");
-        assertThat(updatedNote.version()).isEqualTo(1); // Version incremented
         assertThat(updatedNote.updatedAt()).isAfter(createdNote.updatedAt());
     }
 
@@ -91,7 +78,6 @@ class NoteFlowIntegrationTest extends BaseIntegrationTest {
         assertThat(updatedNote.id()).isEqualTo(createdNote.id());
         assertThat(updatedNote.title()).isEqualTo("Title");
         assertThat(updatedNote.content()).isEqualTo("Updated Content");
-        assertThat(updatedNote.version()).isEqualTo(1);
     }
 
     @Test
@@ -112,7 +98,6 @@ class NoteFlowIntegrationTest extends BaseIntegrationTest {
         assertThat(updatedNote).isNotNull();
         assertThat(updatedNote.title()).isEqualTo("New Title");
         assertThat(updatedNote.content()).isEqualTo("New Content");
-        assertThat(updatedNote.version()).isEqualTo(1);
     }
 
     @Test

@@ -1,17 +1,12 @@
 package org.art.vertex.test.user;
 
 import org.art.vertex.test.BaseIntegrationTest;
-import org.art.vertex.test.step.UserSteps;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 class UserFlowIntegrationTest extends BaseIntegrationTest {
-
-    @Autowired
-    private UserSteps userSteps;
 
     @Test
     void shouldRegisterNewUser() {

@@ -17,8 +17,6 @@ public class Tag {
 
     String name;
 
-    String description;
-
     LocalDateTime createdAt;
 
     LocalDateTime updatedAt;

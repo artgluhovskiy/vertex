@@ -48,8 +48,8 @@ public class NoteEnrichmentService {
         double score = 0.0;
 
         // Same directory adds to similarity
-        if (note1.getDirectory() != null &&
-            note1.getDirectory().equals(note2.getDirectory())) {
+        if (note1.getDir() != null &&
+            note1.getDir().equals(note2.getDir())) {
             score += 0.3;
         }
 

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.VertexApplication;
 import org.art.vertex.test.config.TestConfig;
 import org.art.vertex.test.container.TestContainerManager;
+import org.art.vertex.test.step.NoteSteps;
+import org.art.vertex.test.step.UserSteps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,12 @@ import org.springframework.test.context.DynamicPropertySource;
 public abstract class BaseIntegrationTest {
 
     private static final TestContainerManager containerManager = TestContainerManager.getInstance();
+
+    @Autowired
+    protected UserSteps userSteps;
+
+    @Autowired
+    protected NoteSteps noteSteps;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;

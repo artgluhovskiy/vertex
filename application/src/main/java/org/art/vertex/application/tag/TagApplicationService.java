@@ -1,33 +1,27 @@
 package org.art.vertex.application.tag;
 
-import org.art.vertex.application.tag.command.CreateTagCommand;
-import org.art.vertex.application.tag.command.UpdateTagCommand;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.tag.command.UpsertTagCommand;
 import org.art.vertex.domain.tag.model.Tag;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-public interface TagApplicationService {
-
-    Tag createTag(CreateTagCommand command);
-
-    Tag updateTag(UUID tagId, UpdateTagCommand command);
+@Slf4j
+@RequiredArgsConstructor
+public class TagApplicationService {
 
     /**
-     * Creates tags if not exist or update if exist.
+     * Creates tags if not exist or update if exists.
      *
      * @param userId   user id
      * @param commands upsert tag commands
      * @return created or updated tags
      */
-    List<Tag> upsertTags(UUID userId, List<UpsertTagCommand> commands);
-
-    Tag getTag(UUID tagId);
-
-    List<Tag> getUserTags(UUID userId);
-
-    List<Tag> getPopularTags(UUID userId, int limit);
-
-    void deleteTag(UUID tagId);
+    @Transactional
+    public Set<Tag> upsertTags(UUID userId, Set<UpsertTagCommand> commands) {
+        return null;
+    }
 }

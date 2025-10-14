@@ -1,10 +1,22 @@
 package org.art.vertex.infrastructure.note.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.With;
+import lombok.experimental.SuperBuilder;
+import org.art.vertex.infrastructure.shared.BaseEntity;
 import org.art.vertex.infrastructure.tag.entity.TagEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -17,23 +29,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@Data
-@Builder
+@Setter
+@Getter
+@SuperBuilder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "notes")
-public class NoteEntity {
-
-    @Id
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class NoteEntity extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
     @Column(name = "directory_id")
-    private UUID directoryId;
+    private UUID dirId;
 
     @Column(name = "title", nullable = false)
     private String title;

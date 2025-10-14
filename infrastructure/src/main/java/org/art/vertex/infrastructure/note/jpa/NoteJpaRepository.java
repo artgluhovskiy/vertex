@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -14,7 +15,17 @@ public interface NoteJpaRepository extends JpaRepository<NoteEntity, UUID> {
 
     List<NoteEntity> findAllByUserIdOrderByUpdatedAtDesc(UUID userId);
 
-    List<NoteEntity> findAllByDirectoryId(UUID directoryId);
+    List<NoteEntity> findAllByDirId(UUID directoryId);
+
+    @Query("""
+        SELECT n FROM NoteEntity n
+        WHERE n.id = :noteId
+        AND n.userId = :userId
+        """)
+    Optional<NoteEntity> findByNoteIdAndUserId(
+        @Param("noteId") UUID noteId,
+        @Param("userId") UUID userId
+    );
 
     @Query("""
         SELECT DISTINCT n FROM NoteEntity n

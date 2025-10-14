@@ -3,8 +3,8 @@ package org.art.vertex.application.note.command;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Value
@@ -18,7 +18,9 @@ public class CreateNoteCommand {
     UUID dirId;
 
     // Tags created by the user manually
-    List<String> tags;
+    @Builder.Default
+    Set<String> tags = Set.of();
 
-    Map<String, Object> metadata;
+    @Builder.Default
+    Map<String, Object> metadata = Map.of();
 }

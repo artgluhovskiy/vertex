@@ -7,8 +7,7 @@ import org.art.vertex.domain.user.model.User;
 import org.art.vertex.web.note.dto.NoteDto;
 import org.art.vertex.web.tag.dto.TagDto;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NoteDtoMapper {
@@ -17,7 +16,7 @@ public class NoteDtoMapper {
         return NoteDto.builder()
             .id(note.getId())
             .userId(note.getUser().getId())
-            .dirId(note.getDirectory() != null ? note.getDirectory().getId() : null)
+            .dirId(note.getDir() != null ? note.getDir().getId() : null)
             .title(note.getTitle())
             .content(note.getContent())
             .summary(note.getSummary())
@@ -25,36 +24,38 @@ public class NoteDtoMapper {
             .metadata(note.getMetadata())
             .createdAt(note.getCreatedTs())
             .updatedAt(note.getUpdatedTs())
-            .version(note.getVersion())
             .build();
     }
 
-    public Note toDomain(NoteDto dto, User user, Directory directory, List<Tag> tags) {
+    public Note toDomain(
+        NoteDto dto,
+        User user,
+        Directory directory,
+        Set<Tag> tags
+    ) {
         return Note.builder()
             .id(dto.id())
             .user(user)
-            .directory(directory)
+            .dir(directory)
             .title(dto.title())
             .content(dto.content())
             .summary(dto.summary())
-            .tags(tags != null ? tags : List.of())
+            .tags(tags != null ? tags : Set.of())
             .metadata(dto.metadata() != null ? dto.metadata() : java.util.Map.of())
             .createdTs(dto.createdAt())
             .updatedTs(dto.updatedAt())
-            .version(dto.version())
             .build();
     }
 
-    private List<TagDto> mapTagsToDto(List<Tag> tags) {
+    private Set<TagDto> mapTagsToDto(Set<Tag> tags) {
         if (tags == null || tags.isEmpty()) {
-            return List.of();
+            return Set.of();
         }
         return tags.stream()
             .map(tag -> TagDto.builder()
                 .id(tag.getId())
                 .name(tag.getName())
-                .description(tag.getDescription())
                 .build())
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 }

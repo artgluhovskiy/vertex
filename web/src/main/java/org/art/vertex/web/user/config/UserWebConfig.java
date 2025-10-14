@@ -1,5 +1,6 @@
 package org.art.vertex.web.user.config;
 
+import org.art.vertex.application.user.AuthApplicationService;
 import org.art.vertex.application.user.UserApplicationService;
 import org.art.vertex.web.user.AuthController;
 import org.art.vertex.web.user.mapper.UserCommandMapper;
@@ -22,10 +23,16 @@ public class UserWebConfig {
 
     @Bean
     public AuthController authController(
+        AuthApplicationService authApplicationService,
         UserApplicationService userApplicationService,
         UserCommandMapper userCommandMapper,
         UserDtoMapper userDtoMapper
     ) {
-        return new AuthController(userApplicationService, userCommandMapper, userDtoMapper);
+        return new AuthController(
+            authApplicationService,
+            userApplicationService,
+            userCommandMapper,
+            userDtoMapper
+        );
     }
 }

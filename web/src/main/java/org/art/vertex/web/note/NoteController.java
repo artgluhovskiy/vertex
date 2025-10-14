@@ -34,7 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NoteController {
 
-    private final NoteApplicationService noteApplicationService;
+    private final NoteApplicationService noteService;
 
     private final NoteCommandMapper noteCommandMapper;
 
@@ -48,10 +48,12 @@ public class NoteController {
         log.trace("Processing create note request. User id: {}, title: {}", userId, request.title());
 
         CreateNoteCommand command = noteCommandMapper.toCommand(request);
-        Note createdNote = noteApplicationService.createNote(UUID.fromString(userId), command);
-        NoteDto resultDto = noteDtoMapper.toDto(createdNote);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(resultDto);
+        Note createdNote = noteService.createNote(UUID.fromString(userId), command);
+
+        NoteDto createdNoteDto = noteDtoMapper.toDto(createdNote);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdNoteDto);
     }
 
     @PutMapping("/{noteId}")
@@ -63,23 +65,12 @@ public class NoteController {
         log.trace("Processing update note request. Note id: {}, user id: {}", noteId, userId);
 
         UpdateNoteCommand command = noteCommandMapper.toCommand(request);
-        Note updatedNote = noteApplicationService.updateNote(UUID.fromString(userId), noteId, command);
-        NoteDto resultDto = noteDtoMapper.toDto(updatedNote);
 
-        return ResponseEntity.ok(resultDto);
-    }
+        Note updatedNote = noteService.updateNote(UUID.fromString(userId), noteId, command);
 
-    @GetMapping("/{noteId}")
-    public ResponseEntity<NoteDto> getNote(
-        @PathVariable UUID noteId,
-        @AuthenticationPrincipal String userId
-    ) {
-        log.trace("Fetching note. Note id: {}, user id: {}", noteId, userId);
+        NoteDto updatedNoteDto = noteDtoMapper.toDto(updatedNote);
 
-        Note note = noteApplicationService.getNote(UUID.fromString(userId), noteId);
-        NoteDto dto = noteDtoMapper.toDto(note);
-
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(updatedNoteDto);
     }
 
     @DeleteMapping("/{noteId}")
@@ -90,18 +81,33 @@ public class NoteController {
     ) {
         log.trace("Processing delete note request. Note id: {}, user id: {}", noteId, userId);
 
-        noteApplicationService.deleteNote(UUID.fromString(userId), noteId);
+        noteService.deleteNote(noteId, UUID.fromString(userId));
+    }
+
+    @GetMapping("/{noteId}")
+    public ResponseEntity<NoteDto> getNote(
+        @PathVariable UUID noteId,
+        @AuthenticationPrincipal String userId
+    ) {
+        log.trace("Fetching note. Note id: {}, user id: {}", noteId, userId);
+
+        Note note = noteService.getNote(noteId, UUID.fromString(userId));
+
+        NoteDto noteDto = noteDtoMapper.toDto(note);
+
+        return ResponseEntity.ok(noteDto);
     }
 
     @GetMapping
     public ResponseEntity<List<NoteDto>> getUserNotes(@AuthenticationPrincipal String userId) {
         log.trace("Fetching notes for user. User id: {}", userId);
 
-        List<Note> notes = noteApplicationService.getNotesByUser(UUID.fromString(userId));
-        List<NoteDto> dtos = notes.stream()
+        List<Note> notes = noteService.getAllNotes(UUID.fromString(userId));
+
+        List<NoteDto> noteDtos = notes.stream()
             .map(noteDtoMapper::toDto)
             .toList();
 
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(noteDtos);
     }
 }

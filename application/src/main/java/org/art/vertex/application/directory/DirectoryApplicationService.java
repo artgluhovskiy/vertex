@@ -1,26 +1,25 @@
 package org.art.vertex.application.directory;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.directory.command.CreateDirectoryCommand;
-import org.art.vertex.application.directory.command.MoveDirectoryCommand;
-import org.art.vertex.application.directory.command.RenameDirectoryCommand;
 import org.art.vertex.domain.directory.model.Directory;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface DirectoryApplicationService {
+@Slf4j
+@RequiredArgsConstructor
+public class DirectoryApplicationService {
 
-    Directory createDirectory(CreateDirectoryCommand command);
+    public Directory createDirectory(CreateDirectoryCommand command) {
+        return null;
+    }
 
-    Directory renameDirectory(UUID directoryId, RenameDirectoryCommand command);
+    public Directory getByDirId(UUID dirId) {
+        return null;
+    }
 
-    Directory moveDirectory(UUID directoryId, MoveDirectoryCommand command);
+    void deleteDirectory(UUID dirId) {
 
-    Directory getDirectory(UUID directoryId);
-
-    List<Directory> getUserRootDirectories(UUID userId);
-
-    Directory getDirectoryTree(UUID directoryId);
-
-    void deleteDirectory(UUID directoryId);
+    }
 }

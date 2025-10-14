@@ -1,8 +1,18 @@
 package org.art.vertex.domain.shared.time;
 
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
-public interface Clock {
+@RequiredArgsConstructor
+public class Clock {
 
-    LocalDateTime now();
+    private final java.time.Clock nativeClock;
+
+    public LocalDateTime now() {
+        return nativeClock.instant()
+            .atZone(ZoneOffset.UTC)
+            .toLocalDateTime();
+    }
 }
