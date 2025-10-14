@@ -1,4 +1,4 @@
-package org.art.vertex.domain.shared.generator;
+package org.art.vertex.domain.shared.uuid;
 
 import java.util.UUID;
 

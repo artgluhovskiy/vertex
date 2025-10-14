@@ -6,7 +6,7 @@ import org.art.vertex.application.note.command.CreateNoteCommand;
 import org.art.vertex.application.note.command.UpdateNoteCommand;
 import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.note.model.Note;
-import org.art.vertex.domain.shared.generator.UuidGenerator;
+import org.art.vertex.domain.shared.uuid.UuidGenerator;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.domain.user.model.User;
 

@@ -8,7 +8,7 @@ import org.art.vertex.application.user.model.AuthenticationResult;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
-import org.art.vertex.domain.shared.generator.UuidGenerator;
+import org.art.vertex.domain.shared.uuid.UuidGenerator;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
 import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;

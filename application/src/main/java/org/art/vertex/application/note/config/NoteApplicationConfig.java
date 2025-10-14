@@ -3,7 +3,7 @@ package org.art.vertex.application.note.config;
 import org.art.vertex.application.note.DefaultNoteApplicationService;
 import org.art.vertex.application.note.NoteApplicationService;
 import org.art.vertex.domain.note.NoteRepository;
-import org.art.vertex.domain.shared.generator.UuidGenerator;
+import org.art.vertex.domain.shared.uuid.UuidGenerator;
 import org.art.vertex.domain.user.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

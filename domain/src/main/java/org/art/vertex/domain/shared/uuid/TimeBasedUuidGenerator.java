@@ -1,6 +1,4 @@
-package org.art.vertex.infrastructure.generator;
-
-import org.art.vertex.domain.shared.generator.UuidGenerator;
+package org.art.vertex.domain.shared.uuid;
 
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
