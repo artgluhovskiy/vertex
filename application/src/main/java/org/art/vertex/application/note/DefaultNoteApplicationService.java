@@ -6,6 +6,7 @@ import org.art.vertex.application.note.command.CreateNoteCommand;
 import org.art.vertex.application.note.command.UpdateNoteCommand;
 import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.note.model.Note;
+import org.art.vertex.domain.shared.generator.UuidGenerator;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.domain.user.model.User;
 
@@ -21,6 +22,8 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
 
     private final UserRepository userRepository;
 
+    private final UuidGenerator uuidGenerator;
+
     @Override
     public Note createNote(CreateNoteCommand command) {
         log.debug("Creating note. User id: {}, title: {}", command.getUserId(), command.getTitle());
@@ -30,7 +33,7 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
         LocalDateTime now = LocalDateTime.now();
 
         Note note = Note.create(
-            UUID.randomUUID(),
+            uuidGenerator.generate(),
             user,
             command.getTitle(),
             command.getContent(),

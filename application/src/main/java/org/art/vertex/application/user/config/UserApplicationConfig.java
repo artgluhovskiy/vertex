@@ -1,6 +1,7 @@
 package org.art.vertex.application.user.config;
 
 import org.art.vertex.application.user.UserApplicationService;
+import org.art.vertex.domain.shared.generator.UuidGenerator;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
 import org.art.vertex.domain.user.UserRepository;
@@ -14,9 +15,10 @@ public class UserApplicationConfig {
     public UserApplicationService userApplicationService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
-        JwtTokenProvider jwtTokenProvider
+        JwtTokenProvider jwtTokenProvider,
+        UuidGenerator uuidGenerator
     ) {
-        return new UserApplicationService(userRepository, passwordEncoder, jwtTokenProvider);
+        return new UserApplicationService(userRepository, passwordEncoder, jwtTokenProvider, uuidGenerator);
     }
 }
 

@@ -8,6 +8,7 @@ import org.art.vertex.application.user.model.AuthenticationResult;
 import org.art.vertex.domain.user.exception.DuplicateEmailException;
 import org.art.vertex.domain.user.exception.UserNotFoundException;
 import org.art.vertex.domain.user.model.User;
+import org.art.vertex.domain.shared.generator.UuidGenerator;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
 import org.art.vertex.domain.user.security.exception.InvalidCredentialsException;
@@ -26,6 +27,8 @@ public class UserApplicationService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final UuidGenerator uuidGenerator;
+
     public AuthenticationResult register(RegisterUserCommand command) {
         log.debug("Registering new user. Email: {}", command.email());
 
@@ -37,6 +40,7 @@ public class UserApplicationService {
         String encodedPassword = passwordEncoder.encode(command.password());
 
         User user = User.create(
+            uuidGenerator.generate(),
             command.email(),
             encodedPassword,
             LocalDateTime.now()

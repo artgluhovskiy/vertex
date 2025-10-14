@@ -25,14 +25,14 @@ public class Tag {
 
     Integer version;
 
-    public static Tag create(User user, String name, LocalDateTime ts) {
+    public static Tag create(UUID id, User user, String name, LocalDateTime ts) {
         return Tag.builder()
-            .id(UUID.randomUUID())
+            .id(id)
             .user(user)
             .name(name)
             .createdAt(ts)
             .updatedAt(ts)
-            .version(1)
+            .version(null)
             .build();
     }
 }

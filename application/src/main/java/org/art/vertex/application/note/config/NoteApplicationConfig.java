@@ -3,6 +3,7 @@ package org.art.vertex.application.note.config;
 import org.art.vertex.application.note.DefaultNoteApplicationService;
 import org.art.vertex.application.note.NoteApplicationService;
 import org.art.vertex.domain.note.NoteRepository;
+import org.art.vertex.domain.shared.generator.UuidGenerator;
 import org.art.vertex.domain.user.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +14,9 @@ public class NoteApplicationConfig {
     @Bean
     public NoteApplicationService noteApplicationService(
         NoteRepository noteRepository,
-        UserRepository userRepository
+        UserRepository userRepository,
+        UuidGenerator uuidGenerator
     ) {
-        return new DefaultNoteApplicationService(noteRepository, userRepository);
+        return new DefaultNoteApplicationService(noteRepository, userRepository, uuidGenerator);
     }
 }
