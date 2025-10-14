@@ -54,12 +54,7 @@ public class DefaultNoteApplicationService implements NoteApplicationService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        Note updatedNote = note.toBuilder()
-            .title(command.getTitle() != null ? command.getTitle() : note.getTitle())
-            .content(command.getContent() != null ? command.getContent() : note.getContent())
-            .updatedTs(now)
-            .version(note.getVersion() + 1)
-            .build();
+        Note updatedNote = note.update(command.getTitle(), command.getContent(), now);
 
         updatedNote = noteRepository.update(updatedNote);
 

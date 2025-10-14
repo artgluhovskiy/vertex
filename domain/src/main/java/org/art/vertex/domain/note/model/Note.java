@@ -59,4 +59,46 @@ public class Note {
             .version(null)
             .build();
     }
+
+    public Note updateTitle(String newTitle, LocalDateTime updatedTs) {
+        validateTitle(newTitle);
+        return this.toBuilder()
+            .title(newTitle)
+            .updatedTs(updatedTs)
+            .version(version + 1)
+            .build();
+    }
+
+    public Note updateContent(String newContent, LocalDateTime updatedTs) {
+        return this.toBuilder()
+            .content(newContent)
+            .updatedTs(updatedTs)
+            .version(version + 1)
+            .build();
+    }
+
+    public Note update(String newTitle, String newContent, LocalDateTime updatedTs) {
+        String effectiveTitle = newTitle != null ? newTitle : this.title;
+        String effectiveContent = newContent != null ? newContent : this.content;
+
+        if (newTitle != null) {
+            validateTitle(newTitle);
+        }
+
+        return this.toBuilder()
+            .title(effectiveTitle)
+            .content(effectiveContent)
+            .updatedTs(updatedTs)
+            .version(version + 1)
+            .build();
+    }
+
+    private void validateTitle(String title) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Title cannot be empty");
+        }
+        if (title.length() > 255) {
+            throw new IllegalArgumentException("Title too long (max 255 characters)");
+        }
+    }
 }
