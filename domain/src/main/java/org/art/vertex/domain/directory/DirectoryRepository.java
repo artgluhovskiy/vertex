@@ -1,7 +1,6 @@
 package org.art.vertex.domain.directory;
 
 import org.art.vertex.domain.directory.model.Directory;
-import org.art.vertex.domain.user.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,19 +12,19 @@ public interface DirectoryRepository {
 
     Directory getById(UUID id);
 
-    Directory getByIdAndUser(UUID id, User user);
+    Directory getByIdAndUserId(UUID id, UUID userId);
 
     Optional<Directory> findById(UUID id);
 
-    Optional<Directory> findByIdAndUser(UUID id, User user);
+    Optional<Directory> findByIdAndUserId(UUID id, UUID userId);
 
     /**
      * Find all root directories for a user (directories with no parent).
      *
-     * @param user directory owner
+     * @param userId directory owner ID
      * @return list of root directories
      */
-    List<Directory> findAllRootDirectoriesByUser(User user);
+    List<Directory> findAllRootDirectoriesByUserId(UUID userId);
 
     /**
      * Find all child directories of a parent directory.
@@ -38,10 +37,10 @@ public interface DirectoryRepository {
     /**
      * Find all directories for a user.
      *
-     * @param user directory owner
+     * @param userId directory owner ID
      * @return list of all user's directories
      */
-    List<Directory> findByUser(User user);
+    List<Directory> findByUserId(UUID userId);
 
     /**
      * Get all descendant directories (recursive children).

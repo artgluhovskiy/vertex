@@ -2,7 +2,6 @@ package org.art.vertex.domain.directory.model;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.domain.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +12,7 @@ public class Directory {
 
     UUID id;
 
-    User user;
+    UUID userId;
 
     String name;
 
@@ -28,14 +27,14 @@ public class Directory {
 
     public static Directory create(
         UUID id,
-        User user,
+        UUID userId,
         String name,
         Directory parent,
         LocalDateTime ts
     ) {
         return Directory.builder()
             .id(id)
-            .user(user)
+            .userId(userId)
             .name(name)
             .parent(parent)
             .createdTs(ts)

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class MoveDirectoryCommand {
-    UUID newParentId;
+public class UpdateDirectoryCommand {
+    UUID parentId;
+    String name;
 }
