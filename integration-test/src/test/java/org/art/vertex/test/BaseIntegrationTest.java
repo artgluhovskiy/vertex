@@ -88,8 +88,7 @@ public abstract class BaseIntegrationTest {
 
             // Truncate all tables (add more as schema grows)
             jdbcTemplate.execute("TRUNCATE TABLE notes CASCADE");
-            // TODO: Uncomment when directories table is created
-            // jdbcTemplate.execute("TRUNCATE TABLE directories CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE directories CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE users CASCADE");
 
             // Re-enable foreign key checks
