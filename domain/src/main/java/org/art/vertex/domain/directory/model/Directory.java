@@ -39,7 +39,7 @@ public class Directory {
             .parent(parent)
             .createdTs(ts)
             .updatedTs(ts)
-            .version(1)
+            .version(null)
             .build();
     }
 }

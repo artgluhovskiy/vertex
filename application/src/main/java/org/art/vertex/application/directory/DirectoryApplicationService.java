@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.directory.command.CreateDirectoryCommand;
 import org.art.vertex.application.directory.command.UpdateDirectoryCommand;
-import org.art.vertex.application.user.UserApplicationService;
 import org.art.vertex.domain.directory.DirectoryRepository;
 import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.shared.uuid.UuidGenerator;
-import org.art.vertex.domain.user.model.User;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -19,8 +17,6 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class DirectoryApplicationService {
-
-    private final UserApplicationService userService;
 
     private final DirectoryRepository directoryRepository;
 
@@ -33,8 +29,6 @@ public class DirectoryApplicationService {
         log.debug("Creating directory. User id: {}, name: {}", userId, command.getName());
 
         LocalDateTime now = clock.now();
-
-        User user = userService.getById(userId);
 
         Directory parent = null;
         if (command.getParentId() != null) {
