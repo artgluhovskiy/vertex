@@ -1,5 +1,6 @@
 package org.art.vertex.test.config;
 
+import org.art.vertex.test.step.DirSteps;
 import org.art.vertex.test.step.NoteSteps;
 import org.art.vertex.test.step.UserSteps;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -17,4 +18,10 @@ public class TestConfig {
     public NoteSteps noteSteps() {
         return new NoteSteps();
     }
+
+    @Bean
+    public DirSteps dirSteps() {
+        return new DirSteps();
+    }
 }
+

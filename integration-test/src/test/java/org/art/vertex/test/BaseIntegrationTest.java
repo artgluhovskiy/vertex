@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.VertexApplication;
 import org.art.vertex.test.config.TestConfig;
 import org.art.vertex.test.container.TestContainerManager;
+import org.art.vertex.test.step.DirSteps;
 import org.art.vertex.test.step.NoteSteps;
 import org.art.vertex.test.step.UserSteps;
 import org.junit.jupiter.api.AfterEach;
@@ -33,6 +34,9 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected NoteSteps noteSteps;
+
+    @Autowired
+    protected DirSteps dirSteps;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
@@ -84,6 +88,8 @@ public abstract class BaseIntegrationTest {
 
             // Truncate all tables (add more as schema grows)
             jdbcTemplate.execute("TRUNCATE TABLE notes CASCADE");
+            // TODO: Uncomment when directories table is created
+            // jdbcTemplate.execute("TRUNCATE TABLE directories CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE users CASCADE");
 
             // Re-enable foreign key checks

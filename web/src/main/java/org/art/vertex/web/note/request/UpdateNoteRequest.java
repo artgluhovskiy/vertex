@@ -19,7 +19,7 @@ public record UpdateNoteRequest(
     @NotBlank(message = "Content is required")
     String content,
 
-    @NotNull(message = "Directory is required")
+    @NotNull(message = "Directory id is required")
     UUID dirId,
 
     Set<String> tags

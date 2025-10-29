@@ -11,9 +11,9 @@ public class NoteCommandMapper {
 
     public CreateNoteCommand toCommand(CreateNoteRequest request) {
         return CreateNoteCommand.builder()
-            .dirId(request.dirId())
             .title(request.title())
             .content(request.content())
+            .dirId(request.dirId())
             .tags(request.tags() != null ? request.tags() : Set.of())
             .build();
     }
