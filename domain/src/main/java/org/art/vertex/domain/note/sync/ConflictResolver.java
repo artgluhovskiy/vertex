@@ -89,7 +89,7 @@ public class ConflictResolver {
 
         return Note.builder()
             .id(local.getId())
-            .user(local.getUser())
+            .userId(local.getUserId())
             .dir(local.getDir())
             .title(local.getTitle())
             .content(mergedContent)

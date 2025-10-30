@@ -3,11 +3,11 @@ package org.art.vertex.web.note.mapper;
 import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.tag.model.Tag;
-import org.art.vertex.domain.user.model.User;
 import org.art.vertex.web.note.dto.NoteDto;
 import org.art.vertex.web.tag.dto.TagDto;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class NoteDtoMapper {
@@ -15,7 +15,7 @@ public class NoteDtoMapper {
     public NoteDto toDto(Note note) {
         return NoteDto.builder()
             .id(note.getId())
-            .userId(note.getUser().getId())
+            .userId(note.getUserId())
             .dirId(note.getDir() != null ? note.getDir().getId() : null)
             .title(note.getTitle())
             .content(note.getContent())
@@ -29,13 +29,13 @@ public class NoteDtoMapper {
 
     public Note toDomain(
         NoteDto dto,
-        User user,
+        UUID userId,
         Directory directory,
         Set<Tag> tags
     ) {
         return Note.builder()
             .id(dto.id())
-            .user(user)
+            .userId(userId)
             .dir(directory)
             .title(dto.title())
             .content(dto.content())

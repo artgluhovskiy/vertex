@@ -28,17 +28,16 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class NoteInfrastructureConfig {
 
     @Bean
-    public TagEntityMapper tagEntityMapper(UserRepository userRepository) {
-        return new TagEntityMapper(userRepository);
+    public TagEntityMapper tagEntityMapper() {
+        return new TagEntityMapper();
     }
 
     @Bean
     public NoteEntityMapper noteEntityMapper(
-        UserRepository userRepository,
         DirectoryRepository directoryRepository,
         TagEntityMapper tagEntityMapper
     ) {
-        return new NoteEntityMapper(userRepository, directoryRepository, tagEntityMapper);
+        return new NoteEntityMapper(directoryRepository, tagEntityMapper);
     }
 
     @Bean

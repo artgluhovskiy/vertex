@@ -2,7 +2,6 @@ package org.art.vertex.domain.tag.model;
 
 import lombok.Builder;
 import lombok.Value;
-import org.art.vertex.domain.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +12,7 @@ public class Tag {
 
     UUID id;
 
-    User user;
+    UUID userId;
 
     String name;
 
@@ -23,10 +22,10 @@ public class Tag {
 
     Integer version;
 
-    public static Tag create(UUID id, User user, String name, LocalDateTime ts) {
+    public static Tag create(UUID id, UUID userId, String name, LocalDateTime ts) {
         return Tag.builder()
             .id(id)
-            .user(user)
+            .userId(userId)
             .name(name)
             .createdAt(ts)
             .updatedAt(ts)

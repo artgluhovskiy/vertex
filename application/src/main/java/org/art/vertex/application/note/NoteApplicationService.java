@@ -45,8 +45,6 @@ public class NoteApplicationService {
 
         LocalDateTime now = clock.now();
 
-        User user = userService.getById(userId);
-
         Directory dir = directoryService.getByDirId(command.getDirId());
 
         Set<Tag> tags = tagService.upsertTags(userId,
@@ -59,7 +57,7 @@ public class NoteApplicationService {
 
         Note newNote = Note.create(
             uuidGenerator.generate(),
-            user,
+            userId,
             command.getTitle(),
             command.getContent(),
             dir,
@@ -69,7 +67,7 @@ public class NoteApplicationService {
 
         Note savedNote = noteRepository.save(newNote);
 
-        log.info("Note created successfully. Note id: {}, user id: {}", savedNote.getId(), user.getId());
+        log.info("Note created successfully. Note id: {}, user id: {}", savedNote.getId(), userId);
 
         return savedNote;
     }

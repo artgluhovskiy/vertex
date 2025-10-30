@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Value;
 import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.tag.model.Tag;
-import org.art.vertex.domain.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -17,7 +16,7 @@ public class Note {
 
     UUID id;
 
-    User user;
+    UUID userId;
 
     Directory dir;
 
@@ -42,7 +41,7 @@ public class Note {
 
     public static Note create(
         UUID id,
-        User user,
+        UUID userId,
         String title,
         String content,
         Directory directory,
@@ -51,7 +50,7 @@ public class Note {
     ) {
         return Note.builder()
             .id(id)
-            .user(user)
+            .userId(userId)
             .title(title)
             .content(content)
             .dir(directory)
