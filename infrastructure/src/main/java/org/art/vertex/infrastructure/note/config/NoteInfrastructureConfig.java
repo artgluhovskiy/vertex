@@ -1,5 +1,6 @@
 package org.art.vertex.infrastructure.note.config;
 
+import org.art.vertex.domain.directory.DirectoryRepository;
 import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.note.DefaultNoteRepository;
@@ -32,8 +33,12 @@ public class NoteInfrastructureConfig {
     }
 
     @Bean
-    public NoteEntityMapper noteEntityMapper(UserRepository userRepository, TagEntityMapper tagEntityMapper) {
-        return new NoteEntityMapper(userRepository, tagEntityMapper);
+    public NoteEntityMapper noteEntityMapper(
+        UserRepository userRepository,
+        DirectoryRepository directoryRepository,
+        TagEntityMapper tagEntityMapper
+    ) {
+        return new NoteEntityMapper(userRepository, directoryRepository, tagEntityMapper);
     }
 
     @Bean

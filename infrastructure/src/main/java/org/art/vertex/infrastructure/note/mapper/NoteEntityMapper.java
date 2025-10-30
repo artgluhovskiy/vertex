@@ -1,6 +1,7 @@
 package org.art.vertex.infrastructure.note.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.art.vertex.domain.directory.DirectoryRepository;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.note.entity.NoteEntity;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 public class NoteEntityMapper {
 
     private final UserRepository userRepository;
+
+    private final DirectoryRepository directoryRepository;
 
     private final TagEntityMapper tagEntityMapper;
 
@@ -44,7 +47,7 @@ public class NoteEntityMapper {
         return Note.builder()
             .id(entity.getId())
             .user(userRepository.getById(entity.getUserId()))
-            .dir(null) // TODO: Will be loaded separately when needed
+            .dir(entity.getDirId() != null ? directoryRepository.getById(entity.getDirId()) : null)
             .title(entity.getTitle())
             .content(entity.getContent())
             .summary(entity.getSummary())
