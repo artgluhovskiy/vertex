@@ -2,6 +2,7 @@ package org.art.vertex.test.step;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import org.art.vertex.web.directory.request.CreateDirectoryRequest;
 import org.art.vertex.web.directory.dto.DirectoryDto;
 
 import java.util.HashMap;
@@ -17,12 +18,10 @@ public class DirSteps {
     }
 
     public DirectoryDto createDirectory(String accessToken, String name, UUID parentId) {
-        Map<String, Object> request = new HashMap<>();
-        request.put("name", name);
-
-        if (parentId != null) {
-            request.put("parentId", parentId);
-        }
+        var request = CreateDirectoryRequest.builder()
+            .name(name)
+            .parentId(parentId)
+            .build();
 
         return given()
             .header("Authorization", "Bearer " + accessToken)

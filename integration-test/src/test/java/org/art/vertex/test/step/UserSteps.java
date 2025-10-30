@@ -11,6 +11,10 @@ import static io.restassured.RestAssured.given;
 
 public class UserSteps {
 
+    public String registerAndGetToken(String email, String password) {
+        return register(email, password).accessToken();
+    }
+    
     public AuthenticationResponse register(String email, String password) {
         var request = UserRegistrationRequest.builder()
             .email(email)
@@ -97,9 +101,5 @@ public class UserSteps {
                 .get("/auth/me")
                 .then();
         }
-    }
-
-    public String registerAndGetToken(String email, String password) {
-        return register(email, password).accessToken();
     }
 }
