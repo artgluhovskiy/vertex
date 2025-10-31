@@ -235,6 +235,166 @@ class NoteFlowIntegrationTest extends BaseIntegrationTest {
         assertThat(notes).isEmpty();
     }
 
+    @Test
+    void shouldCreateNoteWithTags() {
+        // GIVEN
+        var auth = userSteps.register("user@example.com", "password123");
+        var token = auth.accessToken();
+        var userId = auth.user().id();
+
+        var dir = dirSteps.createRootDirectory(token, "My Notes");
+        var dirId = dir.id();
+
+        // WHEN
+        var note = noteSteps.createNote(
+            token,
+            "Java Spring Tutorial",
+            "This is a tutorial about Spring Boot",
+            dirId,
+            java.util.Set.of("java", "spring", "backend")
+        );
+
+        // THEN
+        assertThat(note).isNotNull();
+        assertThat(note.id()).isNotNull();
+        assertThat(note.dirId()).isEqualTo(dirId);
+        assertThat(note.title()).isEqualTo("Java Spring Tutorial");
+        assertThat(note.content()).isEqualTo("This is a tutorial about Spring Boot");
+        assertThat(note.userId()).isEqualTo(UUID.fromString(userId));
+        assertThat(note.tags()).isNotNull();
+        assertThat(note.tags()).hasSize(3);
+        assertThat(note.tags()).extracting("name")
+            .containsExactlyInAnyOrder("java", "spring", "backend");
+        assertThat(note.createdAt()).isNotNull();
+        assertThat(note.updatedAt()).isNotNull();
+
+        // THEN - Verify tags are persisted and can be retrieved
+        var retrievedNote = noteSteps.getNote(token, note.id());
+        assertThat(retrievedNote.tags()).hasSize(3);
+        assertThat(retrievedNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("java", "spring", "backend");
+    }
+
+    @Test
+    void shouldUpdateNoteWithChangedTags() {
+        // GIVEN - Create a note with initial tags
+        var auth = userSteps.register("user@example.com", "password123");
+        var token = auth.accessToken();
+        var userId = auth.user().id();
+
+        var dir = dirSteps.createRootDirectory(token, "My Notes");
+        var dirId = dir.id();
+
+        var createdNote = noteSteps.createNote(
+            token,
+            "Initial Note",
+            "Initial Content",
+            dirId,
+            java.util.Set.of("old-tag-1", "old-tag-2")
+        );
+
+        // THEN - Verify initial tags
+        assertThat(createdNote.tags()).hasSize(2);
+        assertThat(createdNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("old-tag-1", "old-tag-2");
+
+        // WHEN - Update note with different tags
+        var updatedNote = noteSteps.updateNote(
+            token,
+            createdNote.id(),
+            "Updated Note",
+            "Updated Content",
+            dirId,
+            java.util.Set.of("new-tag-1", "new-tag-2", "new-tag-3")
+        );
+
+        // THEN - Verify note is updated with new tags
+        assertThat(updatedNote).isNotNull();
+        assertThat(updatedNote.id()).isEqualTo(createdNote.id());
+        assertThat(updatedNote.userId()).isEqualTo(UUID.fromString(userId));
+        assertThat(updatedNote.dirId()).isEqualTo(dirId);
+        assertThat(updatedNote.title()).isEqualTo("Updated Note");
+        assertThat(updatedNote.content()).isEqualTo("Updated Content");
+        assertThat(updatedNote.tags()).hasSize(3);
+        assertThat(updatedNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("new-tag-1", "new-tag-2", "new-tag-3");
+        assertThat(updatedNote.updatedAt()).isAfter(createdNote.updatedAt());
+
+        // THEN - Verify tags are persisted and can be retrieved
+        var retrievedNote = noteSteps.getNote(token, updatedNote.id());
+        assertThat(retrievedNote.tags()).hasSize(3);
+        assertThat(retrievedNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("new-tag-1", "new-tag-2", "new-tag-3");
+    }
+
+    @Test
+    void shouldUpdateNoteWithOverlappingTags() {
+        // GIVEN - Create a note with initial tags
+        var auth = userSteps.register("user@example.com", "password123");
+        var token = auth.accessToken();
+        var userId = auth.user().id();
+
+        var dir = dirSteps.createRootDirectory(token, "My Notes");
+        var dirId = dir.id();
+
+        // Initial tags: "java", "spring", "backend", "database"
+        var createdNote = noteSteps.createNote(
+            token,
+            "Spring Boot Tutorial",
+            "Tutorial Content",
+            dirId,
+            java.util.Set.of("java", "spring", "backend", "database")
+        );
+
+        // THEN - Verify initial tags
+        assertThat(createdNote.tags()).hasSize(4);
+        assertThat(createdNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("java", "spring", "backend", "database");
+
+        // WHEN - Update note with overlapping tags
+        // Keep: "java", "backend"
+        // Remove: "spring", "database"
+        // Add: "kotlin", "microservices"
+        var updatedNote = noteSteps.updateNote(
+            token,
+            createdNote.id(),
+            "Spring Boot and Kotlin Tutorial",
+            "Updated Tutorial Content",
+            dirId,
+            java.util.Set.of("java", "backend", "kotlin", "microservices")
+        );
+
+        // THEN - Verify note is updated with overlapping tags
+        assertThat(updatedNote).isNotNull();
+        assertThat(updatedNote.id()).isEqualTo(createdNote.id());
+        assertThat(updatedNote.userId()).isEqualTo(UUID.fromString(userId));
+        assertThat(updatedNote.dirId()).isEqualTo(dirId);
+        assertThat(updatedNote.title()).isEqualTo("Spring Boot and Kotlin Tutorial");
+        assertThat(updatedNote.content()).isEqualTo("Updated Tutorial Content");
+        assertThat(updatedNote.tags()).hasSize(4);
+        assertThat(updatedNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("java", "backend", "kotlin", "microservices");
+        assertThat(updatedNote.updatedAt()).isAfter(createdNote.updatedAt());
+
+        // THEN - Verify common tags ("java", "backend") remained associated with the note
+        assertThat(updatedNote.tags()).extracting("name")
+            .contains("java", "backend");
+
+        // THEN - Verify removed tags ("spring", "database") are no longer associated
+        assertThat(updatedNote.tags()).extracting("name")
+            .doesNotContain("spring", "database");
+
+        // THEN - Verify new tags ("kotlin", "microservices") are now associated
+        assertThat(updatedNote.tags()).extracting("name")
+            .contains("kotlin", "microservices");
+
+        // THEN - Verify tags are persisted and can be retrieved
+        var retrievedNote = noteSteps.getNote(token, updatedNote.id());
+        assertThat(retrievedNote.tags()).hasSize(4);
+        assertThat(retrievedNote.tags()).extracting("name")
+            .containsExactlyInAnyOrder("java", "backend", "kotlin", "microservices");
+    }
+
     // ========== ERROR SCENARIO TESTS ==========
 
     @Test

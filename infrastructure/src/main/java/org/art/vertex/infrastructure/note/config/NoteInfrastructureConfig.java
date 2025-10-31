@@ -2,12 +2,14 @@ package org.art.vertex.infrastructure.note.config;
 
 import org.art.vertex.domain.directory.DirectoryRepository;
 import org.art.vertex.domain.note.NoteRepository;
+import org.art.vertex.domain.tag.TagRepository;
 import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.note.DefaultNoteRepository;
 import org.art.vertex.infrastructure.note.entity.NoteEntity;
 import org.art.vertex.infrastructure.note.jpa.NoteJpaRepository;
 import org.art.vertex.infrastructure.note.mapper.NoteEntityMapper;
 import org.art.vertex.infrastructure.note.updater.NoteUpdater;
+import org.art.vertex.infrastructure.tag.DefaultTagRepository;
 import org.art.vertex.infrastructure.tag.entity.TagEntity;
 import org.art.vertex.infrastructure.tag.jpa.TagJpaRepository;
 import org.art.vertex.infrastructure.tag.mapper.TagEntityMapper;
@@ -30,6 +32,14 @@ public class NoteInfrastructureConfig {
     @Bean
     public TagEntityMapper tagEntityMapper() {
         return new TagEntityMapper();
+    }
+
+    @Bean
+    public TagRepository tagRepository(
+        TagJpaRepository tagJpaRepository,
+        TagEntityMapper tagEntityMapper
+    ) {
+        return new DefaultTagRepository(tagJpaRepository, tagEntityMapper);
     }
 
     @Bean

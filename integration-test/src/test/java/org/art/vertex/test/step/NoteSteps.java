@@ -7,6 +7,7 @@ import org.art.vertex.web.note.request.CreateNoteRequest;
 import org.art.vertex.web.note.request.UpdateNoteRequest;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
@@ -14,10 +15,15 @@ import static io.restassured.RestAssured.given;
 public class NoteSteps {
 
     public NoteDto createNote(String accessToken, String title, String content, UUID directoryId) {
+        return createNote(accessToken, title, content, directoryId, null);
+    }
+
+    public NoteDto createNote(String accessToken, String title, String content, UUID directoryId, Set<String> tags) {
         var request = CreateNoteRequest.builder()
             .title(title)
             .content(content)
             .dirId(directoryId)
+            .tags(tags)
             .build();
 
         return given()
@@ -84,10 +90,15 @@ public class NoteSteps {
     }
 
     public NoteDto updateNote(String accessToken, UUID noteId, String title, String content, UUID dirId) {
+        return updateNote(accessToken, noteId, title, content, dirId, null);
+    }
+
+    public NoteDto updateNote(String accessToken, UUID noteId, String title, String content, UUID dirId, Set<String> tags) {
         var request = UpdateNoteRequest.builder()
             .title(title)
             .content(content)
             .dirId(dirId)
+            .tags(tags)
             .build();
 
         return given()

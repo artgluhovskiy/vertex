@@ -19,6 +19,8 @@ public interface TagRepository {
 
     Optional<Tag> findByNameAndUser(String name, User user);
 
+    Optional<Tag> findByNameAndUserId(String name, UUID userId);
+
     List<Tag> findAllByUserOrderByName(User user);
 
     boolean existsByNameAndUser(String name, User user);
