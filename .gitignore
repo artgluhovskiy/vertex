@@ -96,3 +96,7 @@ Thumbs.db
 coverage
 *.lcov
 .nyc_output
+
+# Backend
+backend/target/
+backend/**/target/
