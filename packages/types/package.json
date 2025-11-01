@@ -1,0 +1,20 @@
+{
+  "name": "@synapse/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./domain": "./src/domain/index.ts",
+    "./api": "./src/api/index.ts",
+    "./common": "./src/common/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "devDependencies": {
+    "@synapse/typescript-config": "workspace:*",
+    "typescript": "^5.3.3"
+  }
+}

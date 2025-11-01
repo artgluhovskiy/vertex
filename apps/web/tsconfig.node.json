@@ -1,0 +1,11 @@
+{
+  "extends": "@synapse/typescript-config/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false
+  },
+  "include": ["vite.config.ts"]
+}

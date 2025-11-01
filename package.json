@@ -1,0 +1,35 @@
+{
+  "name": "synapse-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Synapse - AI-powered note-taking application",
+  "author": "Synapse Team",
+  "license": "MIT",
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@synapse/web",
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter=@synapse/web",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint --fix",
+    "type-check": "turbo run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "clean:cache": "rm -rf .turbo node_modules/.cache"
+  },
+  "devDependencies": {
+    "@synapse/eslint-config": "workspace:*",
+    "@synapse/typescript-config": "workspace:*",
+    "prettier": "^3.1.1",
+    "turbo": "^1.11.3",
+    "typescript": "^5.3.3"
+  }
+}
