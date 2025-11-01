@@ -2,6 +2,7 @@ package org.art.vertex.domain.shared.time;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -9,6 +10,10 @@ import java.time.ZoneOffset;
 public class Clock {
 
     private final java.time.Clock nativeClock;
+
+    public Instant instant() {
+        return nativeClock.instant();
+    }
 
     public LocalDateTime now() {
         return nativeClock.instant()

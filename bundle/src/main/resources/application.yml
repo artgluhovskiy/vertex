@@ -23,6 +23,10 @@ server:
 security:
   bcrypt:
     strength: 12
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:changeme-this-is-a-default-secret-key-for-development-only-minimum-256-bits}
+    expiration: 24h
+    issuer: vertex
 
 logging:
   level:

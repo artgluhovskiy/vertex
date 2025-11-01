@@ -1,12 +1,13 @@
 package org.art.vertex.web.config;
 
 import lombok.RequiredArgsConstructor;
+import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.user.security.JwtTokenProvider;
 import org.art.vertex.domain.user.security.PasswordEncoder;
 import org.art.vertex.web.security.BCryptPasswordEncoder;
+import org.art.vertex.web.security.DefaultJwtTokenProvider;
 import org.art.vertex.web.security.JwtAuthenticationEntryPoint;
 import org.art.vertex.web.security.JwtAuthenticationFilter;
-import org.art.vertex.web.security.StubJwtTokenProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,7 +65,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtTokenProvider jwtTokenProvider() {
-        return new StubJwtTokenProvider();
+    public JwtTokenProvider jwtTokenProvider(Clock clock) {
+        return new DefaultJwtTokenProvider(securityProperties.getJwt(), clock);
     }
 }
