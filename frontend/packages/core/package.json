@@ -1,0 +1,26 @@
+{
+  "name": "@synapse/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./stores": "./src/stores/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./features": "./src/features/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@synapse/types": "workspace:*",
+    "react": "^18.2.0",
+    "zustand": "^4.4.7"
+  },
+  "devDependencies": {
+    "@synapse/typescript-config": "workspace:*",
+    "@types/react": "^18.2.43",
+    "typescript": "^5.3.3"
+  }
+}

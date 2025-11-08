@@ -1,0 +1,18 @@
+{
+  "name": "@synapse/utils",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "devDependencies": {
+    "@synapse/typescript-config": "workspace:*",
+    "typescript": "^5.3.3"
+  }
+}

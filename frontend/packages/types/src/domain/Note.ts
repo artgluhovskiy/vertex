@@ -1,3 +1,5 @@
+import type { Tag } from './Tag';
+
 export interface Note {
   id: string;
   userId: string;
@@ -10,13 +12,6 @@ export interface Note {
   createdAt: string;
   updatedAt: string;
   version: number;
-}
-
-export interface Tag {
-  id: string;
-  name: string;
-  description: string | null;
-  color: string | null;
 }
 
 export interface CreateNoteData {

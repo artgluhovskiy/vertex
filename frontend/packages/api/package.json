@@ -1,0 +1,29 @@
+{
+  "name": "@synapse/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./client": "./src/client/index.ts",
+    "./services": "./src/services/index.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./query-keys": "./src/query-keys.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@synapse/types": "workspace:*",
+    "@tanstack/react-query": "^5.13.4",
+    "axios": "^1.6.2",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@synapse/typescript-config": "workspace:*",
+    "@types/react": "^18.2.43",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.7"
+  }
+}

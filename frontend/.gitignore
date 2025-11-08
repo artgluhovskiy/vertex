@@ -61,3 +61,6 @@ Thumbs.db
 coverage
 *.lcov
 .nyc_output
+
+/rules
+/doc
