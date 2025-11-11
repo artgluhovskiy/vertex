@@ -55,24 +55,24 @@ export const DashboardPage: React.FC = () => {
   const notes = isDemoMode || error ? MOCK_NOTES : apiNotes;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
+      <header className="bg-light-bg-primary dark:bg-dark-bg-secondary border-b border-light-border-primary dark:border-dark-border-primary px-6 py-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold dark:text-gray-100">Synapse</h1>
+          <h1 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary">Synapse</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors dark:text-gray-100"
+              className="px-4 py-2 text-sm bg-light-bg-tertiary dark:bg-dark-bg-tertiary hover:bg-light-bg-hover dark:hover:bg-dark-bg-hover rounded-lg transition-colors text-light-text-primary dark:text-dark-text-primary"
             >
               {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
             </button>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
               {user?.email}
             </span>
             <button
               onClick={logout}
-              className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+              className="px-4 py-2 text-sm bg-error hover:bg-error-hover text-white rounded-lg transition-colors"
             >
               Logout
             </button>
@@ -83,37 +83,37 @@ export const DashboardPage: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto p-6">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2 dark:text-gray-100">
+          <h2 className="text-3xl font-bold mb-2 text-light-text-primary dark:text-dark-text-primary">
             Welcome to Synapse
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">
             Your AI-powered second brain for knowledge management
           </p>
           {isDemoMode && (
-            <div className="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-              <p className="text-sm text-purple-800 dark:text-purple-200">
-                🚀 <strong>Demo Mode</strong> - You're viewing mock data. Connect to backend to use full features.
+            <div className="mt-4 p-4 bg-secondary-light/10 dark:bg-secondary/20 border border-secondary-light dark:border-secondary rounded-lg">
+              <p className="text-sm text-secondary-dark dark:text-secondary-light">
+                🚀 <strong>Demo Mode</strong> - You&apos;re viewing mock data. Connect to backend to use full features.
               </p>
             </div>
           )}
         </div>
 
         {/* Notes Section */}
-        <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-          <h3 className="text-xl font-semibold mb-4 dark:text-gray-100">
+        <section className="card p-6">
+          <h3 className="text-xl font-semibold mb-4 text-light-text-primary dark:text-dark-text-primary">
             Recent Notes
           </h3>
 
           {isLoading ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-light-text-muted dark:text-dark-text-muted">
               Loading notes...
             </div>
           ) : notes.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-light-text-muted dark:text-dark-text-muted mb-4">
                 No notes yet. Create your first note to get started!
               </p>
-              <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+              <button className="btn-primary">
                 Create Note
               </button>
             </div>
@@ -122,12 +122,12 @@ export const DashboardPage: React.FC = () => {
               {notes.map((note) => (
                 <div
                   key={note.id}
-                  className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="p-4 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg hover:bg-light-bg-hover dark:hover:bg-dark-bg-hover transition-colors cursor-pointer border border-light-border-primary dark:border-dark-border-primary"
                 >
-                  <h4 className="font-medium mb-1 dark:text-gray-100">
+                  <h4 className="font-medium mb-1 text-light-text-primary dark:text-dark-text-primary">
                     {note.title}
                   </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                  <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-2">
                     {note.content}
                   </p>
                 </div>
@@ -138,29 +138,29 @@ export const DashboardPage: React.FC = () => {
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-            <h4 className="font-semibold mb-2 dark:text-gray-100">
+          <div className="card p-6">
+            <h4 className="font-semibold mb-2 text-light-text-primary dark:text-dark-text-primary">
               📝 Notes
             </h4>
-            <p className="text-2xl font-bold text-blue-500">
+            <p className="text-2xl font-bold text-primary">
               {notes.length}
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-            <h4 className="font-semibold mb-2 dark:text-gray-100">
+          <div className="card p-6">
+            <h4 className="font-semibold mb-2 text-light-text-primary dark:text-dark-text-primary">
               📁 Folders
             </h4>
-            <p className="text-2xl font-bold text-green-500">
+            <p className="text-2xl font-bold text-success">
               0
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
-            <h4 className="font-semibold mb-2 dark:text-gray-100">
+          <div className="card p-6">
+            <h4 className="font-semibold mb-2 text-light-text-primary dark:text-dark-text-primary">
               🏷️ Tags
             </h4>
-            <p className="text-2xl font-bold text-purple-500">
+            <p className="text-2xl font-bold text-secondary">
               0
             </p>
           </div>

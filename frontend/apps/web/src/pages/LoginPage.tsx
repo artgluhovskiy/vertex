@@ -45,18 +45,18 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-      <div className="w-full max-w-md p-8 bg-white dark:bg-gray-900 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-center dark:text-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
+      <div className="w-full max-w-md p-8 card-elevated animate-fade-in">
+        <h1 className="text-3xl font-bold mb-6 text-center text-light-text-primary dark:text-dark-text-primary">
           Synapse
         </h1>
-        <h2 className="text-xl mb-6 text-center text-gray-600 dark:text-gray-400">
+        <h2 className="text-xl mb-6 text-center text-light-text-secondary dark:text-dark-text-secondary">
           Sign In
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2 dark:text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium mb-2 text-light-text-secondary dark:text-dark-text-secondary">
               Email
             </label>
             <input
@@ -65,13 +65,13 @@ export const LoginPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+              className="input-base"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-2 dark:text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium mb-2 text-light-text-secondary dark:text-dark-text-secondary">
               Password
             </label>
             <input
@@ -80,13 +80,13 @@ export const LoginPage: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+              className="input-base"
               placeholder="••••••••"
             />
           </div>
 
           {loginError && (
-            <div className="text-red-500 text-sm">
+            <div className="text-error text-sm">
               {loginError.message || 'Login failed. Please try again.'}
             </div>
           )}
@@ -94,7 +94,7 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -103,10 +103,10 @@ export const LoginPage: React.FC = () => {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+              <div className="w-full border-t border-light-border-primary dark:border-dark-border-primary"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+              <span className="px-2 bg-light-bg-tertiary dark:bg-dark-bg-tertiary text-light-text-muted dark:text-dark-text-muted">
                 Or
               </span>
             </div>
@@ -114,13 +114,13 @@ export const LoginPage: React.FC = () => {
 
           <button
             onClick={handleDemoMode}
-            className="mt-4 w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            className="btn-secondary w-full mt-4"
           >
             🚀 Try Demo Mode (No Backend Required)
           </button>
         </div>
 
-        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-6 text-center text-sm text-light-text-muted dark:text-dark-text-muted">
           Demo mode lets you explore the UI with mock data
         </p>
       </div>

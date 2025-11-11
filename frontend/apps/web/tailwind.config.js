@@ -1,8 +1,9 @@
-const baseConfig = require('@synapse/tailwind-config/base');
+import baseConfig from '@synapse/tailwind-config/base';
+import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   ...baseConfig,
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [typography],
 };

@@ -1,9 +1,10 @@
+import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
-import { LoginPage } from '../pages/LoginPage';
-import { DashboardPage } from '../pages/DashboardPage';
+import { LoginPage } from '@/pages/LoginPage';
+import { DashboardPage } from '@/pages/DashboardPage';
 
-export const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginPage />,
@@ -16,4 +17,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-]);
+];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const router = createBrowserRouter(routes) as any;
