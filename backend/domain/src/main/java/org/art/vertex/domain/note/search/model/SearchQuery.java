@@ -27,5 +27,14 @@ public class SearchQuery {
     Integer maxResults;
 
     @Builder.Default
+    Double minScore = 0.0;
+
+    @Builder.Default
+    boolean includeHighlights = false;
+
+    @Builder.Default
+    String embeddingModel = "default";
+
+    @Builder.Default
     Map<String, Object> options = Map.of();
 }

@@ -2,7 +2,7 @@ import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { LoginPage } from '@/pages/LoginPage';
-import { DashboardPage } from '@/pages/DashboardPage';
+import { MainPage } from '@/pages/MainPage';
 
 const routes: RouteObject[] = [
   {
@@ -13,7 +13,7 @@ const routes: RouteObject[] = [
     path: '/',
     element: (
       <ProtectedRoute>
-        <DashboardPage />
+        <MainPage />
       </ProtectedRoute>
     ),
   },
