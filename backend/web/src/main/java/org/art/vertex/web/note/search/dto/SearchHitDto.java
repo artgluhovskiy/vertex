@@ -1,18 +1,11 @@
 package org.art.vertex.web.note.search.dto;
 
 import lombok.Builder;
-import lombok.Value;
+import org.art.vertex.web.note.dto.NoteDto;
 
-import java.util.List;
-import java.util.UUID;
-
-@Value
 @Builder
-public class SearchHitDto {
-    UUID noteId;
-    String title;
-    String content;
-    double score;
-    String matchType;
-    List<String> highlights;
+public record SearchHitDto(
+    NoteDto note,
+    double score
+) {
 }
