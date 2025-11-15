@@ -8,6 +8,7 @@ import org.art.vertex.infrastructure.note.entity.NoteEntity;
 import org.art.vertex.infrastructure.note.jpa.NoteJpaRepository;
 import org.art.vertex.infrastructure.note.mapper.NoteEntityMapper;
 import org.art.vertex.infrastructure.note.search.jpa.NoteEmbeddingJpaRepository;
+import org.art.vertex.infrastructure.note.search.config.SearchProperties;
 import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProvider;
 import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProviderFactory;
 import org.art.vertex.infrastructure.note.search.embedding.ollama.OllamaNomicEmbedTextProvider;
@@ -20,15 +21,14 @@ import org.art.vertex.infrastructure.tag.DefaultTagRepository;
 import org.art.vertex.infrastructure.tag.entity.TagEntity;
 import org.art.vertex.infrastructure.tag.jpa.TagJpaRepository;
 import org.art.vertex.infrastructure.tag.mapper.TagEntityMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
@@ -42,6 +42,7 @@ import java.util.List;
     TagEntity.class,
     NoteEmbeddingEntity.class
 })
+@EnableConfigurationProperties(SearchProperties.class)
 public class NoteInfrastructureConfig {
 
     @Bean
@@ -88,7 +89,7 @@ public class NoteInfrastructureConfig {
 
     @Bean
     @ConditionalOnProperty(
-        name = "embedding.indexing.enhanced.enabled",
+        name = "search.indexing.enhanced-enabled",
         havingValue = "true",
         matchIfMissing = false
     )
@@ -100,15 +101,23 @@ public class NoteInfrastructureConfig {
 
     @Bean
     @ConditionalOnProperty(
-        name = "embedding.providers.ollama.enabled",
+        name = "search.embedding.providers.ollama.enabled",
         havingValue = "true",
         matchIfMissing = true
     )
-    public EmbeddingProvider ollamaNomicEmbedTextProvider(
-        @Value("${embedding.providers.ollama.base-url:http://localhost:11434}") String baseUrl,
-        @Value("${embedding.providers.ollama.timeout-seconds:30}") int timeoutSeconds
-    ) {
-        return new OllamaNomicEmbedTextProvider(baseUrl, Duration.ofSeconds(timeoutSeconds));
+    public EmbeddingProvider ollamaNomicEmbedTextProvider(SearchProperties searchProperties) {
+        SearchProperties.EmbeddingProperties.ProviderConfig ollamaConfig =
+            searchProperties.getEmbedding().getProviders().get("ollama");
+
+        String baseUrl = ollamaConfig != null && ollamaConfig.getBaseUrl() != null
+            ? ollamaConfig.getBaseUrl()
+            : "http://localhost:11434";
+
+        Duration timeout = ollamaConfig != null && ollamaConfig.getTimeout() != null
+            ? ollamaConfig.getTimeout()
+            : Duration.ofSeconds(30);
+
+        return new OllamaNomicEmbedTextProvider(baseUrl, timeout);
     }
 
     @Bean

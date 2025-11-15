@@ -33,3 +33,45 @@ logging:
     org.art.vertex: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# ========== Search Configuration ==========
+search:
+  embedding:
+    # Default embedding model to use
+    default-model: OLLAMA_NOMIC_EMBED_TEXT_SMALL
+
+    # Embedding provider configurations
+    providers:
+      ollama:
+        enabled: true
+        base-url: http://localhost:11434
+        timeout: 30s
+      # Future providers can be added here:
+      # openai:
+      #   enabled: false
+      #   base-url: https://api.openai.com/v1
+      #   timeout: 60s
+      #   api-key: ${OPENAI_API_KEY}
+
+  indexing:
+    # Default indexing strategy (BASIC, ENHANCED)
+    strategy: BASIC
+    # Enable enhanced indexing with higher field weights
+    enhanced-enabled: false
+    # Enable chunking for long notes (RAG optimization)
+    chunking-enabled: false
+    chunk-size: 4000
+    chunk-overlap: 200
+
+  vector:
+    # Default number of search results
+    default-limit: 20
+    # Minimum similarity threshold (0.0 - 1.0)
+    min-similarity: 0.7
+    # Maximum results that can be requested
+    max-results: 100
+    # Include note content in search results
+    include-content: true
+    # Query result caching
+    cache-enabled: false
+    cache-ttl: 15m
