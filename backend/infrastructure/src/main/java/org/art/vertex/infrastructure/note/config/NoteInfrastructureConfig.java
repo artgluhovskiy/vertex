@@ -3,29 +3,44 @@ package org.art.vertex.infrastructure.note.config;
 import org.art.vertex.domain.directory.DirectoryRepository;
 import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.tag.TagRepository;
-import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.infrastructure.note.DefaultNoteRepository;
 import org.art.vertex.infrastructure.note.entity.NoteEntity;
 import org.art.vertex.infrastructure.note.jpa.NoteJpaRepository;
 import org.art.vertex.infrastructure.note.mapper.NoteEntityMapper;
+import org.art.vertex.infrastructure.note.search.jpa.NoteEmbeddingJpaRepository;
+import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProvider;
+import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProviderFactory;
+import org.art.vertex.infrastructure.note.search.embedding.ollama.OllamaNomicEmbedTextProvider;
+import org.art.vertex.infrastructure.note.search.entity.NoteEmbeddingEntity;
+import org.art.vertex.infrastructure.note.search.indexing.BasicTextIndexingStrategy;
+import org.art.vertex.infrastructure.note.search.indexing.EnhancedTextIndexingStrategy;
+import org.art.vertex.infrastructure.note.search.indexing.TextIndexingStrategy;
 import org.art.vertex.infrastructure.note.updater.NoteUpdater;
 import org.art.vertex.infrastructure.tag.DefaultTagRepository;
 import org.art.vertex.infrastructure.tag.entity.TagEntity;
 import org.art.vertex.infrastructure.tag.jpa.TagJpaRepository;
 import org.art.vertex.infrastructure.tag.mapper.TagEntityMapper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration(proxyBeanMethods = false)
 @EnableJpaRepositories(basePackageClasses = {
     NoteJpaRepository.class,
-    TagJpaRepository.class
+    TagJpaRepository.class,
+    NoteEmbeddingJpaRepository.class
 })
 @EntityScan(basePackageClasses = {
     NoteEntity.class,
-    TagEntity.class
+    TagEntity.class,
+    NoteEmbeddingEntity.class
 })
 public class NoteInfrastructureConfig {
 
@@ -62,5 +77,42 @@ public class NoteInfrastructureConfig {
         NoteUpdater noteUpdater
     ) {
         return new DefaultNoteRepository(noteJpaRepository, noteEntityMapper, noteUpdater);
+    }
+
+    // ========== Text Indexing Strategies ==========
+
+    @Bean
+    public TextIndexingStrategy basicTextIndexingStrategy() {
+        return new BasicTextIndexingStrategy();
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "embedding.indexing.enhanced.enabled",
+        havingValue = "true",
+        matchIfMissing = false
+    )
+    public TextIndexingStrategy enhancedTextIndexingStrategy() {
+        return new EnhancedTextIndexingStrategy();
+    }
+
+    // ========== Embedding Providers ==========
+
+    @Bean
+    @ConditionalOnProperty(
+        name = "embedding.providers.ollama.enabled",
+        havingValue = "true",
+        matchIfMissing = true
+    )
+    public EmbeddingProvider ollamaNomicEmbedTextProvider(
+        @Value("${embedding.providers.ollama.base-url:http://localhost:11434}") String baseUrl,
+        @Value("${embedding.providers.ollama.timeout-seconds:30}") int timeoutSeconds
+    ) {
+        return new OllamaNomicEmbedTextProvider(baseUrl, Duration.ofSeconds(timeoutSeconds));
+    }
+
+    @Bean
+    public EmbeddingProviderFactory embeddingProviderFactory(List<EmbeddingProvider> providers) {
+        return new EmbeddingProviderFactory(providers);
     }
 }
