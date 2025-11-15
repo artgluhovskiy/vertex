@@ -1,6 +1,7 @@
 package org.art.vertex.infrastructure.note.search.indexing;
 
 import org.art.vertex.domain.note.model.Note;
+import org.art.vertex.infrastructure.embedding.EmbeddingProvider;
 
 /**
  * Strategy interface for converting notes into indexable text for embedding generation.
@@ -26,7 +27,7 @@ import org.art.vertex.domain.note.model.Note;
  * </pre>
  *
  * @see IndexableText
- * @see org.art.vertex.infrastructure.note.search.embedding.EmbeddingProvider
+ * @see EmbeddingProvider
  */
 public interface TextIndexingStrategy {
 

@@ -1,5 +1,6 @@
-package org.art.vertex.infrastructure.note.search.embedding;
+package org.art.vertex.infrastructure.embedding;
 
+import lombok.Getter;
 import org.art.vertex.domain.note.search.model.EmbeddingModel;
 
 /**
@@ -12,37 +13,18 @@ import org.art.vertex.domain.note.search.model.EmbeddingModel;
  * - Model is not loaded yet
  * - Authentication failed
  */
+@Getter
 public class EmbeddingProviderNotReadyException extends RuntimeException {
 
     private final EmbeddingModel model;
 
-    /**
-     * Create exception with model.
-     *
-     * @param model Embedding model that is not ready
-     */
     public EmbeddingProviderNotReadyException(EmbeddingModel model) {
         super(String.format("Embedding provider not ready for model: %s", model));
         this.model = model;
     }
 
-    /**
-     * Create exception with message and model.
-     *
-     * @param message Error message
-     * @param model   Embedding model that is not ready
-     */
     public EmbeddingProviderNotReadyException(String message, EmbeddingModel model) {
         super(message);
         this.model = model;
-    }
-
-    /**
-     * Get the embedding model that is not ready.
-     *
-     * @return Embedding model
-     */
-    public EmbeddingModel getModel() {
-        return model;
     }
 }

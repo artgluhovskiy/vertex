@@ -2,7 +2,7 @@ package org.art.vertex.test.embedding;
 
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.domain.note.search.model.EmbeddingModel;
-import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProviderFactory;
+import org.art.vertex.infrastructure.embedding.EmbeddingProviderFactory;
 import org.art.vertex.test.BaseIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

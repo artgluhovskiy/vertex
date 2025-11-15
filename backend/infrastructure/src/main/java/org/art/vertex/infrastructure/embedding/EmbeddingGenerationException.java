@@ -1,4 +1,4 @@
-package org.art.vertex.infrastructure.note.search.embedding;
+package org.art.vertex.infrastructure.embedding;
 
 /**
  * Exception thrown when embedding generation fails.

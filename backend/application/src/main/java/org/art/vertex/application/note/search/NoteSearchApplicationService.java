@@ -44,7 +44,6 @@ public class NoteSearchApplicationService {
             .type(SearchType.SEMANTIC)
             .pageSize(command.getMaxResults() != null ? command.getMaxResults() : 20)
             .pageNumber(1)
-            .minScore(0.5) // Default similarity threshold
             .embeddingModel(EmbeddingModel.OLLAMA_NOMIC_EMBED_TEXT_SMALL)
             .build();
 

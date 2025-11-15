@@ -1,4 +1,4 @@
-package org.art.vertex.infrastructure.note.search.embedding;
+package org.art.vertex.infrastructure.embedding;
 
 import org.art.vertex.domain.note.search.model.EmbeddingModel;
 
@@ -28,7 +28,7 @@ public interface EmbeddingProvider {
      * @param text Input text to embed (max length depends on model)
      * @return Embedding vector as list of floats (normalized)
      * @throws EmbeddingGenerationException if embedding generation fails
-     * @throws IllegalArgumentException if text is null or exceeds model limits
+     * @throws IllegalArgumentException     if text is null or exceeds model limits
      */
     List<Float> embed(String text);
 
@@ -44,7 +44,7 @@ public interface EmbeddingProvider {
      * @param texts List of texts to embed
      * @return List of embedding vectors (same order as input)
      * @throws EmbeddingGenerationException if any embedding generation fails
-     * @throws IllegalArgumentException if texts is null or empty
+     * @throws IllegalArgumentException     if texts is null or empty
      */
     List<List<Float>> embedAll(List<String> texts);
 
@@ -85,59 +85,5 @@ public interface EmbeddingProvider {
      */
     boolean isReady();
 
-    /**
-     * Get provider type (for logging and monitoring).
-     * Examples: "OLLAMA", "OPENAI", "TRANSFORMERS_JS"
-     *
-     * @return Provider type string
-     */
-    default String getProviderType() {
-        return getSupportedModel().getProvider().name();
-    }
-
-    /**
-     * Get estimated time to generate embedding (milliseconds).
-     * Used for timeout configuration and performance monitoring.
-     * <p>
-     * Default implementation returns a conservative estimate.
-     * Providers should override with actual measurements.
-     *
-     * @return Estimated generation time in milliseconds
-     */
-    default long getEstimatedGenerationTimeMs() {
-        return 1000L; // 1 second default
-    }
-
-    /**
-     * Get maximum text length supported by this model (in characters).
-     * Implementations should return the actual model limit.
-     * <p>
-     * Default implementation returns a conservative estimate.
-     *
-     * @return Maximum text length in characters
-     */
-    default int getMaxTextLength() {
-        return 8192; // Conservative default (~2000 tokens)
-    }
-
-    /**
-     * Validate that text is within model limits.
-     * Throws exception if text is invalid.
-     *
-     * @param text Text to validate
-     * @throws IllegalArgumentException if text is invalid
-     */
-    default void validateText(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("Text cannot be null");
-        }
-        if (text.isEmpty()) {
-            throw new IllegalArgumentException("Text cannot be empty");
-        }
-        if (text.length() > getMaxTextLength()) {
-            throw new IllegalArgumentException(
-                String.format("Text length (%d) exceeds maximum (%d) for model %s",
-                    text.length(), getMaxTextLength(), getModelName()));
-        }
-    }
+    int getMaxTextLength();
 }

@@ -14,14 +14,15 @@ import org.art.vertex.domain.note.search.model.SearchQuery;
 import org.art.vertex.domain.note.search.model.SearchResult;
 import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.shared.uuid.UuidGenerator;
-import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProvider;
-import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProviderFactory;
+import org.art.vertex.infrastructure.embedding.EmbeddingProvider;
+import org.art.vertex.infrastructure.embedding.EmbeddingProviderFactory;
 import org.art.vertex.infrastructure.note.search.indexing.IndexableText;
 import org.art.vertex.infrastructure.note.search.indexing.TextIndexingStrategy;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -43,14 +44,12 @@ public class DefaultVectorSearchService implements VectorSearchService {
         log.debug("Indexing note for vector search: {}", note.getId());
 
         try {
-            // Prepare indexable text
             IndexableText indexableText = indexingStrategy.prepareText(note);
             String text = indexableText.getText();
 
             log.trace("Prepared index text ({} chars) for note: {}",
                 text.length(), note.getId());
 
-            // Get embedding provider
             EmbeddingProvider provider = providerFactory.getProvider(defaultModel);
 
             if (!provider.isReady()) {
@@ -59,14 +58,12 @@ public class DefaultVectorSearchService implements VectorSearchService {
                 return;
             }
 
-            // Generate embedding
             List<Float> vector = provider.embed(text);
             EmbeddingDimension dimension = EmbeddingDimension.fromValue(provider.getDimension());
 
             log.trace("Generated embedding ({}-dimensional) for note: {}",
                 provider.getDimension(), note.getId());
 
-            // Save or update embedding
             LocalDateTime now = clock.now();
             var existingOpt = embeddingRepository.findByNoteId(note.getId());
 
@@ -132,9 +129,8 @@ public class DefaultVectorSearchService implements VectorSearchService {
         log.debug("Executing vector search, query: {}", query.getQ());
 
         try {
-            // Get embedding provider
-            EmbeddingModel model = query.getEmbeddingModel() != null ?
-                query.getEmbeddingModel() : defaultModel;
+            EmbeddingModel model = Optional.ofNullable(query.getEmbeddingModel()).orElse(defaultModel);
+
             EmbeddingProvider provider = providerFactory.getProvider(model);
 
             if (!provider.isReady()) {
@@ -151,12 +147,11 @@ public class DefaultVectorSearchService implements VectorSearchService {
             log.trace("Generated query embedding ({}-dimensional)",
                 queryVector.size());
 
-            // Determine search parameters
-            double minSimilarity = query.getMinScore() != null ?
-                query.getMinScore() : config.getVectorMinSimilarityThreshold();
+            double minSimilarity = Optional.ofNullable(query.getMinScore())
+                .orElse(config.getVectorMinSimilarityThreshold());
+
             int limit = query.getPageSize();
 
-            // Execute vector search via repository
             List<SearchHit> hits = embeddingRepository.searchByVector(
                 queryVector,
                 provider.getModelName(),
@@ -179,20 +174,5 @@ public class DefaultVectorSearchService implements VectorSearchService {
                 .totalHits(0)
                 .build();
         }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Note> findKNearest(UUID noteId, int k) {
-        log.debug("Finding {} nearest notes for note: {}", k, noteId);
-
-        // This method is intentionally left with minimal implementation
-        // The application layer should use NoteEmbeddingRepository.findKNearestNoteIds()
-        // and then fetch full Note objects via NoteRepository
-        // This maintains proper separation of concerns
-
-        log.warn("findKNearest called on DefaultVectorSearchService - " +
-            "this should be handled at application layer");
-        return List.of();
     }
 }

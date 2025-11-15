@@ -1,4 +1,4 @@
-package org.art.vertex.infrastructure.note.search.embedding.ollama;
+package org.art.vertex.infrastructure.embedding.ollama;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

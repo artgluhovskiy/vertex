@@ -1,8 +1,8 @@
-package org.art.vertex.infrastructure.note.search.embedding.ollama;
+package org.art.vertex.infrastructure.embedding.ollama;
 
 import lombok.extern.slf4j.Slf4j;
-import org.art.vertex.infrastructure.note.search.embedding.EmbeddingGenerationException;
-import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProvider;
+import org.art.vertex.infrastructure.embedding.EmbeddingGenerationException;
+import org.art.vertex.infrastructure.embedding.EmbeddingProvider;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -20,23 +20,14 @@ import java.util.Map;
  * - POST /api/embeddings - Generate embeddings
  * - GET /api/tags - List available models
  * <p>
- * Subclasses must implement:
- * - {@link #getSupportedModel()}
- * - {@link #getModelName()}
- * - {@link #getDimension()}
  */
 @Slf4j
 public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvider {
 
     protected final WebClient webClient;
+
     protected final Duration timeout;
 
-    /**
-     * Constructor with base URL and timeout.
-     *
-     * @param baseUrl Ollama base URL (e.g., "http://localhost:11434")
-     * @param timeout Request timeout
-     */
     protected AbstractOllamaEmbeddingProvider(String baseUrl, Duration timeout) {
         this.webClient = WebClient.builder()
             .baseUrl(baseUrl)
@@ -49,20 +40,16 @@ public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvid
 
     @Override
     public List<Float> embed(String text) {
-        validateText(text);
-
         log.debug("Generating embedding with Ollama: model={}, textLength={}",
             getModelName(), text.length());
 
         try {
-            // Build request body
             Map<String, Object> request = Map.of(
                 "model", getModelName(),
                 "prompt", text,
                 "stream", false
             );
 
-            // Call Ollama API
             OllamaEmbeddingResponse response = webClient.post()
                 .uri("/api/embeddings")
                 .bodyValue(request)
@@ -78,7 +65,6 @@ public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvid
                     "Received null response from Ollama for model: " + getModelName());
             }
 
-            // Convert Double to Float and normalize
             List<Float> embedding = convertToFloatList(response.embedding());
             normalizeVector(embedding);
 
@@ -90,24 +76,18 @@ public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvid
         } catch (WebClientResponseException e) {
             log.error("Ollama HTTP error: status={}, body={}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new EmbeddingGenerationException(
-                String.format("Ollama API HTTP error for model %s: %s", getModelName(), e.getMessage()),
-                e
+                "Ollama API HTTP error for model %s: %s".formatted(getModelName(), e.getMessage()), e
             );
         } catch (Exception e) {
             log.error("Failed to generate embedding with Ollama: model={}", getModelName(), e);
             throw new EmbeddingGenerationException(
-                String.format("Embedding generation failed for model %s", getModelName()),
-                e
+                "Embedding generation failed for model %s".formatted(getModelName()), e
             );
         }
     }
 
     @Override
     public List<List<Float>> embedAll(List<String> texts) {
-        if (texts == null || texts.isEmpty()) {
-            throw new IllegalArgumentException("Texts list cannot be null or empty");
-        }
-
         log.debug("Batch embedding generation: model={}, count={}", getModelName(), texts.size());
 
         // Ollama doesn't have native batch API, so process sequentially
@@ -119,7 +99,7 @@ public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvid
             } catch (Exception e) {
                 log.error("Failed to embed text at index {}: {}", i, e.getMessage());
                 throw new EmbeddingGenerationException(
-                    String.format("Batch embedding failed at index %d", i), e);
+                    "Batch embedding failed at index %d".formatted(i), e);
             }
         }
 
@@ -144,7 +124,6 @@ public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvid
                 })
                 .block();
 
-            // Basic check: response should contain "models"
             boolean ready = response != null && response.contains("models");
 
             if (ready) {
@@ -159,12 +138,6 @@ public abstract class AbstractOllamaEmbeddingProvider implements EmbeddingProvid
             log.warn("Ollama readiness check failed: model={}", getModelName(), e);
             return false;
         }
-    }
-
-    @Override
-    public long getEstimatedGenerationTimeMs() {
-        // Ollama is typically fast (local execution)
-        return 500L; // 500ms average
     }
 
     @Override

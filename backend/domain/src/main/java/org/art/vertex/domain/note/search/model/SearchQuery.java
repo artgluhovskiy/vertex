@@ -22,7 +22,7 @@ public class SearchQuery {
     int pageNumber = 1;
 
     @Builder.Default
-    Double minScore = 0.0;
+    Double minScore = 0.5;
 
     @Builder.Default
     EmbeddingModel embeddingModel = EmbeddingModel.OLLAMA_NOMIC_EMBED_TEXT_SMALL;
