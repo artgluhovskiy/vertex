@@ -63,6 +63,8 @@ coverage
 .nyc_output
 
 /rules
-/doc
+/front-doc
 
 notes.txt
+
+../doc/FRONTEND_EXPLAINED_FOR_BACKEND_DEVS.md

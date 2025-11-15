@@ -29,14 +29,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@Entity
+@Table(name = "notes")
 @Setter
 @Getter
 @SuperBuilder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "notes")
 public class NoteEntity extends BaseEntity {
 
     @Column(name = "user_id", nullable = false)
