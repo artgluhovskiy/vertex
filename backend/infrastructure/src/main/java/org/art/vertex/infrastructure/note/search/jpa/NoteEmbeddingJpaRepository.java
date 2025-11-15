@@ -264,3 +264,4 @@ public interface NoteEmbeddingJpaRepository extends JpaRepository<NoteEmbeddingE
         """, nativeQuery = true)
     List<UUID> findIndexedNoteIdsByUserId(@Param("userId") UUID userId);
 }
+
