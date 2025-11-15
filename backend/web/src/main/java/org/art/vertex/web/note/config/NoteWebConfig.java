@@ -42,13 +42,4 @@ public class NoteWebConfig {
     public SearchDtoMapper searchDtoMapper(NoteDtoMapper noteDtoMapper) {
         return new SearchDtoMapper(noteDtoMapper);
     }
-
-    @Bean
-    public NoteSearchController searchController(
-        NoteSearchApplicationService noteSearchApplicationService,
-        SearchCommandMapper searchCommandMapper,
-        SearchDtoMapper searchDtoMapper
-    ) {
-        return new NoteSearchController(noteSearchApplicationService, searchCommandMapper, searchDtoMapper);
-    }
 }

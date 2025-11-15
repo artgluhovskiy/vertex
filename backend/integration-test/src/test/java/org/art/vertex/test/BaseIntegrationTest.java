@@ -7,6 +7,7 @@ import org.art.vertex.test.config.TestConfig;
 import org.art.vertex.test.container.TestContainerManager;
 import org.art.vertex.test.step.DirSteps;
 import org.art.vertex.test.step.NoteSteps;
+import org.art.vertex.test.step.SearchSteps;
 import org.art.vertex.test.step.UserSteps;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,6 +38,9 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected DirSteps dirSteps;
+
+    @Autowired
+    protected SearchSteps searchSteps;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
