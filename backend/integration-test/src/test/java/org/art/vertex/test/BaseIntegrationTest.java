@@ -79,6 +79,9 @@ public abstract class BaseIntegrationTest {
                 + containerManager.getPostgresPort() + "/vertex");
         registry.add("spring.datasource.username", () -> "vertex");
         registry.add("spring.datasource.password", () -> "vertex");
+
+        registry.add("search.embedding.providers.ollama.base-url", () ->
+            "http://" + containerManager.getOllamaHost() + ":" + containerManager.getOllamaPort());
     }
 
     protected void cleanupAllTestData() {
@@ -88,6 +91,7 @@ public abstract class BaseIntegrationTest {
 
             // Truncate all tables (add more as schema grows)
             jdbcTemplate.execute("TRUNCATE TABLE notes CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE note_embeddings CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE directories CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE users CASCADE");
 
