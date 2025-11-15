@@ -1,13 +1,19 @@
 package org.art.vertex.infrastructure.note.config;
 
 import org.art.vertex.domain.directory.DirectoryRepository;
+import org.art.vertex.domain.note.NoteEmbeddingRepository;
 import org.art.vertex.domain.note.NoteRepository;
+import org.art.vertex.domain.note.search.VectorSearchService;
+import org.art.vertex.domain.note.search.model.EmbeddingModel;
+import org.art.vertex.domain.note.search.model.SearchConfiguration;
+import org.art.vertex.domain.shared.time.Clock;
+import org.art.vertex.domain.shared.uuid.UuidGenerator;
 import org.art.vertex.domain.tag.TagRepository;
 import org.art.vertex.infrastructure.note.DefaultNoteRepository;
 import org.art.vertex.infrastructure.note.entity.NoteEntity;
 import org.art.vertex.infrastructure.note.jpa.NoteJpaRepository;
 import org.art.vertex.infrastructure.note.mapper.NoteEntityMapper;
-import org.art.vertex.infrastructure.note.search.jpa.NoteEmbeddingJpaRepository;
+import org.art.vertex.infrastructure.note.search.DefaultNoteEmbeddingRepository;
 import org.art.vertex.infrastructure.note.search.config.SearchProperties;
 import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProvider;
 import org.art.vertex.infrastructure.note.search.embedding.EmbeddingProviderFactory;
@@ -16,6 +22,9 @@ import org.art.vertex.infrastructure.note.search.entity.NoteEmbeddingEntity;
 import org.art.vertex.infrastructure.note.search.indexing.BasicTextIndexingStrategy;
 import org.art.vertex.infrastructure.note.search.indexing.EnhancedTextIndexingStrategy;
 import org.art.vertex.infrastructure.note.search.indexing.TextIndexingStrategy;
+import org.art.vertex.infrastructure.note.search.jpa.NoteEmbeddingJpaRepository;
+import org.art.vertex.infrastructure.note.search.mapper.NoteEmbeddingEntityMapper;
+import org.art.vertex.infrastructure.note.search.service.DefaultVectorSearchService;
 import org.art.vertex.infrastructure.note.updater.NoteUpdater;
 import org.art.vertex.infrastructure.tag.DefaultTagRepository;
 import org.art.vertex.infrastructure.tag.entity.TagEntity;
@@ -123,5 +132,59 @@ public class NoteInfrastructureConfig {
     @Bean
     public EmbeddingProviderFactory embeddingProviderFactory(List<EmbeddingProvider> providers) {
         return new EmbeddingProviderFactory(providers);
+    }
+
+    // ========== Search Configuration ==========
+
+    @Bean
+    public SearchConfiguration searchConfiguration(SearchProperties searchProperties) {
+        SearchProperties.VectorSearchProperties vectorProps = searchProperties.getVector();
+
+        return SearchConfiguration.builder()
+            .vectorMinSimilarityThreshold(vectorProps.getMinSimilarity())
+            .defaultMaxResults(vectorProps.getDefaultLimit())
+            .build();
+    }
+
+    // ========== Embedding Repository ==========
+
+    @Bean
+    public NoteEmbeddingEntityMapper noteEmbeddingEntityMapper() {
+        return new NoteEmbeddingEntityMapper();
+    }
+
+    @Bean
+    public NoteEmbeddingRepository noteEmbeddingRepository(
+        NoteEmbeddingJpaRepository jpaRepository,
+        NoteEmbeddingEntityMapper mapper
+    ) {
+        return new DefaultNoteEmbeddingRepository(jpaRepository, mapper);
+    }
+
+    // ========== Vector Search Service ==========
+
+    @Bean
+    public VectorSearchService vectorSearchService(
+        NoteEmbeddingRepository embeddingRepository,
+        EmbeddingProviderFactory providerFactory,
+        TextIndexingStrategy indexingStrategy,
+        SearchConfiguration searchConfiguration,
+        UuidGenerator uuidGenerator,
+        Clock clock,
+        SearchProperties searchProperties
+    ) {
+        // Get default model from configuration
+        String defaultModelName = searchProperties.getEmbedding().getDefaultModel();
+        EmbeddingModel defaultModel = EmbeddingModel.valueOf(defaultModelName);
+
+        return new DefaultVectorSearchService(
+            embeddingRepository,
+            providerFactory,
+            indexingStrategy,
+            searchConfiguration,
+            uuidGenerator,
+            clock,
+            defaultModel
+        );
     }
 }

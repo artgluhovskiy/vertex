@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
 import org.art.vertex.application.note.command.UpdateNoteCommand;
+import org.art.vertex.application.note.search.NoteIndexingApplicationService;
 import org.art.vertex.application.tag.TagApplicationService;
 import org.art.vertex.application.tag.command.UpsertTagCommand;
 import org.art.vertex.application.user.UserApplicationService;
@@ -14,7 +15,6 @@ import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.shared.uuid.UuidGenerator;
 import org.art.vertex.domain.tag.model.Tag;
-import org.art.vertex.domain.user.model.User;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -34,6 +34,8 @@ public class NoteApplicationService {
     private final TagApplicationService tagService;
 
     private final NoteRepository noteRepository;
+
+    private final NoteIndexingApplicationService indexingService;
 
     private final UuidGenerator uuidGenerator;
 
@@ -69,6 +71,9 @@ public class NoteApplicationService {
 
         log.info("Note created successfully. Note id: {}, user id: {}", savedNote.getId(), userId);
 
+        // Index note for search (async, in separate transaction)
+        indexingService.indexNoteAsync(savedNote);
+
         return savedNote;
     }
 
@@ -102,6 +107,9 @@ public class NoteApplicationService {
 
         log.info("Note updated successfully. Note id: {}", noteId);
 
+        // Reindex note for search (async, in separate transaction)
+        indexingService.reindexNoteAsync(updatedNote);
+
         return updatedNote;
     }
 
@@ -126,5 +134,8 @@ public class NoteApplicationService {
         noteRepository.deleteByNoteIdAndUserId(noteId, userId);
 
         log.info("Note deleted successfully. Note id: {}", noteId);
+
+        // Remove from search index (async, in separate transaction)
+        indexingService.removeNoteFromIndexAsync(noteId);
     }
 }

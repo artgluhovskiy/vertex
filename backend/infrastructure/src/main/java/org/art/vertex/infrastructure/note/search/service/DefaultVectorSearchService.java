@@ -156,15 +156,11 @@ public class DefaultVectorSearchService implements VectorSearchService {
                 query.getMinScore() : config.getVectorMinSimilarityThreshold();
             int limit = query.getPageSize();
 
-            // Note: userId needs to be provided separately or added to SearchQuery
-            // For now, using a placeholder - this needs to be fixed
-            UUID userId = UUID.randomUUID(); // TODO: Get from context or query
-
             // Execute vector search via repository
             List<SearchHit> hits = embeddingRepository.searchByVector(
                 queryVector,
                 provider.getModelName(),
-                userId,
+                query.getUserId(),
                 minSimilarity,
                 limit
             );
