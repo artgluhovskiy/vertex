@@ -1,4 +1,5 @@
-import type { DirectoryTreeNode } from '@/types/directory-tree';
+import { memo } from 'react';
+import type { DirectoryTreeNode } from '@/types/directoryTree';
 
 interface DirectoryTreeItemProps {
   /** The tree node to render */
@@ -14,7 +15,7 @@ interface DirectoryTreeItemProps {
   onToggle: (directoryId: string) => void;
 }
 
-export function DirectoryTreeItem({
+export const DirectoryTreeItem = memo(function DirectoryTreeItem({
   node,
   selectedId,
   onSelect,
@@ -107,4 +108,4 @@ export function DirectoryTreeItem({
       )}
     </div>
   );
-}
+});

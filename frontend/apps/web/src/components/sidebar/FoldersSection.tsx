@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useDirectories } from '@synapse/api/hooks';
 import { useNotes } from '@synapse/api/hooks';
 import { DirectoryTree } from './DirectoryTree';
@@ -30,7 +30,7 @@ export function FoldersSection() {
   }, [directories, rootDirectory, notes, expandedIds]);
 
   // Handle expand/collapse toggle
-  const handleToggle = (directoryId: string) => {
+  const handleToggle = useCallback((directoryId: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(directoryId)) {
@@ -40,14 +40,13 @@ export function FoldersSection() {
       }
       return next;
     });
-  };
+  }, []);
 
   // Handle directory selection
-  const handleSelect = (directoryId: string) => {
+  const handleSelect = useCallback((directoryId: string) => {
     setSelectedId(directoryId);
     // TODO: Filter notes by selected directory
-    console.log('Selected directory:', directoryId);
-  };
+  }, []);
 
   // Loading state
   if (isLoading) {
