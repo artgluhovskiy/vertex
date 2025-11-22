@@ -1,5 +1,12 @@
 import { memo } from 'react';
 import type { DirectoryTreeNode } from '@/types/directoryTree';
+import { ChevronIcon } from '@/components/icons/ChevronIcon';
+import {
+  TREE_ITEM_HEIGHT,
+  TREE_INDENT_INCREMENT,
+  CHEVRON_CENTER_OFFSET,
+  TREE_ITEM_BASE_PADDING,
+} from './constants';
 
 interface DirectoryTreeItemProps {
   /** The tree node to render */
@@ -28,7 +35,7 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
 
   // Calculate indentation based on tree level
   // Level 0 = ROOT (not rendered), Level 1 = 0px, Level 2 = 16px, etc.
-  const indentPx = Math.max(0, level - 1) * 16;
+  const indentPx = Math.max(0, level - 1) * TREE_INDENT_INCREMENT;
 
   const handleClick = () => {
     // If folder has children, toggle expand/collapse
@@ -43,6 +50,10 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
     <div className="relative">
       {/* Directory Item */}
       <button
+        role="treeitem"
+        aria-expanded={hasChildren ? isExpanded : undefined}
+        aria-selected={isSelected}
+        aria-label={`${directory.name}${hasChildren ? `, ${children.length} ${children.length === 1 ? 'subfolder' : 'subfolders'}` : ''}`}
         onClick={handleClick}
         className={`
           w-full flex items-center gap-1 px-1 py-1 text-sm
@@ -53,22 +64,16 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
               : 'hover:bg-light-bg-hover/50 dark:hover:bg-dark-bg-hover/50'
           }
         `}
-        style={{ paddingLeft: `${4 + indentPx}px` }}
+        style={{ paddingLeft: `${TREE_ITEM_BASE_PADDING + indentPx}px` }}
       >
         {/* Expand/Collapse Chevron */}
         <span
           className={`
             flex-shrink-0 w-5 h-5 flex items-center justify-center
-            transition-transform
             ${hasChildren ? 'text-light-text-muted dark:text-dark-text-muted' : 'invisible'}
           `}
-          style={{
-            transform: isExpanded && hasChildren ? 'rotate(90deg)' : 'rotate(0deg)',
-          }}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M5 3l6 5-6 5V3z"/>
-          </svg>
+          <ChevronIcon rotated={isExpanded && hasChildren} />
         </span>
 
         {/* Directory Name */}
@@ -82,7 +87,7 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
         <div
           className="overflow-hidden transition-all duration-200 ease-in-out relative"
           style={{
-            maxHeight: isExpanded ? `${children.length * 32}px` : '0px',
+            maxHeight: isExpanded ? `${children.length * TREE_ITEM_HEIGHT}px` : '0px',
             opacity: isExpanded ? 1 : 0,
           }}
         >
@@ -91,7 +96,7 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
             <div
               className="absolute top-0 bottom-0 w-px bg-light-text-muted/20 dark:bg-dark-text-muted/20"
               style={{
-                left: `${4 + indentPx + 10}px`, // Position at the center of the chevron
+                left: `${TREE_ITEM_BASE_PADDING + indentPx + CHEVRON_CENTER_OFFSET}px`, // Position at the center of the chevron
               }}
             />
           )}

@@ -3,6 +3,8 @@ import { useDirectories } from '@synapse/api/hooks';
 import { useNotes } from '@synapse/api/hooks';
 import { DirectoryTree } from './DirectoryTree';
 import { buildDirectoryTree } from '@/utils/buildDirectoryTree';
+import { ChevronIcon } from '@/components/icons/ChevronIcon';
+import { SECTION_MAX_HEIGHT } from './constants';
 
 export function FoldersSection() {
   // Fetch directories and notes from API
@@ -101,13 +103,8 @@ export function FoldersSection() {
         onClick={() => setIsSectionCollapsed(!isSectionCollapsed)}
       >
         <div className="flex items-center gap-1">
-          <span
-            className="transition-transform text-light-text-muted dark:text-dark-text-muted flex items-center justify-center w-5 h-5"
-            style={{ transform: isSectionCollapsed ? 'rotate(0deg)' : 'rotate(90deg)' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M5 3l6 5-6 5V3z"/>
-            </svg>
+          <span className="text-light-text-muted dark:text-dark-text-muted flex items-center justify-center w-5 h-5">
+            <ChevronIcon rotated={!isSectionCollapsed} />
           </span>
           <span>Folders</span>
         </div>
@@ -117,7 +114,7 @@ export function FoldersSection() {
       <div
         className="overflow-hidden transition-all duration-300 ease-in-out"
         style={{
-          maxHeight: isSectionCollapsed ? '0px' : '1000px',
+          maxHeight: isSectionCollapsed ? '0px' : `${SECTION_MAX_HEIGHT}px`,
           opacity: isSectionCollapsed ? 0 : 1,
         }}
       >

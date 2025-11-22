@@ -5,6 +5,29 @@ import { mockNotes } from './data/notes';
 // API base URL - must match the axios client baseURL
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
+// Request body types
+interface CreateDirectoryRequest {
+  name: string;
+  parentId?: string | null;
+}
+
+interface UpdateDirectoryRequest {
+  name?: string;
+  parentId?: string | null;
+}
+
+interface CreateNoteRequest {
+  title: string;
+  content?: string;
+  directoryId?: string | null;
+}
+
+interface UpdateNoteRequest {
+  title?: string;
+  content?: string;
+  directoryId?: string | null;
+}
+
 /**
  * MSW handlers for mocking API endpoints during development.
  *
@@ -12,6 +35,25 @@ const API_BASE_URL = 'http://localhost:8080/api/v1';
  * allowing the frontend to work without a running backend.
  */
 export const handlers = [
+  // GET /api/v1/auth/me - Get current user
+  http.get(`${API_BASE_URL}/auth/me`, () => {
+    return HttpResponse.json(
+      {
+        id: 'user-1',
+        email: 'user@example.com',
+        name: 'Test User',
+        createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }),
+
   // GET /api/v1/directories - Get all directories
   http.get(`${API_BASE_URL}/directories`, () => {
     return HttpResponse.json(mockDirectories, {
@@ -91,11 +133,12 @@ export const handlers = [
 
   // POST /api/v1/directories - Create directory
   http.post(`${API_BASE_URL}/directories`, async ({ request }) => {
-    const body = await request.json();
+    const body = (await request.json()) as CreateDirectoryRequest;
     const newDirectory = {
       id: `dir-${Date.now()}`,
       userId: 'user-1',
-      ...(body as any),
+      name: body.name,
+      parentId: body.parentId ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -112,11 +155,13 @@ export const handlers = [
 
   // POST /api/v1/notes - Create note
   http.post(`${API_BASE_URL}/notes`, async ({ request }) => {
-    const body = await request.json();
+    const body = (await request.json()) as CreateNoteRequest;
     const newNote = {
       id: `note-${Date.now()}`,
       userId: 'user-1',
-      ...(body as any),
+      title: body.title,
+      content: body.content ?? '',
+      directoryId: body.directoryId ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -132,7 +177,7 @@ export const handlers = [
   // PUT /api/v1/directories/:id - Update directory
   http.put(`${API_BASE_URL}/directories/:id`, async ({ params, request }) => {
     const { id } = params;
-    const body = await request.json();
+    const body = (await request.json()) as UpdateDirectoryRequest;
     const directory = mockDirectories.find((dir) => dir.id === id);
 
     if (!directory) {
@@ -144,7 +189,8 @@ export const handlers = [
 
     const updatedDirectory = {
       ...directory,
-      ...(body as any),
+      ...(body.name !== undefined && { name: body.name }),
+      ...(body.parentId !== undefined && { parentId: body.parentId }),
       updatedAt: new Date(),
     };
 
@@ -159,7 +205,7 @@ export const handlers = [
   // PUT /api/v1/notes/:id - Update note
   http.put(`${API_BASE_URL}/notes/:id`, async ({ params, request }) => {
     const { id } = params;
-    const body = await request.json();
+    const body = (await request.json()) as UpdateNoteRequest;
     const note = mockNotes.find((n) => n.id === id);
 
     if (!note) {
@@ -171,7 +217,9 @@ export const handlers = [
 
     const updatedNote = {
       ...note,
-      ...(body as any),
+      ...(body.title !== undefined && { title: body.title }),
+      ...(body.content !== undefined && { content: body.content }),
+      ...(body.directoryId !== undefined && { directoryId: body.directoryId }),
       updatedAt: new Date(),
     };
 

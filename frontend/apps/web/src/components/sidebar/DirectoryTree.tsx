@@ -66,7 +66,7 @@ export function DirectoryTree({
 
   // Default: Render only the children of the root (hide the ROOT "Folders" directory)
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-0.5" role="tree" aria-label="Directory tree">
       {rootNode.children.map((childNode) => (
         <DirectoryTreeItem
           key={childNode.directory.id}

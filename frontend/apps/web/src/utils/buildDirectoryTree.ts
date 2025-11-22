@@ -37,7 +37,7 @@ export function buildDirectoryTree(
     if (note.directoryId) {
       directNoteCounts.set(
         note.directoryId,
-        (directNoteCounts.get(note.directoryId) || 0) + 1
+        (directNoteCounts.get(note.directoryId) ?? 0) + 1
       );
     }
   });
@@ -46,7 +46,7 @@ export function buildDirectoryTree(
   const rootNode: DirectoryTreeNode = {
     directory: rootDirectory,
     children: [],
-    noteCount: directNoteCounts.get(rootDirectory.id) || 0,
+    noteCount: directNoteCounts.get(rootDirectory.id) ?? 0,
     isExpanded: true, // ROOT is always expanded
     level: 0,
   };
@@ -62,7 +62,7 @@ export function buildDirectoryTree(
     const node: DirectoryTreeNode = {
       directory: dir,
       children: [],
-      noteCount: directNoteCounts.get(dir.id) || 0,
+      noteCount: directNoteCounts.get(dir.id) ?? 0,
       isExpanded: expandedIds.has(dir.id),
       level: 0, // Will be calculated when connecting relationships
     };
@@ -77,7 +77,7 @@ export function buildDirectoryTree(
     if (!node) return; // Shouldn't happen, but guard against it
 
     // Find parent (default to ROOT if parentId is null or not found)
-    const parentId = dir.parentId || rootDirectory.id;
+    const parentId = dir.parentId ?? rootDirectory.id;
     const parent = nodeMap.get(parentId);
 
     if (parent) {
@@ -114,7 +114,7 @@ export function buildDirectoryTree(
         0
       );
 
-      const directNotes = directNoteCounts.get(node.directory.id) || 0;
+      const directNotes = directNoteCounts.get(node.directory.id) ?? 0;
       node.noteCount = directNotes + childNotesTotal;
 
       return node.noteCount;
