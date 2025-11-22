@@ -49,3 +49,7 @@ Thumbs.db
 /**/target/
 
 /back-doc
+
+OBSIDIAN_MIGRATION_PLAN.md
+SEMANTIC_SEARCH_BENCHMARK_PLAN.md
+CLAUDE.md

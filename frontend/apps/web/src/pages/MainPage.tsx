@@ -1,79 +1,58 @@
+import { MainLayout } from '@/components/layout';
+import { NoteViewer, NoteContent } from '@/components/note';
+
 export const MainPage: React.FC = () => {
+  // TODO: Get note data from API
+  // TODO: Handle routing for different notes
+  // TODO: Add loading states
+  // TODO: Add error states
+
+  const mockNoteContent = `
+# Welcome to Synapse
+
+This is the main application skeleton with placeholder components.
+
+## What's Implemented
+
+- ✅ Three-panel layout structure
+- ✅ Left sidebar (navigation)
+- ✅ Right sidebar (context/AI)
+- ✅ Icon toolbar with theme toggle
+- ✅ Note viewer structure
+- ✅ Status bar with stats
+
+## What's Next (TODOs)
+
+### Design System
+- Implement Button variants and styling
+- Implement Input with icon support
+- Implement Badge colors and variants
+- Implement Card glassmorphism effect
+
+### Layout Components
+- Add collapsible sidebar functionality
+- Implement TabBar with multi-tab support
+- Add breadcrumb navigation
+
+### Feature Components
+- Wire up NotesSection to real API
+- Implement FoldersSection tree structure
+- Implement SmartShelvesSection with tags
+- Add markdown rendering
+- Connect AI suggestions
+
+### Polish
+- Add animations and transitions
+- Implement responsive design
+- Add keyboard shortcuts
+- Improve accessibility
+`;
+
   return (
-    <div className="flex h-screen bg-light-bg-primary dark:bg-dark-bg-primary">
-      {/* Left Sidebar */}
-      <aside className="w-56 bg-light-bg-secondary dark:bg-dark-bg-secondary border-r border-light-border-primary dark:border-dark-border-primary flex flex-col">
-        {/* Search Input */}
-        <div className="p-4">
-          {/* Search placeholder */}
-        </div>
-
-        {/* New Note Button */}
-        <div className="px-4 pb-4">
-          {/* Button placeholder */}
-        </div>
-
-        {/* Sort and Filter */}
-        <div className="px-4 pb-4">
-          {/* Sort/Filter placeholder */}
-        </div>
-
-        {/* Notes Section */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Notes list placeholder */}
-        </div>
-
-        {/* Folders Section */}
-        <div className="border-t border-light-border-primary dark:border-dark-border-primary">
-          {/* Folders placeholder */}
-        </div>
-
-        {/* Smart Shelves Section */}
-        <div className="border-t border-light-border-primary dark:border-dark-border-primary">
-          {/* Smart Shelves placeholder */}
-        </div>
-      </aside>
-
-      {/* Central Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Tab Bar */}
-        <div className="border-b border-light-border-primary dark:border-dark-border-primary">
-          {/* Tabs placeholder */}
-        </div>
-
-        {/* Note Header */}
-        <div className="border-b border-light-border-primary dark:border-dark-border-primary">
-          {/* Note header placeholder */}
-        </div>
-
-        {/* Note Content */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Note content placeholder */}
-        </div>
-
-        {/* Footer Stats */}
-        <div className="border-t border-light-border-primary dark:border-dark-border-primary">
-          {/* Footer stats placeholder */}
-        </div>
-      </main>
-
-      {/* Right Sidebar */}
-      <aside className="w-64 bg-light-bg-secondary dark:bg-dark-bg-secondary border-l border-light-border-primary dark:border-dark-border-primary flex flex-col">
-        {/* Tools Section */}
-        <div className="border-b border-light-border-primary dark:border-dark-border-primary">
-          {/* Tools placeholder */}
-        </div>
-
-        {/* Note Context Section */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Note context placeholder */}
-        </div>
-      </aside>
-
-      {/* Vertical Toolbar */}
-      <aside className="w-12 bg-light-bg-primary dark:bg-dark-bg-primary border-l border-light-border-primary dark:border-dark-border-primary flex flex-col items-center py-4 gap-4">
-        {/* Toolbar icons placeholder */}
-      </aside>
-    </div>
+    <MainLayout>
+      <NoteViewer>
+        <NoteContent content={mockNoteContent} />
+      </NoteViewer>
+    </MainLayout>
   );
 };
