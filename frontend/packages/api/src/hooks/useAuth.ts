@@ -6,7 +6,7 @@ import type { AuthCredentials } from '@synapse/types/domain';
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading, isError } = useQuery({
+  const { data: user, isLoading } = useQuery({
     queryKey: queryKeys.auth.me,
     queryFn: authService.getCurrentUser,
     retry: false,
