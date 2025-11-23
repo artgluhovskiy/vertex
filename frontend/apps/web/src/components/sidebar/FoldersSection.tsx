@@ -6,7 +6,12 @@ import { buildDirectoryTree } from '@/utils/buildDirectoryTree';
 import { ChevronIcon } from '@/components/icons/ChevronIcon';
 import { SECTION_MAX_HEIGHT } from './constants';
 
-export function FoldersSection() {
+interface FoldersSectionProps {
+  onNoteSelect?: (noteId: string) => void;
+  selectedNoteId?: string | null;
+}
+
+export function FoldersSection({ onNoteSelect, selectedNoteId }: FoldersSectionProps) {
   // Fetch directories and notes from API
   const { directories, rootDirectory, isLoading, error } = useDirectories();
   const { notes } = useNotes();
@@ -124,6 +129,8 @@ export function FoldersSection() {
             selectedId={selectedId}
             onSelect={handleSelect}
             onToggle={handleToggle}
+            onNoteSelect={onNoteSelect}
+            selectedNoteId={selectedNoteId}
           />
         </div>
       </div>

@@ -1,8 +1,8 @@
-import type { Directory } from '@synapse/types/domain';
+import type { Directory, Note } from '@synapse/types/domain';
 
 /**
  * Represents a node in the directory tree structure.
- * Contains the directory data, its children, note count, and UI state.
+ * Contains the directory data, its children, notes, note count, and UI state.
  */
 export interface DirectoryTreeNode {
   /** The directory data from the API */
@@ -10,6 +10,9 @@ export interface DirectoryTreeNode {
 
   /** Child directories (nested structure) */
   children: DirectoryTreeNode[];
+
+  /** Notes that belong to this directory (direct children only, not recursive) */
+  notes: Note[];
 
   /** Total number of notes in this directory (recursive count includes children) */
   noteCount: number;

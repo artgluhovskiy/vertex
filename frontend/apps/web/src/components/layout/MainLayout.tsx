@@ -5,9 +5,11 @@ import { IconToolbar } from './IconToolbar';
 
 interface MainLayoutProps {
   children: ReactNode;
+  onNoteSelect?: (noteId: string) => void;
+  selectedNoteId?: string | null;
 }
 
-export function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children, onNoteSelect, selectedNoteId }: MainLayoutProps) {
   // TODO: Add state management for sidebar visibility
   // TODO: Connect to UI store for theme and layout preferences
 
@@ -15,7 +17,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     <div className="flex h-screen bg-light-bg-secondary dark:bg-dark-bg-primary">
       {/* Left Sidebar - 220px fixed */}
       <aside className="w-[220px] flex-shrink-0 border-r border-light-border-primary dark:border-dark-border-primary bg-light-bg-primary dark:bg-dark-bg-secondary">
-        <LeftSidebar />
+        <LeftSidebar onNoteSelect={onNoteSelect} selectedNoteId={selectedNoteId} />
       </aside>
 
       {/* Main Content Area - Flexible */}

@@ -31,22 +31,22 @@ export function buildDirectoryTree(
     sortAlphabetically = true,
   } = options;
 
-  // Step 1: Count notes per directory (direct count, not recursive)
-  const directNoteCounts = new Map<string, number>();
+  // Step 1: Group notes by directory
+  const notesByDirectory = new Map<string, Note[]>();
   notes.forEach((note) => {
     if (note.directoryId) {
-      directNoteCounts.set(
-        note.directoryId,
-        (directNoteCounts.get(note.directoryId) ?? 0) + 1
-      );
+      const existing = notesByDirectory.get(note.directoryId) || [];
+      notesByDirectory.set(note.directoryId, [...existing, note]);
     }
   });
 
   // Step 2: Create the ROOT node
+  const rootNotes = notesByDirectory.get(rootDirectory.id) || [];
   const rootNode: DirectoryTreeNode = {
     directory: rootDirectory,
     children: [],
-    noteCount: directNoteCounts.get(rootDirectory.id) ?? 0,
+    notes: rootNotes,
+    noteCount: rootNotes.length,
     isExpanded: true, // ROOT is always expanded
     level: 0,
   };
@@ -59,10 +59,12 @@ export function buildDirectoryTree(
   directories.forEach((dir) => {
     if (dir.id === rootDirectory.id) return; // Skip ROOT (already created)
 
+    const dirNotes = notesByDirectory.get(dir.id) || [];
     const node: DirectoryTreeNode = {
       directory: dir,
       children: [],
-      noteCount: directNoteCounts.get(dir.id) ?? 0,
+      notes: dirNotes,
+      noteCount: dirNotes.length,
       isExpanded: expandedIds.has(dir.id),
       level: 0, // Will be calculated when connecting relationships
     };
@@ -114,7 +116,7 @@ export function buildDirectoryTree(
         0
       );
 
-      const directNotes = directNoteCounts.get(node.directory.id) ?? 0;
+      const directNotes = node.notes.length;
       node.noteCount = directNotes + childNotesTotal;
 
       return node.noteCount;

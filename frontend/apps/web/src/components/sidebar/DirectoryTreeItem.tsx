@@ -20,6 +20,12 @@ interface DirectoryTreeItemProps {
 
   /** Callback when expand/collapse icon is clicked */
   onToggle: (directoryId: string) => void;
+
+  /** Callback when a note is clicked */
+  onNoteSelect?: (noteId: string) => void;
+
+  /** ID of the currently selected note */
+  selectedNoteId?: string | null;
 }
 
 export const DirectoryTreeItem = memo(function DirectoryTreeItem({
@@ -27,8 +33,10 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
   selectedId,
   onSelect,
   onToggle,
+  onNoteSelect,
+  selectedNoteId,
 }: DirectoryTreeItemProps) {
-  const { directory, children, isExpanded, level } = node;
+  const { directory, children, notes, isExpanded, level } = node;
 
   const isSelected = selectedId === directory.id;
   const hasChildren = children.length > 0;
@@ -82,6 +90,34 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
         </span>
       </button>
 
+      {/* Render Notes (if expanded) */}
+      {isExpanded && notes.length > 0 && (
+        <div className="mt-0.5">
+          {notes.map((note) => {
+            const isNoteSelected = selectedNoteId === note.id;
+            return (
+              <button
+                key={note.id}
+                onClick={() => onNoteSelect?.(note.id)}
+                className={`
+                  w-full flex items-center gap-1 px-1 py-1 text-sm transition-colors rounded
+                  ${
+                    isNoteSelected
+                      ? 'bg-primary/10 text-primary'
+                      : 'hover:bg-light-bg-hover/50 dark:hover:bg-dark-bg-hover/50 text-light-text-secondary dark:text-dark-text-secondary'
+                  }
+                `}
+                style={{ paddingLeft: `${TREE_ITEM_BASE_PADDING + indentPx + 32}px` }}
+              >
+                <span className="truncate text-sm">
+                  {note.title}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Render Children (if expanded) */}
       {hasChildren && (
         <div
@@ -107,6 +143,8 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
               selectedId={selectedId}
               onSelect={onSelect}
               onToggle={onToggle}
+              onNoteSelect={onNoteSelect}
+              selectedNoteId={selectedNoteId}
             />
           ))}
         </div>

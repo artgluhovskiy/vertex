@@ -1,6 +1,11 @@
 import { NotesSection, FoldersSection, SmartShelvesSection } from '../sidebar';
 
-export function LeftSidebar() {
+interface LeftSidebarProps {
+  onNoteSelect?: (noteId: string) => void;
+  selectedNoteId?: string | null;
+}
+
+export function LeftSidebar({ onNoteSelect, selectedNoteId }: LeftSidebarProps) {
   // TODO: Add search bar
   // TODO: Add "New Note" button
   // TODO: Add sort/filter buttons
@@ -17,7 +22,7 @@ export function LeftSidebar() {
         {/* Sections */}
         <div className="space-y-2">
           <NotesSection />
-          <FoldersSection />
+          <FoldersSection onNoteSelect={onNoteSelect} selectedNoteId={selectedNoteId} />
           <SmartShelvesSection />
         </div>
       </div>

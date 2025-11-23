@@ -14,6 +14,12 @@ interface DirectoryTreeProps {
   /** Callback when expand/collapse is triggered */
   onToggle: (directoryId: string) => void;
 
+  /** Callback when a note is clicked */
+  onNoteSelect?: (noteId: string) => void;
+
+  /** ID of the currently selected note */
+  selectedNoteId?: string | null;
+
   /** Whether to render the root node itself or just its children */
   renderRoot?: boolean;
 }
@@ -39,6 +45,8 @@ export function DirectoryTree({
   selectedId,
   onSelect,
   onToggle,
+  onNoteSelect,
+  selectedNoteId,
   renderRoot = false,
 }: DirectoryTreeProps) {
   // If no children, show empty state
@@ -60,6 +68,8 @@ export function DirectoryTree({
         selectedId={selectedId}
         onSelect={onSelect}
         onToggle={onToggle}
+        onNoteSelect={onNoteSelect}
+        selectedNoteId={selectedNoteId}
       />
     );
   }
@@ -74,6 +84,8 @@ export function DirectoryTree({
           selectedId={selectedId}
           onSelect={onSelect}
           onToggle={onToggle}
+          onNoteSelect={onNoteSelect}
+          selectedNoteId={selectedNoteId}
         />
       ))}
     </div>
