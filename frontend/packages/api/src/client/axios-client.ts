@@ -1,7 +1,9 @@
 import axios, { type AxiosInstance } from 'axios';
 
-// Default API base URL - can be overridden via environment variable
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+// Use relative URL to leverage Vite's proxy configuration
+// This avoids CORS issues during development
+// In production, ensure VITE_API_BASE_URL is set to the full backend URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -30,9 +32,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized - clear token and redirect to login
+      // Handle unauthorized - clear token
+      // Don't redirect here to avoid infinite loops
+      // Let React Query and the auth hook handle the redirect
       localStorage.removeItem('auth_token');
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

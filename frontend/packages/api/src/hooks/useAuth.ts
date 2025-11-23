@@ -6,10 +6,16 @@ import type { AuthCredentials } from '@synapse/types/domain';
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, isError } = useQuery({
     queryKey: queryKeys.auth.me,
     queryFn: authService.getCurrentUser,
     retry: false,
+    // Don't show error in console for 401 (expected when not logged in)
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    // Ensure loading state completes even on error
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   const loginMutation = useMutation({

@@ -1,22 +1,66 @@
-version: '3.8'
-
 services:
+  # PostgreSQL with pgvector extension for vector similarity search
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     container_name: vertex-postgres
-    environment:
-      POSTGRES_DB: vertex
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_DB: vertex
+      POSTGRES_USER: vertex
+      POSTGRES_PASSWORD: vertex
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U vertex -d vertex"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - vertex-network
+    labels:
+      - "com.vertex.service=postgres"
+      - "com.vertex.purpose=integration-test"
+
+  # Ollama for local embeddings (nomic-embed-text, mxbai-embed-large)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: vertex-ollama
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_INSECURE: "true"
+      OLLAMA_SKIP_VERIFY: "true"
+      OLLAMA_TLS_VERIFY: "false"
+      OLLAMA_NOHISTORY: "true"
+      CURL_CA_BUNDLE: ""
+      OLLAMA_HOST: "0.0.0.0:11434"
+      OLLAMA_ORIGINS: "*"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    networks:
+      - vertex-network
+    labels:
+      - "com.vertex.service=ollama"
+      - "com.vertex.purpose=integration-test"
+
+networks:
+  vertex-network:
+    driver: bridge
+    name: vertex-network
 
 volumes:
   postgres_data:
+    name: vertex-postgres-data
+    driver: local
+  ollama_data:
+    name: vertex-ollama-data
+    driver: local

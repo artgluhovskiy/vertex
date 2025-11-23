@@ -3,8 +3,8 @@ spring:
     name: vertex
   datasource:
     url: jdbc:postgresql://localhost:5432/vertex
-    username: postgres
-    password: postgres
+    username: vertex
+    password: vertex
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

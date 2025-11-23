@@ -3,7 +3,11 @@ import { mockDirectories } from './data/directories';
 import { mockNotes } from './data/notes';
 
 // API base URL - must match the axios client baseURL
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+// When mocking is enabled, axios uses relative URLs, so we need to match that
+// MSW intercepts requests at the network level, so we use the full URL pattern
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}`
+  : 'http://localhost:5173/api/v1'; // Match Vite dev server URL with proxy
 
 // Request body types
 interface CreateDirectoryRequest {
