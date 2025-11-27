@@ -4,13 +4,13 @@ import { StatusBar } from './StatusBar';
 
 interface NoteViewerProps {
   children: ReactNode;
+  title?: string;
+  breadcrumb?: string;
+  tags?: string[];
 }
 
-export function NoteViewer({ children }: NoteViewerProps) {
+export function NoteViewer({ children, title, breadcrumb, tags }: NoteViewerProps) {
   // TODO: Add TabBar at the top
-  // TODO: Add markdown rendering
-  // TODO: Add tag display
-  // TODO: Add metadata
 
   return (
     <div className="h-full flex flex-col">
@@ -20,7 +20,7 @@ export function NoteViewer({ children }: NoteViewerProps) {
       </div>
 
       {/* Note Header */}
-      <NoteHeader />
+      <NoteHeader title={title} breadcrumb={breadcrumb} tags={tags} />
 
       {/* Note Content */}
       <div className="flex-1 overflow-y-auto">

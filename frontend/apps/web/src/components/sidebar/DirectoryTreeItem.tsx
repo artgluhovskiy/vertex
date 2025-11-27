@@ -1,11 +1,13 @@
 import { memo } from 'react';
 import type { DirectoryTreeNode } from '@/types/directoryTree';
 import { ChevronIcon } from '@/components/icons/ChevronIcon';
+import { NoteIcon } from '@/components/icons/NoteIcon';
 import {
   TREE_ITEM_HEIGHT,
   TREE_INDENT_INCREMENT,
   CHEVRON_CENTER_OFFSET,
   TREE_ITEM_BASE_PADDING,
+  NOTE_INDENT_OFFSET,
 } from './constants';
 
 interface DirectoryTreeItemProps {
@@ -38,20 +40,22 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
 }: DirectoryTreeItemProps) {
   const { directory, children, notes, isExpanded, level } = node;
 
-  const isSelected = selectedId === directory.id;
   const hasChildren = children.length > 0;
+  const hasNotes = notes.length > 0;
 
   // Calculate indentation based on tree level
   // Level 0 = ROOT (not rendered), Level 1 = 0px, Level 2 = 16px, etc.
   const indentPx = Math.max(0, level - 1) * TREE_INDENT_INCREMENT;
 
+  // Calculate total height needed for expanded content (notes + child directories)
+  const totalItemCount = notes.length + children.length;
+  const expandedHeight = totalItemCount * TREE_ITEM_HEIGHT;
+
   const handleClick = () => {
-    // If folder has children, toggle expand/collapse
-    if (hasChildren) {
+    // Toggle expand/collapse if folder has children or notes
+    if (hasChildren || hasNotes) {
       onToggle(directory.id);
     }
-    // Always select the directory
-    onSelect(directory.id);
   };
 
   return (
@@ -59,29 +63,20 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
       {/* Directory Item */}
       <button
         role="treeitem"
-        aria-expanded={hasChildren ? isExpanded : undefined}
-        aria-selected={isSelected}
-        aria-label={`${directory.name}${hasChildren ? `, ${children.length} ${children.length === 1 ? 'subfolder' : 'subfolders'}` : ''}`}
+        aria-expanded={hasChildren || hasNotes ? isExpanded : undefined}
+        aria-label={`${directory.name}${hasChildren ? `, ${children.length} ${children.length === 1 ? 'subfolder' : 'subfolders'}` : ''}${hasNotes ? `, ${notes.length} ${notes.length === 1 ? 'note' : 'notes'}` : ''}`}
         onClick={handleClick}
-        className={`
-          w-full flex items-center gap-1 px-1 py-1 text-sm
-          transition-colors rounded relative
-          ${
-            isSelected
-              ? 'bg-light-bg-hover dark:bg-dark-bg-hover'
-              : 'hover:bg-light-bg-hover/50 dark:hover:bg-dark-bg-hover/50'
-          }
-        `}
+        className="w-full flex items-center gap-1 px-1 py-1 text-sm transition-colors rounded relative hover:bg-light-bg-hover/50 dark:hover:bg-dark-bg-hover/50"
         style={{ paddingLeft: `${TREE_ITEM_BASE_PADDING + indentPx}px` }}
       >
         {/* Expand/Collapse Chevron */}
         <span
           className={`
             flex-shrink-0 w-5 h-5 flex items-center justify-center
-            ${hasChildren ? 'text-light-text-muted dark:text-dark-text-muted' : 'invisible'}
+            ${hasChildren || hasNotes ? 'text-light-text-muted dark:text-dark-text-muted' : 'text-light-text-muted/30 dark:text-dark-text-muted/30'}
           `}
         >
-          <ChevronIcon rotated={isExpanded && hasChildren} />
+          <ChevronIcon rotated={isExpanded && (hasChildren || hasNotes)} />
         </span>
 
         {/* Directory Name */}
@@ -90,40 +85,12 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
         </span>
       </button>
 
-      {/* Render Notes (if expanded) */}
-      {isExpanded && notes.length > 0 && (
-        <div className="mt-0.5">
-          {notes.map((note) => {
-            const isNoteSelected = selectedNoteId === note.id;
-            return (
-              <button
-                key={note.id}
-                onClick={() => onNoteSelect?.(note.id)}
-                className={`
-                  w-full flex items-center gap-1 px-1 py-1 text-sm transition-colors rounded
-                  ${
-                    isNoteSelected
-                      ? 'bg-primary/10 text-primary'
-                      : 'hover:bg-light-bg-hover/50 dark:hover:bg-dark-bg-hover/50 text-light-text-secondary dark:text-dark-text-secondary'
-                  }
-                `}
-                style={{ paddingLeft: `${TREE_ITEM_BASE_PADDING + indentPx + 32}px` }}
-              >
-                <span className="truncate text-sm">
-                  {note.title}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Render Children (if expanded) */}
-      {hasChildren && (
+      {/* Render Children and Notes (if expanded) */}
+      {(hasChildren || hasNotes) && (
         <div
-          className="overflow-hidden transition-all duration-200 ease-in-out relative"
+          className="overflow-hidden transition-all duration-100 ease-in-out relative"
           style={{
-            maxHeight: isExpanded ? `${children.length * TREE_ITEM_HEIGHT}px` : '0px',
+            maxHeight: isExpanded ? `${expandedHeight}px` : '0px',
             opacity: isExpanded ? 1 : 0,
           }}
         >
@@ -136,6 +103,43 @@ export const DirectoryTreeItem = memo(function DirectoryTreeItem({
               }}
             />
           )}
+
+          {/* Render Notes first */}
+          {hasNotes && (
+            <div className="mt-0.5">
+              {notes.map((note) => {
+                const isNoteSelected = selectedNoteId === note.id;
+                return (
+                  <button
+                    key={note.id}
+                    role="treeitem"
+                    aria-selected={isNoteSelected}
+                    aria-label={`Note: ${note.title}`}
+                    onClick={() => onNoteSelect?.(note.id)}
+                    className={`
+                      w-full flex items-center gap-1 px-1 py-1 text-sm transition-colors rounded
+                      focus:outline-none text-light-text-secondary dark:text-dark-text-secondary
+                      ${
+                        isNoteSelected
+                          ? 'bg-light-bg-hover dark:bg-dark-bg-hover'
+                          : 'hover:bg-light-bg-hover/50 dark:hover:bg-dark-bg-hover/50'
+                      }
+                    `}
+                    style={{ paddingLeft: `${TREE_ITEM_BASE_PADDING + indentPx + NOTE_INDENT_OFFSET}px` }}
+                  >
+                    <span className="flex items-center gap-2 truncate">
+                      <span className="flex-shrink-0 text-light-text-muted dark:text-dark-text-muted" aria-hidden="true">
+                        <NoteIcon />
+                      </span>
+                      <span className="truncate text-sm">{note.title}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Then render child directories */}
           {children.map((childNode) => (
             <DirectoryTreeItem
               key={childNode.directory.id}

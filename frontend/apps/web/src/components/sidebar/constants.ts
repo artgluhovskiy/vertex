@@ -16,3 +16,6 @@ export const CHEVRON_CENTER_OFFSET = 10;
 
 /** Base padding for tree items in pixels */
 export const TREE_ITEM_BASE_PADDING = 4;
+
+/** Additional indent offset for notes under folders in pixels */
+export const NOTE_INDENT_OFFSET = 32;

@@ -1,21 +1,11 @@
 import type { Note } from '@synapse/types/domain';
 
-/**
- * Mock note data for development and testing.
- *
- * Distribution:
- * - Work/Projects: 5 notes
- * - Work/Meetings: 3 notes
- * - Personal/Learning: 4 notes
- * - Personal: 2 notes
- * - Archive: 1 note
- */
 export const mockNotes: Note[] = [
   // Work/Projects notes
   {
     id: 'note-1',
     userId: 'user-1',
-    directoryId: 'dir-2',
+    directoryId: 'root-1',
     title: 'Q1 Roadmap Planning',
     content: 'Planning notes for Q1 product roadmap...',
     summary: null,
@@ -28,7 +18,7 @@ export const mockNotes: Note[] = [
   {
     id: 'note-2',
     userId: 'user-1',
-    directoryId: 'dir-2',
+    directoryId: 'dir-1',
     title: 'API Architecture Design',
     content: 'RESTful API design for the new microservices...',
     summary: null,
@@ -41,7 +31,7 @@ export const mockNotes: Note[] = [
   {
     id: 'note-3',
     userId: 'user-1',
-    directoryId: 'dir-2',
+    directoryId: 'dir-1',
     title: 'Database Schema v2',
     content: 'Updated schema with new tables and relationships...',
     summary: null,
@@ -54,7 +44,7 @@ export const mockNotes: Note[] = [
   {
     id: 'note-4',
     userId: 'user-1',
-    directoryId: 'dir-2',
+    directoryId: 'dir-1',
     title: 'Frontend Component Library',
     content: 'Design system components and guidelines...',
     summary: null,
@@ -67,7 +57,7 @@ export const mockNotes: Note[] = [
   {
     id: 'note-5',
     userId: 'user-1',
-    directoryId: 'dir-2',
+    directoryId: 'dir-1',
     title: 'Testing Strategy',
     content: 'Unit, integration, and E2E testing approach...',
     summary: null,
@@ -77,12 +67,10 @@ export const mockNotes: Note[] = [
     createdAt: '2024-01-09T10:00:00Z',
     updatedAt: '2024-01-09T10:00:00Z',
   },
-
-  // Work/Meetings notes
   {
     id: 'note-6',
     userId: 'user-1',
-    directoryId: 'dir-3',
+    directoryId: 'dir-1',
     title: 'Sprint Planning - Jan 10',
     content: 'Sprint goals, user stories, and estimates...',
     summary: null,
@@ -104,115 +92,5 @@ export const mockNotes: Note[] = [
     version: 1,
     createdAt: '2024-01-11T15:00:00Z',
     updatedAt: '2024-01-11T15:00:00Z',
-  },
-  {
-    id: 'note-8',
-    userId: 'user-1',
-    directoryId: 'dir-3',
-    title: 'Stakeholder Sync',
-    content: 'Product updates and timeline review...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-12T11:00:00Z',
-    updatedAt: '2024-01-12T11:00:00Z',
-  },
-
-  // Personal/Learning notes
-  {
-    id: 'note-9',
-    userId: 'user-1',
-    directoryId: 'dir-5',
-    title: 'React 18 Features',
-    content: 'Concurrent rendering, automatic batching, transitions...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-13T20:00:00Z',
-    updatedAt: '2024-01-13T20:00:00Z',
-  },
-  {
-    id: 'note-10',
-    userId: 'user-1',
-    directoryId: 'dir-5',
-    title: 'TypeScript Advanced Types',
-    content: 'Conditional types, mapped types, template literals...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-14T20:00:00Z',
-    updatedAt: '2024-01-14T20:00:00Z',
-  },
-  {
-    id: 'note-11',
-    userId: 'user-1',
-    directoryId: 'dir-5',
-    title: 'System Design Patterns',
-    content: 'Microservices, event sourcing, CQRS...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-15T20:00:00Z',
-    updatedAt: '2024-01-15T20:00:00Z',
-  },
-  {
-    id: 'note-12',
-    userId: 'user-1',
-    directoryId: 'dir-5',
-    title: 'Rust Programming Language',
-    content: 'Ownership, borrowing, lifetimes...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-16T20:00:00Z',
-    updatedAt: '2024-01-16T20:00:00Z',
-  },
-
-  // Personal notes
-  {
-    id: 'note-13',
-    userId: 'user-1',
-    directoryId: 'dir-4',
-    title: 'Book Ideas',
-    content: 'Ideas for a technical book on modern web development...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-17T19:00:00Z',
-    updatedAt: '2024-01-17T19:00:00Z',
-  },
-  {
-    id: 'note-14',
-    userId: 'user-1',
-    directoryId: 'dir-4',
-    title: 'Travel Plans 2024',
-    content: 'Destinations, dates, and budgets...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2024-01-18T19:00:00Z',
-    updatedAt: '2024-01-18T19:00:00Z',
-  },
-
-  // Archive notes
-  {
-    id: 'note-15',
-    userId: 'user-1',
-    directoryId: 'dir-6',
-    title: 'Old Project Notes',
-    content: 'Archived notes from completed project...',
-    summary: null,
-    tags: [],
-    metadata: {},
-    version: 1,
-    createdAt: '2023-12-01T10:00:00Z',
-    updatedAt: '2023-12-01T10:00:00Z',
   },
 ];

@@ -28,7 +28,11 @@ export const MainPage: React.FC = () => {
           </div>
         </div>
       ) : note ? (
-        <NoteViewer>
+        <NoteViewer
+          title={note.title}
+          breadcrumb={note.directoryId ? 'Folder' : undefined}
+          tags={note.tags.map(tag => tag.name)}
+        >
           <NoteContent content={note.content} />
         </NoteViewer>
       ) : (
