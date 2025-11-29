@@ -1,11 +1,11 @@
-package org.art.vertex.obsidian.infrastructure.reader;
+package org.art.vertex.obsidian.domain.service;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Infrastructure service for reading Obsidian vault files from the filesystem.
+ * Service for reading Obsidian vault files from the filesystem.
  * <p>
  * Responsibilities:
  * <ul>

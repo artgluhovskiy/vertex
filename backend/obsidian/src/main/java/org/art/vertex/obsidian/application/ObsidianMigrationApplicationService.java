@@ -12,7 +12,7 @@ import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.obsidian.domain.model.ObsidianNote;
 import org.art.vertex.obsidian.domain.service.ObsidianLinkResolver;
 import org.art.vertex.obsidian.domain.service.ObsidianNoteParser;
-import org.art.vertex.obsidian.infrastructure.reader.ObsidianFileReader;
+import org.art.vertex.obsidian.domain.service.ObsidianFileReader;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
@@ -99,10 +99,15 @@ public class ObsidianMigrationApplicationService {
         log.info("Phase 2: Creating directory structure...");
 
         Set<String> directoryPaths = extractDirectoryPaths(markdownFiles, vaultPath);
+        log.debug("Extracted directory paths: {}", directoryPaths);
+
         Map<String, Directory> directoryMap = new HashMap<>();
-        directoryMap.put("", getRootDirectory(userId));
+        Directory rootDir = getRootDirectory(userId);
+        log.debug("Root directory: {} (id: {})", rootDir.getName(), rootDir.getId());
+        directoryMap.put("", rootDir);
 
         List<String> sortedPaths = directoryPaths.stream().sorted().toList();
+        log.debug("Sorted paths for creation: {}", sortedPaths);
 
         for (String dirPath : sortedPaths) {
             if (dirPath.isEmpty()) {
@@ -121,6 +126,9 @@ public class ObsidianMigrationApplicationService {
                 String pathKey = currentPath.toString();
                 if (!directoryMap.containsKey(pathKey)) {
                     Directory parent = findParentDirectory(currentPath.toString(), part, directoryMap);
+                    log.debug("Creating directory '{}' (path: '{}') with parent: {} (parentId: {})",
+                        part, pathKey, parent != null ? parent.getName() : "null",
+                        parent != null ? parent.getId() : "null");
                     Directory dir = createDirectory(userId, part, parent);
                     directoryMap.put(pathKey, dir);
                     resultBuilder.directoriesCreated++;

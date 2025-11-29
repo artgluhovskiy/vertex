@@ -16,8 +16,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class DirectoryInfrastructureConfig {
 
     @Bean
-    public DirectoryEntityMapper directoryEntityMapper() {
-        return new DirectoryEntityMapper();
+    public DirectoryEntityMapper directoryEntityMapper(DirectoryJpaRepository directoryJpaRepository) {
+        return new DirectoryEntityMapper(directoryJpaRepository);
     }
 
     @Bean

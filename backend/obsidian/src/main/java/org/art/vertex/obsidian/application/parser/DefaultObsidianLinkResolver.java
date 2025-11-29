@@ -1,4 +1,4 @@
-package org.art.vertex.obsidian.infrastructure.parser;
+package org.art.vertex.obsidian.application.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.obsidian.domain.model.WikilinkReference;

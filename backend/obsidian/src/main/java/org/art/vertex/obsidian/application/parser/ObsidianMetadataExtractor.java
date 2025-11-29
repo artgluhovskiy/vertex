@@ -1,4 +1,4 @@
-package org.art.vertex.obsidian.infrastructure.parser;
+package org.art.vertex.obsidian.application.parser;
 
 import java.util.Map;
 

@@ -1,10 +1,11 @@
-package org.art.vertex.obsidian.infrastructure.parser;
+package org.art.vertex.obsidian.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.obsidian.domain.model.ObsidianNote;
 import org.art.vertex.obsidian.domain.model.WikilinkReference;
 import org.art.vertex.obsidian.domain.service.ObsidianNoteParser;
+import org.art.vertex.obsidian.application.parser.ObsidianMetadataExtractor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
