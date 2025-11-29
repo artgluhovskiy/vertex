@@ -11,11 +11,13 @@ import org.art.vertex.obsidian.application.parser.ObsidianMetadataExtractor;
 import org.art.vertex.obsidian.domain.service.ObsidianFileReader;
 import org.art.vertex.obsidian.domain.service.ObsidianLinkResolver;
 import org.art.vertex.obsidian.domain.service.ObsidianNoteParser;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 @Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(ObsidianProperties.class)
 public class ObsidianApplicationConfig {
 
     @Bean

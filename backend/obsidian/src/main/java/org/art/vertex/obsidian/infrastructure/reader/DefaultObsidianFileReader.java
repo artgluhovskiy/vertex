@@ -1,18 +1,22 @@
 package org.art.vertex.obsidian.infrastructure.reader;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.obsidian.domain.service.ObsidianFileReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
 @Slf4j
+@RequiredArgsConstructor
 public class DefaultObsidianFileReader implements ObsidianFileReader {
+
+    private final Clock clock;
 
     private static final String MARKDOWN_EXTENSION = ".md";
 
@@ -52,11 +56,11 @@ public class DefaultObsidianFileReader implements ObsidianFileReader {
                 Files.readAttributes(filePath, java.nio.file.attribute.BasicFileAttributes.class)
                     .creationTime()
                     .toInstant(),
-                ZoneId.systemDefault()
+                java.time.ZoneOffset.UTC
             );
         } catch (IOException e) {
             log.warn("Failed to get creation time for file: {}. Using current time.", filePath, e);
-            return LocalDateTime.now();
+            return clock.now();
         }
     }
 
@@ -65,11 +69,11 @@ public class DefaultObsidianFileReader implements ObsidianFileReader {
         try {
             return LocalDateTime.ofInstant(
                 Files.getLastModifiedTime(filePath).toInstant(),
-                ZoneId.systemDefault()
+                java.time.ZoneOffset.UTC
             );
         } catch (IOException e) {
             log.warn("Failed to get modification time for file: {}. Using current time.", filePath, e);
-            return LocalDateTime.now();
+            return clock.now();
         }
     }
 

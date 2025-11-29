@@ -71,3 +71,19 @@ search:
     # Query result caching
     cache-enabled: false
     cache-ttl: 15m
+
+# ========== Obsidian Migration Configuration ==========
+vertex:
+  obsidian:
+    # Maximum vault size in MB (1-10240)
+    max-vault-size-mb: 1024
+    # Maximum number of notes to process (1-100000)
+    max-notes: 10000
+    # Skip invalid markdown files during migration
+    skip-invalid-files: true
+    # Migration timeout in seconds (10-3600)
+    migration-timeout-seconds: 300
+    # Markdown file extension
+    markdown-extension: ".md"
+    # Batch size for note creation (10-1000)
+    note-batch-size: 100

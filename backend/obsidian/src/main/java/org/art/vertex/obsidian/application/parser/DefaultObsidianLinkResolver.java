@@ -30,6 +30,9 @@ public class DefaultObsidianLinkResolver implements ObsidianLinkResolver {
     ) {
         log.debug("Resolving links for {} notes", wikilinks.size());
 
+        // Build case-insensitive lookup map once - O(n)
+        Map<String, UUID> caseInsensitiveMap = buildCaseInsensitiveMap(noteNameToIdMap);
+
         Map<UUID, List<UUID>> resolvedLinks = new HashMap<>();
 
         for (Map.Entry<UUID, List<WikilinkReference>> entry : wikilinks.entrySet()) {
@@ -43,7 +46,7 @@ public class DefaultObsidianLinkResolver implements ObsidianLinkResolver {
                     continue;
                 }
 
-                UUID targetId = resolveWikilink(ref.getTargetNoteName(), noteNameToIdMap);
+                UUID targetId = resolveWikilink(ref.getTargetNoteName(), caseInsensitiveMap);
                 if (targetId != null) {
                     targetIds.add(targetId);
                 } else {
@@ -64,33 +67,37 @@ public class DefaultObsidianLinkResolver implements ObsidianLinkResolver {
         return resolvedLinks;
     }
 
-    private UUID resolveWikilink(String targetNoteName, Map<String, UUID> noteNameToIdMap) {
-        UUID id = noteNameToIdMap.get(targetNoteName);
+    private Map<String, UUID> buildCaseInsensitiveMap(Map<String, UUID> noteNameToIdMap) {
+        Map<String, UUID> caseInsensitive = new HashMap<>();
+
+        for (Map.Entry<String, UUID> entry : noteNameToIdMap.entrySet()) {
+            String key = entry.getKey();
+            String lowerKey = key.toLowerCase();
+            UUID value = entry.getValue();
+
+            // Store original key
+            caseInsensitive.put(key, value);
+
+            // Store lowercase version (only if not already present to preserve exact matches)
+            caseInsensitive.putIfAbsent(lowerKey, value);
+
+            // Store without .md extension
+            String withoutExt = key.replaceAll("\\.md$", "");
+            caseInsensitive.putIfAbsent(withoutExt, value);
+            caseInsensitive.putIfAbsent(withoutExt.toLowerCase(), value);
+        }
+
+        return caseInsensitive;
+    }
+
+    private UUID resolveWikilink(String targetNoteName, Map<String, UUID> caseInsensitiveMap) {
+        // Direct O(1) lookup
+        UUID id = caseInsensitiveMap.get(targetNoteName);
         if (id != null) {
             return id;
         }
 
-        String lowerTarget = targetNoteName.toLowerCase();
-        for (Map.Entry<String, UUID> entry : noteNameToIdMap.entrySet()) {
-            if (entry.getKey().toLowerCase().equals(lowerTarget)) {
-                return entry.getValue();
-            }
-        }
-
-        String withoutExtension = targetNoteName.replaceAll("\\.md$", "");
-        id = noteNameToIdMap.get(withoutExtension);
-        if (id != null) {
-            return id;
-        }
-
-        String lowerWithoutExtension = withoutExtension.toLowerCase();
-        for (Map.Entry<String, UUID> entry : noteNameToIdMap.entrySet()) {
-            String keyWithoutExt = entry.getKey().replaceAll("\\.md$", "");
-            if (keyWithoutExt.toLowerCase().equals(lowerWithoutExtension)) {
-                return entry.getValue();
-            }
-        }
-
-        return null;
+        // Try lowercase version
+        return caseInsensitiveMap.get(targetNoteName.toLowerCase());
     }
 }

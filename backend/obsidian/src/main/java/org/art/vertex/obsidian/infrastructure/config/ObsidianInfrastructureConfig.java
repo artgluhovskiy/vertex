@@ -1,5 +1,6 @@
 package org.art.vertex.obsidian.infrastructure.config;
 
+import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.obsidian.domain.service.ObsidianFileReader;
 import org.art.vertex.obsidian.infrastructure.reader.DefaultObsidianFileReader;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class ObsidianInfrastructureConfig {
 
     @Bean
-    public ObsidianFileReader obsidianFileReader() {
-        return new DefaultObsidianFileReader();
+    public ObsidianFileReader obsidianFileReader(Clock clock) {
+        return new DefaultObsidianFileReader(clock);
     }
 }
