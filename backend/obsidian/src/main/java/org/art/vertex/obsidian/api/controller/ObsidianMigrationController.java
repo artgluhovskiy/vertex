@@ -28,6 +28,7 @@ import java.util.UUID;
 public class ObsidianMigrationController {
 
     private final ObsidianMigrationApplicationService migrationService;
+    private final MigrationMapper mapper;
 
     /**
      * Migrate Obsidian vault to Synapse.
@@ -44,7 +45,7 @@ public class ObsidianMigrationController {
         log.info("Migration request received. User id: {}, vault: {}", userId, request.getVaultPath());
 
         MigrationResult result = migrationService.migrateVault(userId, Paths.get(request.getVaultPath()));
-        MigrationResultDto dto = MigrationMapper.toDto(result);
+        MigrationResultDto dto = mapper.toDto(result);
 
         log.info("Migration completed. User id: {}, notes created: {}", userId, result.getNotesCreated());
 

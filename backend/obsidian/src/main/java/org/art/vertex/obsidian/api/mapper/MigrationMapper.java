@@ -8,7 +8,7 @@ import org.art.vertex.obsidian.application.MigrationResult;
  */
 public class MigrationMapper {
 
-    public static MigrationResultDto toDto(MigrationResult result) {
+    public MigrationResultDto toDto(MigrationResult result) {
         return MigrationResultDto.builder()
             .totalFiles(result.getTotalFiles())
             .notesCreated(result.getNotesCreated())
@@ -17,12 +17,12 @@ public class MigrationMapper {
             .linksFailed(result.getLinksFailed())
             .durationMs(result.getDurationMs())
             .errors(result.getErrors().stream()
-                .map(MigrationMapper::toErrorDto)
+                .map(this::toErrorDto)
                 .toList())
             .build();
     }
 
-    private static MigrationResultDto.MigrationErrorDto toErrorDto(MigrationResult.MigrationError error) {
+    private MigrationResultDto.MigrationErrorDto toErrorDto(MigrationResult.MigrationError error) {
         return MigrationResultDto.MigrationErrorDto.builder()
             .file(error.getFile())
             .message(error.getMessage())

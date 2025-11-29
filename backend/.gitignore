@@ -58,3 +58,6 @@ CLAUDE.md
 preprod-data/
 backups/
 .env.preprod
+
+# Preprod Spring profile (contains environment-specific config)
+!bundle/src/main/resources/application-preprod.yml
