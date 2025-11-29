@@ -1,0 +1,3 @@
+#!/bin/bash
+# Convenience wrapper in backend root for stopping preprod
+exec "$(dirname "$0")/scripts/stop-preprod.sh" "$@"

@@ -40,41 +40,64 @@ print_header() {
     echo ""
 }
 
-# Check if preprod environment is running
-check_preprod_env() {
+# Check if preprod environment is running, start if needed
+ensure_preprod_env() {
     print_info "Checking preprod environment..."
 
-    if ! docker ps --format '{{.Names}}' | grep -q "vertex-postgres-preprod"; then
-        print_error "Preprod PostgreSQL is not running"
-        echo ""
-        print_info "Start preprod environment first:"
-        echo "  ./scripts/env.sh preprod start"
-        echo "  or"
-        echo "  ./scripts/preprod.sh start"
+    local postgres_running=false
+    local ollama_running=false
+
+    # Check if containers are running
+    if docker ps --format '{{.Names}}' | grep -q "vertex-postgres-preprod"; then
+        postgres_running=true
+    fi
+
+    if docker ps --format '{{.Names}}' | grep -q "vertex-ollama-preprod"; then
+        ollama_running=true
+    fi
+
+    # If both are running, verify they're healthy
+    if [ "$postgres_running" = true ] && [ "$ollama_running" = true ]; then
+        print_success "Preprod containers are running"
+
+        # Test PostgreSQL connection
+        print_info "Verifying PostgreSQL connection..."
+        if docker exec vertex-postgres-preprod pg_isready -U vertex_preprod -d vertex_preprod > /dev/null 2>&1; then
+            print_success "PostgreSQL is ready"
+        else
+            print_warning "PostgreSQL is not ready, restarting preprod..."
+            "$SCRIPT_DIR/env.sh" preprod restart
+            return
+        fi
+
+        # Test Ollama connection
+        print_info "Verifying Ollama connection..."
+        if curl -f -s http://localhost:11435/api/tags > /dev/null 2>&1; then
+            print_success "Ollama is ready"
+        else
+            print_warning "Ollama is not ready, restarting preprod..."
+            "$SCRIPT_DIR/env.sh" preprod restart
+            return
+        fi
+
+        print_success "Preprod environment is healthy"
+        return
+    fi
+
+    # If not running, start preprod environment
+    print_warning "Preprod environment is not running"
+    print_info "Starting preprod environment..."
+    echo ""
+
+    "$SCRIPT_DIR/env.sh" preprod start
+
+    if [ $? -ne 0 ]; then
+        print_error "Failed to start preprod environment"
         exit 1
     fi
 
-    if ! docker ps --format '{{.Names}}' | grep -q "vertex-ollama-preprod"; then
-        print_error "Preprod Ollama is not running"
-        echo ""
-        print_info "Start preprod environment first:"
-        echo "  ./scripts/env.sh preprod start"
-        exit 1
-    fi
-
-    # Test PostgreSQL connection
-    if ! docker exec vertex-postgres-preprod pg_isready -U vertex_preprod -d vertex_preprod > /dev/null 2>&1; then
-        print_error "PostgreSQL is not ready"
-        exit 1
-    fi
-
-    # Test Ollama connection
-    if ! curl -f -s http://localhost:11435/api/tags > /dev/null 2>&1; then
-        print_error "Ollama is not ready"
-        exit 1
-    fi
-
-    print_success "Preprod environment is running"
+    echo ""
+    print_success "Preprod environment started successfully"
 }
 
 # Load environment variables from .env.preprod
@@ -93,7 +116,7 @@ load_env_vars() {
 main() {
     print_header
 
-    check_preprod_env
+    ensure_preprod_env
     load_env_vars
 
     echo ""
@@ -132,15 +155,16 @@ case "${1:-}" in
         echo "  --help, -h    Show this help message"
         echo ""
         echo "Prerequisites:"
-        echo "  - Preprod environment must be running"
-        echo "    Run: ./scripts/preprod.sh start"
+        echo "  - Docker must be running"
+        echo "  - Preprod infrastructure will start automatically if not running"
         echo ""
         echo "What this script does:"
-        echo "  1. Checks preprod environment is running"
-        echo "  2. Loads configuration from .env.preprod"
-        echo "  3. Starts Spring Boot with 'preprod' profile"
-        echo "  4. Connects to preprod database (port 5433)"
-        echo "  5. Connects to preprod Ollama (port 11435)"
+        echo "  1. Checks preprod environment status"
+        echo "  2. Starts preprod infrastructure if needed (PostgreSQL + Ollama)"
+        echo "  3. Loads configuration from .env.preprod"
+        echo "  4. Starts Spring Boot with 'preprod' profile"
+        echo "  5. Connects to preprod database (port 5433)"
+        echo "  6. Connects to preprod Ollama (port 11435)"
         echo ""
         exit 0
         ;;
