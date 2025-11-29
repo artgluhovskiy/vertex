@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/v1.0/005-add-notes-directory-fk.sql
   - include:
       file: db/changelog/v1.0/006-create-note-embeddings-table.sql
+  - include:
+      file: db/changelog/v1.0/007-create-note-links-table.sql

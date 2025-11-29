@@ -304,7 +304,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
             .isEqualTo(result.getLinksCreated());
 
         // Verify specific link exists (e.g., Welcome.md -> Project Alpha)
-        String welcomeTitle = "Welcome to My Vault";
+        String welcomeTitle = "Welcome to Test Vault";
         String projectAlphaTitle = "Project Alpha";
 
         UUID welcomeNoteId = jdbcTemplate.queryForObject(

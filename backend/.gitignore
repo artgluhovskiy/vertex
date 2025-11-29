@@ -53,3 +53,8 @@ Thumbs.db
 OBSIDIAN_MIGRATION_PLAN.md
 SEMANTIC_SEARCH_BENCHMARK_PLAN.md
 CLAUDE.md
+
+# Preprod environment data (local persistent storage)
+preprod-data/
+backups/
+.env.preprod
