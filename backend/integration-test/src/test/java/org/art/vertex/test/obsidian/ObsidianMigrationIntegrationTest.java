@@ -2,13 +2,13 @@ package org.art.vertex.test.obsidian;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.art.vertex.obsidian.application.MigrationResult;
-import org.art.vertex.obsidian.application.ObsidianMigrationApplicationService;
+import org.art.vertex.obsidian.api.dto.MigrationResultDto;
 import org.art.vertex.test.BaseIntegrationTest;
+import org.art.vertex.test.step.ObsidianMigrationSteps;
+import org.art.vertex.web.user.dto.AuthenticationResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -22,24 +22,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private ObsidianMigrationApplicationService migrationService;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private ObsidianMigrationSteps obsidianMigrationSteps;
 
     @Test
     @SneakyThrows
     @DisplayName("Should successfully migrate complete Obsidian vault with all edge cases")
     void shouldMigrateCompleteVault() {
-        // Given: Test user
-        UUID userId = createTestUser();
+        // Given: Test user and access token
+        AuthenticationResponse authResponse = userSteps.register("test-obsidian@example.com", "password123");
+        String accessToken = authResponse.accessToken();
+        UUID userId = UUID.fromString(authResponse.user().id());
+        assertThat(accessToken).isNotEmpty();
 
         // Given: Test vault path
         Path vaultPath = getTestVaultPath();
         log.info("Test vault path: {}", vaultPath);
 
-        // When: Migrate vault
-        MigrationResult result = migrationService.migrateVault(userId, vaultPath);
+        // When: Migrate vault via REST API
+        MigrationResultDto result = obsidianMigrationSteps.migrateVault(accessToken, vaultPath.toString());
 
         // Then: Verify migration statistics
         assertThat(result.getTotalFiles())
@@ -81,12 +81,6 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
             result.getNotesCreated(), result.getDirectoriesCreated(), result.getLinksCreated(), result.getDurationMs());
     }
 
-    private UUID createTestUser() {
-        var response = userSteps.register("test-obsidian@example.com", "password123");
-        assertThat(response.accessToken()).isNotEmpty();
-        return UUID.fromString(response.user().id());
-    }
-
     private Path getTestVaultPath() throws URISyntaxException {
         return Paths.get(getClass().getClassLoader()
             .getResource("test-vault")
@@ -97,8 +91,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         Integer dirCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ?",
             Integer.class,
-            new Object[]{userId}
-        );
+            userId);
 
         assertThat(dirCount)
             .as("Should have created directories (including root)")
@@ -108,22 +101,19 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         Integer projectsWorkCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND name = ?",
             Integer.class,
-            new Object[]{userId, "Work"}
-        );
+            userId, "Work");
         assertThat(projectsWorkCount).isEqualTo(1);
 
         Integer dailyCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND name = ?",
             Integer.class,
-            new Object[]{userId, "Daily"}
-        );
+            userId, "Daily");
         assertThat(dailyCount).isEqualTo(1);
 
         Integer archiveCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND name = ?",
             Integer.class,
-            new Object[]{userId, "Archive"}
-        );
+            userId, "Archive");
         assertThat(archiveCount).isEqualTo(1);
 
         // Verify parent relationships
@@ -137,16 +127,14 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         UUID rootId = jdbcTemplate.queryForObject(
             "SELECT id FROM directories WHERE user_id = ? AND name = ? AND parent_id IS NULL",
             UUID.class,
-            new Object[]{userId, "Root"}
-        );
+            userId, "Root");
         assertThat(rootId).as("Root directory should exist").isNotNull();
 
         // Verify top-level directories have Root as parent
         Integer topLevelDirsWithRootParent = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND parent_id = ? AND name IN ('Archive', 'Daily', 'Projects')",
             Integer.class,
-            new Object[]{userId, rootId}
-        );
+            userId, rootId);
         assertThat(topLevelDirsWithRootParent)
             .as("Archive, Daily, and Projects should have Root as parent")
             .isEqualTo(3);
@@ -155,14 +143,12 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         UUID projectsId = jdbcTemplate.queryForObject(
             "SELECT id FROM directories WHERE user_id = ? AND name = ?",
             UUID.class,
-            new Object[]{userId, "Projects"}
-        );
+            userId, "Projects");
 
         UUID workParentId = jdbcTemplate.queryForObject(
             "SELECT parent_id FROM directories WHERE user_id = ? AND name = ?",
             UUID.class,
-            new Object[]{userId, "Work"}
-        );
+            userId, "Work");
         assertThat(workParentId)
             .as("Work directory should have Projects as parent")
             .isEqualTo(projectsId);
@@ -174,8 +160,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         Integer noteCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM notes WHERE user_id = ?",
             Integer.class,
-            new Object[]{userId}
-        );
+            userId);
 
         assertThat(noteCount)
             .as("All notes should be created")
@@ -197,8 +182,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM notes WHERE user_id = ? AND title = ?",
             Integer.class,
-            new Object[]{userId, title}
-        );
+            userId, title);
         assertThat(count)
             .as("Note '%s' should exist", title)
             .isEqualTo(1);
@@ -232,8 +216,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM tags WHERE name = ?",
             Integer.class,
-            new Object[]{tagName}
-        );
+            tagName);
         assertThat(count)
             .as("Tag '%s' should exist", tagName)
             .isGreaterThanOrEqualTo(1);
@@ -244,8 +227,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         String welcomeContent = jdbcTemplate.queryForObject(
             "SELECT content FROM notes WHERE user_id = ? AND title = ?",
             String.class,
-            new Object[]{userId, "Welcome to Test Vault"}
-        );
+            userId, "Welcome to Test Vault");
         assertThat(welcomeContent)
             .as("Welcome note content should not contain frontmatter")
             .doesNotContain("---")
@@ -256,8 +238,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         String noFrontmatterContent = jdbcTemplate.queryForObject(
             "SELECT content FROM notes WHERE user_id = ? AND title = ?",
             String.class,
-            new Object[]{userId, "No Frontmatter"}
-        );
+            userId, "No Frontmatter");
         assertThat(noFrontmatterContent)
             .as("No frontmatter note should have correct content")
             .contains("Simple note without any YAML frontmatter");
@@ -266,8 +247,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         String projectAlphaContent = jdbcTemplate.queryForObject(
             "SELECT content FROM notes WHERE user_id = ? AND title = ?",
             String.class,
-            new Object[]{userId, "Project Alpha"}
-        );
+            userId, "Project Alpha");
         assertThat(projectAlphaContent)
             .as("Project Alpha should have correct content")
             .contains("Project Alpha is our main initiative")
@@ -276,7 +256,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         log.info("✓ Note content verified");
     }
 
-    private void verifyLinksCreated(UUID userId, MigrationResult result) {
+    private void verifyLinksCreated(UUID userId, MigrationResultDto result) {
         // Verify links were created from migration result
         assertThat(result.getLinksCreated())
             .as("Should have created note links")
@@ -286,8 +266,7 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         Integer linkCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM note_links WHERE user_id = ?",
             Integer.class,
-            new Object[]{userId}
-        );
+            userId);
         assertThat(linkCount)
             .as("Links should be persisted to database")
             .isEqualTo(result.getLinksCreated());
@@ -299,20 +278,17 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         UUID welcomeNoteId = jdbcTemplate.queryForObject(
             "SELECT id FROM notes WHERE user_id = ? AND title = ?",
             UUID.class,
-            new Object[]{userId, welcomeTitle}
-        );
+            userId, welcomeTitle);
 
         UUID projectAlphaNoteId = jdbcTemplate.queryForObject(
             "SELECT id FROM notes WHERE user_id = ? AND title = ?",
             UUID.class,
-            new Object[]{userId, projectAlphaTitle}
-        );
+            userId, projectAlphaTitle);
 
         Integer welcomeToAlphaLinks = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM note_links WHERE source_note_id = ? AND target_note_id = ?",
             Integer.class,
-            new Object[]{welcomeNoteId, projectAlphaNoteId}
-        );
+            welcomeNoteId, projectAlphaNoteId);
 
         assertThat(welcomeToAlphaLinks)
             .as("Link from Welcome to Project Alpha should exist")
@@ -325,12 +301,13 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
     @SneakyThrows
     @DisplayName("Should handle migration with partial errors gracefully")
     void shouldHandlePartialErrors() {
-        // Given: Test user
-        UUID userId = createTestUser();
+        // Given: Test user and access token
+        AuthenticationResponse authResponse = userSteps.register("test-partial@example.com", "password123");
+        String accessToken = authResponse.accessToken();
         Path vaultPath = getTestVaultPath();
 
         // When: Migrate (some notes might have issues, but migration continues)
-        MigrationResult result = migrationService.migrateVault(userId, vaultPath);
+        MigrationResultDto result = obsidianMigrationSteps.migrateVault(accessToken, vaultPath.toString());
 
         // Then: Verify migration completed
         assertThat(result.getNotesCreated())

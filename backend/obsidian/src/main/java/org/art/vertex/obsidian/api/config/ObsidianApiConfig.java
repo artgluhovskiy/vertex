@@ -1,8 +1,8 @@
 package org.art.vertex.obsidian.api.config;
 
-import org.art.vertex.obsidian.api.controller.ObsidianMigrationController;
+import org.art.vertex.domain.shared.time.Clock;
+import org.art.vertex.obsidian.api.exception.ObsidianApiExceptionHandler;
 import org.art.vertex.obsidian.api.mapper.MigrationMapper;
-import org.art.vertex.obsidian.application.ObsidianMigrationApplicationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,10 +18,7 @@ public class ObsidianApiConfig {
     }
 
     @Bean
-    public ObsidianMigrationController obsidianMigrationController(
-        ObsidianMigrationApplicationService migrationService,
-        MigrationMapper mapper
-    ) {
-        return new ObsidianMigrationController(migrationService, mapper);
+    public ObsidianApiExceptionHandler obsidianApiExceptionHandler(Clock clock) {
+        return new ObsidianApiExceptionHandler(clock);
     }
 }

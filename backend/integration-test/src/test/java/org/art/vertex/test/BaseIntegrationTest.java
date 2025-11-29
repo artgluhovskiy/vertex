@@ -94,8 +94,9 @@ public abstract class BaseIntegrationTest {
             jdbcTemplate.execute("SET session_replication_role = 'replica'");
 
             // Truncate all tables (add more as schema grows)
-            jdbcTemplate.execute("TRUNCATE TABLE notes CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE note_links CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE note_embeddings CASCADE");
+            jdbcTemplate.execute("TRUNCATE TABLE notes CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE directories CASCADE");
             jdbcTemplate.execute("TRUNCATE TABLE users CASCADE");
 

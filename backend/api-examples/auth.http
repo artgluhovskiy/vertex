@@ -6,3 +6,47 @@ Content-Type: application/json
   "email": "test@example.com",
   "password": "Test123!"
 }
+
+> {%
+    client.global.set("access_token", response.body.accessToken);
+    client.global.set("user_id", response.body.user.id);
+%}
+
+###
+
+### User Login
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test123!"
+}
+
+> {%
+    client.global.set("access_token", response.body.accessToken);
+    client.global.set("user_id", response.body.user.id);
+%}
+
+###
+
+### Create Root Directory
+POST http://localhost:8080/api/v1/directories
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "name": "Root",
+  "parentId": null
+}
+
+###
+
+### Migrate Obsidian Vault
+POST http://localhost:8080/api/v1/migration/obsidian
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "vaultPath": "/Users/artsiomh/IdeaProjects/vertex/backend/integration-test/src/test/resources/test-vault"
+}

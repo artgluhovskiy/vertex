@@ -39,12 +39,12 @@ public class ObsidianMigrationController {
      */
     @PostMapping
     public ResponseEntity<MigrationResultDto> migrateVault(
-        @AuthenticationPrincipal UUID userId,
+        @AuthenticationPrincipal String userId,
         @Valid @RequestBody MigrationRequest request
     ) {
         log.info("Migration request received. User id: {}, vault: {}", userId, request.getVaultPath());
 
-        MigrationResult result = migrationService.migrateVault(userId, Paths.get(request.getVaultPath()));
+        MigrationResult result = migrationService.migrateVault(UUID.fromString(userId), Paths.get(request.getVaultPath()));
         MigrationResultDto dto = mapper.toDto(result);
 
         log.info("Migration completed. User id: {}, notes created: {}", userId, result.getNotesCreated());
