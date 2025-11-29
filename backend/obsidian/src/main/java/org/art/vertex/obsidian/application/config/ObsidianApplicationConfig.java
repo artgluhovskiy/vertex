@@ -3,6 +3,11 @@ package org.art.vertex.obsidian.application.config;
 import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.note.NoteApplicationService;
 import org.art.vertex.application.tag.TagApplicationService;
+import org.art.vertex.domain.note.NoteLinkRepository;
+import org.art.vertex.domain.note.NoteRepository;
+import org.art.vertex.domain.shared.time.Clock;
+import org.art.vertex.domain.shared.uuid.UuidGenerator;
+import org.art.vertex.domain.user.UserRepository;
 import org.art.vertex.obsidian.application.DefaultObsidianNoteParser;
 import org.art.vertex.obsidian.application.ObsidianMigrationApplicationService;
 import org.art.vertex.obsidian.application.parser.DefaultObsidianLinkResolver;
@@ -47,7 +52,12 @@ public class ObsidianApplicationConfig {
         ObsidianLinkResolver linkResolver,
         NoteApplicationService noteService,
         DirectoryApplicationService directoryService,
-        TagApplicationService tagService
+        TagApplicationService tagService,
+        NoteLinkRepository noteLinkRepository,
+        NoteRepository noteRepository,
+        UserRepository userRepository,
+        UuidGenerator uuidGenerator,
+        Clock clock
     ) {
         return new ObsidianMigrationApplicationService(
             fileReader,
@@ -55,7 +65,12 @@ public class ObsidianApplicationConfig {
             linkResolver,
             noteService,
             directoryService,
-            tagService
+            tagService,
+            noteLinkRepository,
+            noteRepository,
+            userRepository,
+            uuidGenerator,
+            clock
         );
     }
 }

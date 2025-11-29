@@ -8,8 +8,17 @@ import org.art.vertex.application.note.NoteApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
 import org.art.vertex.application.tag.TagApplicationService;
 import org.art.vertex.domain.directory.model.Directory;
+import org.art.vertex.domain.note.NoteLinkRepository;
+import org.art.vertex.domain.note.NoteRepository;
+import org.art.vertex.domain.note.model.LinkType;
 import org.art.vertex.domain.note.model.Note;
+import org.art.vertex.domain.note.model.NoteLink;
+import org.art.vertex.domain.shared.time.Clock;
+import org.art.vertex.domain.shared.uuid.UuidGenerator;
+import org.art.vertex.domain.user.UserRepository;
+import org.art.vertex.domain.user.model.User;
 import org.art.vertex.obsidian.domain.model.ObsidianNote;
+import org.art.vertex.obsidian.domain.model.WikilinkReference;
 import org.art.vertex.obsidian.domain.service.ObsidianLinkResolver;
 import org.art.vertex.obsidian.domain.service.ObsidianNoteParser;
 import org.art.vertex.obsidian.domain.service.ObsidianFileReader;
@@ -46,6 +55,11 @@ public class ObsidianMigrationApplicationService {
     private final NoteApplicationService noteService;
     private final DirectoryApplicationService directoryService;
     private final TagApplicationService tagService;
+    private final NoteLinkRepository noteLinkRepository;
+    private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
+    private final UuidGenerator uuidGenerator;
+    private final Clock clock;
 
     /**
      * Migrate Obsidian vault to Synapse.
@@ -66,11 +80,14 @@ public class ObsidianMigrationApplicationService {
             Map<String, Directory> directoryMap = createDirectoryStructure(userId, markdownFiles, vaultPath, resultBuilder);
             Map<Path, ObsidianNote> parsedNotes = parseNotes(markdownFiles, vaultPath, resultBuilder);
             Map<Path, Note> createdNotes = createNotes(userId, parsedNotes, directoryMap, resultBuilder);
+            Map<UUID, List<UUID>> resolvedLinks = resolveLinks(parsedNotes, createdNotes, resultBuilder);
+            createNoteLinks(userId, resolvedLinks, resultBuilder);
 
             long duration = System.currentTimeMillis() - startTime;
 
-            log.info("Migration completed. Notes: {}, directories: {}, duration: {}ms",
-                resultBuilder.notesCreated, resultBuilder.directoriesCreated, duration);
+            log.info("Migration completed. Notes: {}, directories: {}, links: {}, duration: {}ms",
+                resultBuilder.notesCreated, resultBuilder.directoriesCreated,
+                resultBuilder.linksCreated, duration);
 
             return resultBuilder.build(duration);
 
@@ -238,6 +255,106 @@ public class ObsidianMigrationApplicationService {
             .parentId(parent != null ? parent.getId() : null)
             .build();
         return directoryService.createDirectory(userId, command);
+    }
+
+    private Map<UUID, List<UUID>> resolveLinks(
+        Map<Path, ObsidianNote> parsedNotes,
+        Map<Path, Note> createdNotes,
+        MigrationResultBuilder resultBuilder
+    ) {
+        log.info("Phase 5: Resolving wikilinks...");
+
+        // Build wikilink map: note ID -> list of wikilink references
+        Map<UUID, List<WikilinkReference>> wikilinkMap = new HashMap<>();
+        for (Map.Entry<Path, ObsidianNote> entry : parsedNotes.entrySet()) {
+            Note note = createdNotes.get(entry.getKey());
+            if (note != null && !entry.getValue().getWikilinks().isEmpty()) {
+                wikilinkMap.put(note.getId(), entry.getValue().getWikilinks());
+            }
+        }
+
+        log.debug("Collected wikilinks from {} notes", wikilinkMap.size());
+
+        // Build name-to-ID map: note name/alias -> note ID (case-insensitive)
+        Map<String, UUID> noteNameToIdMap = new HashMap<>();
+        for (Map.Entry<Path, ObsidianNote> entry : parsedNotes.entrySet()) {
+            Note note = createdNotes.get(entry.getKey());
+            if (note != null) {
+                ObsidianNote obsidianNote = entry.getValue();
+
+                // Add title
+                noteNameToIdMap.put(obsidianNote.getTitle(), note.getId());
+
+                // Add filename without extension
+                String fileNameWithoutExt = obsidianNote.getFileName().replaceAll("\\.md$", "");
+                noteNameToIdMap.putIfAbsent(fileNameWithoutExt, note.getId());
+
+                // Add all aliases
+                obsidianNote.getAliases().forEach(alias ->
+                    noteNameToIdMap.putIfAbsent(alias, note.getId())
+                );
+            }
+        }
+
+        log.debug("Built name-to-ID map with {} entries", noteNameToIdMap.size());
+
+        Map<UUID, List<UUID>> resolvedLinks = linkResolver.resolveLinks(wikilinkMap, noteNameToIdMap);
+
+        int totalLinks = resolvedLinks.values().stream().mapToInt(List::size).sum();
+        log.info("Resolved {} wikilinks from {} notes", totalLinks, resolvedLinks.size());
+
+        return resolvedLinks;
+    }
+
+    private void createNoteLinks(
+        UUID userId,
+        Map<UUID, List<UUID>> resolvedLinks,
+        MigrationResultBuilder resultBuilder
+    ) {
+        log.info("Phase 6: Creating note links...");
+
+        User user = userRepository.getById(userId);
+        LocalDateTime now = clock.now();
+
+        int successCount = 0;
+        int failCount = 0;
+
+        for (Map.Entry<UUID, List<UUID>> entry : resolvedLinks.entrySet()) {
+            UUID sourceId = entry.getKey();
+            List<UUID> targetIds = entry.getValue();
+
+            Note sourceNote = noteRepository.getByNoteIdAndUserId(sourceId, userId);
+
+            for (UUID targetId : targetIds) {
+                try {
+                    Note targetNote = noteRepository.getByNoteIdAndUserId(targetId, userId);
+
+                    // Check if link already exists to avoid duplicates
+                    if (!noteLinkRepository.existsBetweenNotes(sourceNote, targetNote)) {
+                        NoteLink link = NoteLink.create(
+                            uuidGenerator.generate(),
+                            user,
+                            sourceNote,
+                            targetNote,
+                            LinkType.MANUAL,
+                            now
+                        );
+                        noteLinkRepository.save(link);
+                        successCount++;
+                        resultBuilder.linksCreated++;
+                    } else {
+                        log.debug("Link already exists from {} to {}", sourceId, targetId);
+                    }
+                } catch (Exception e) {
+                    log.error("Failed to create link from {} to {}", sourceId, targetId, e);
+                    failCount++;
+                    resultBuilder.linksFailed++;
+                }
+            }
+        }
+
+        log.info("Created {} note links ({} succeeded, {} failed)",
+            successCount + failCount, successCount, failCount);
     }
 
     private static class MigrationResultBuilder {

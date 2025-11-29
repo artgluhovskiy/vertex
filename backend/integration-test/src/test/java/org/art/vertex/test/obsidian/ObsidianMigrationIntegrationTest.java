@@ -74,8 +74,11 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Then: Verify note content and metadata
         verifyNoteContent(userId);
 
-        log.info("✅ Migration test completed successfully. Notes: {}, Directories: {}, Duration: {}ms",
-            result.getNotesCreated(), result.getDirectoriesCreated(), result.getDurationMs());
+        // Then: Verify links were created
+        verifyLinksCreated(userId, result);
+
+        log.info("✅ Migration test completed successfully. Notes: {}, Directories: {}, Links: {}, Duration: {}ms",
+            result.getNotesCreated(), result.getDirectoriesCreated(), result.getLinksCreated(), result.getDurationMs());
     }
 
     private UUID createTestUser() {
@@ -282,6 +285,54 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
             .doesNotContain("---"); // Frontmatter should be removed
 
         log.info("✓ Note content verified");
+    }
+
+    private void verifyLinksCreated(UUID userId, MigrationResult result) {
+        // Verify links were created from migration result
+        assertThat(result.getLinksCreated())
+            .as("Should have created note links")
+            .isGreaterThan(0);
+
+        // Verify links exist in database
+        Integer linkCount = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM note_links WHERE user_id = ?",
+            Integer.class,
+            userId
+        );
+        assertThat(linkCount)
+            .as("Links should be persisted to database")
+            .isEqualTo(result.getLinksCreated());
+
+        // Verify specific link exists (e.g., Welcome.md -> Project Alpha)
+        String welcomeTitle = "Welcome to My Vault";
+        String projectAlphaTitle = "Project Alpha";
+
+        UUID welcomeNoteId = jdbcTemplate.queryForObject(
+            "SELECT id FROM notes WHERE user_id = ? AND title = ?",
+            UUID.class,
+            userId,
+            welcomeTitle
+        );
+
+        UUID projectAlphaNoteId = jdbcTemplate.queryForObject(
+            "SELECT id FROM notes WHERE user_id = ? AND title = ?",
+            UUID.class,
+            userId,
+            projectAlphaTitle
+        );
+
+        Integer welcomeToAlphaLinks = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM note_links WHERE source_note_id = ? AND target_note_id = ?",
+            Integer.class,
+            welcomeNoteId,
+            projectAlphaNoteId
+        );
+
+        assertThat(welcomeToAlphaLinks)
+            .as("Link from Welcome to Project Alpha should exist")
+            .isEqualTo(1);
+
+        log.info("✓ Note links verified. Total links: {}", result.getLinksCreated());
     }
 
     @Test
