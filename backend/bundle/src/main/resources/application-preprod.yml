@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/vertex_preprod
+    username: vertex_preprod
+    password: ${POSTGRES_PASSWORD:vertex_preprod_secure}
+
+search:
+  embedding:
+    providers:
+      ollama:
+        base-url: http://localhost:11435

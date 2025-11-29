@@ -1,0 +1,3 @@
+#!/bin/bash
+# Convenience wrapper in backend root
+exec "$(dirname "$0")/scripts/run-preprod.sh" "$@"

@@ -1,0 +1,65 @@
+services:
+  # PostgreSQL with pgvector for Preprod environment
+  postgres-preprod:
+    image: pgvector/pgvector:pg16
+    container_name: vertex-postgres-preprod
+    restart: unless-stopped
+    ports:
+      - "5433:5432"  # Different port to avoid conflicts with dev/test
+    environment:
+      POSTGRES_DB: vertex_preprod
+      POSTGRES_USER: vertex_preprod
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vertex_preprod_secure}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=en_US.utf8 --lc-ctype=en_US.utf8"
+    volumes:
+      - ./preprod-data/postgres:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+      - ./backups:/backups  # For backup/restore operations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vertex_preprod -d vertex_preprod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - vertex-preprod-network
+    labels:
+      - "com.vertex.env=preprod"
+      - "com.vertex.service=postgres"
+      - "com.vertex.backup=enabled"
+
+  # Ollama for embeddings in Preprod
+  ollama-preprod:
+    image: ollama/ollama:latest
+    container_name: vertex-ollama-preprod
+    restart: unless-stopped
+    ports:
+      - "11435:11434"  # Different port to avoid conflicts
+    environment:
+      OLLAMA_INSECURE: "true"
+      OLLAMA_SKIP_VERIFY: "true"
+      OLLAMA_TLS_VERIFY: "false"
+      OLLAMA_NOHISTORY: "false"  # Keep history in preprod
+      CURL_CA_BUNDLE: ""
+      OLLAMA_HOST: "0.0.0.0:11434"
+      OLLAMA_ORIGINS: "*"
+    volumes:
+      - ./preprod-data/ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - vertex-preprod-network
+    labels:
+      - "com.vertex.env=preprod"
+      - "com.vertex.service=ollama"
+
+networks:
+  vertex-preprod-network:
+    driver: bridge
+    name: vertex-preprod-network
+
+# Volumes section removed - using direct bind mounts above for simplicity and reliability
