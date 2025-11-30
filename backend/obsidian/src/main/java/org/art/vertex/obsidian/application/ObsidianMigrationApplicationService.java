@@ -6,17 +6,11 @@ import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.directory.command.CreateDirectoryCommand;
 import org.art.vertex.application.note.NoteApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
+import org.art.vertex.application.note.link.NoteLinkApplicationService;
+import org.art.vertex.application.note.link.command.CreateNoteLinkCommand;
 import org.art.vertex.application.tag.TagApplicationService;
 import org.art.vertex.domain.directory.model.Directory;
-import org.art.vertex.domain.note.NoteLinkRepository;
-import org.art.vertex.domain.note.NoteRepository;
-import org.art.vertex.domain.note.model.LinkType;
 import org.art.vertex.domain.note.model.Note;
-import org.art.vertex.domain.note.model.NoteLink;
-import org.art.vertex.domain.shared.time.Clock;
-import org.art.vertex.domain.shared.uuid.UuidGenerator;
-import org.art.vertex.domain.user.UserRepository;
-import org.art.vertex.domain.user.model.User;
 import org.art.vertex.obsidian.domain.model.ObsidianNote;
 import org.art.vertex.obsidian.domain.model.WikilinkReference;
 import org.art.vertex.obsidian.domain.service.ObsidianLinkResolver;
@@ -55,11 +49,7 @@ public class ObsidianMigrationApplicationService {
     private final NoteApplicationService noteService;
     private final DirectoryApplicationService directoryService;
     private final TagApplicationService tagService;
-    private final NoteLinkRepository noteLinkRepository;
-    private final NoteRepository noteRepository;
-    private final UserRepository userRepository;
-    private final UuidGenerator uuidGenerator;
-    private final Clock clock;
+    private final NoteLinkApplicationService noteLinkService;
 
     /**
      * Migrate Obsidian vault to Synapse.
@@ -313,9 +303,6 @@ public class ObsidianMigrationApplicationService {
     ) {
         log.info("Phase 6: Creating note links...");
 
-        User user = userRepository.getById(userId);
-        LocalDateTime now = clock.now();
-
         int successCount = 0;
         int failCount = 0;
 
@@ -323,28 +310,16 @@ public class ObsidianMigrationApplicationService {
             UUID sourceId = entry.getKey();
             List<UUID> targetIds = entry.getValue();
 
-            Note sourceNote = noteRepository.getByNoteIdAndUserId(sourceId, userId);
-
             for (UUID targetId : targetIds) {
                 try {
-                    Note targetNote = noteRepository.getByNoteIdAndUserId(targetId, userId);
+                    CreateNoteLinkCommand command = CreateNoteLinkCommand.builder()
+                        .sourceNoteId(sourceId)
+                        .targetNoteId(targetId)
+                        .build();
 
-                    // Check if link already exists to avoid duplicates
-                    if (!noteLinkRepository.existsBetweenNotes(sourceNote, targetNote)) {
-                        NoteLink link = NoteLink.create(
-                            uuidGenerator.generate(),
-                            user,
-                            sourceNote,
-                            targetNote,
-                            LinkType.MANUAL,
-                            now
-                        );
-                        noteLinkRepository.save(link);
-                        successCount++;
-                        resultBuilder.linksCreated++;
-                    } else {
-                        log.debug("Link already exists from {} to {}", sourceId, targetId);
-                    }
+                    noteLinkService.createLink(userId, command);
+                    successCount++;
+                    resultBuilder.linksCreated++;
                 } catch (Exception e) {
                     log.error("Failed to create link from {} to {}", sourceId, targetId, e);
                     failCount++;

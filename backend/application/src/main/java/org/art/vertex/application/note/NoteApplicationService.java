@@ -1,6 +1,5 @@
 package org.art.vertex.application.note;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
@@ -24,7 +23,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RequiredArgsConstructor
 public class NoteApplicationService {
 
     private final UserApplicationService userService;
@@ -40,6 +38,28 @@ public class NoteApplicationService {
     private final UuidGenerator uuidGenerator;
 
     private final Clock clock;
+
+    private final boolean asyncIndexing;
+
+    public NoteApplicationService(
+        UserApplicationService userService,
+        DirectoryApplicationService directoryService,
+        TagApplicationService tagService,
+        NoteRepository noteRepository,
+        NoteIndexingApplicationService indexingService,
+        UuidGenerator uuidGenerator,
+        Clock clock,
+        boolean asyncIndexing
+    ) {
+        this.userService = userService;
+        this.directoryService = directoryService;
+        this.tagService = tagService;
+        this.noteRepository = noteRepository;
+        this.indexingService = indexingService;
+        this.uuidGenerator = uuidGenerator;
+        this.clock = clock;
+        this.asyncIndexing = asyncIndexing;
+    }
 
     @Transactional
     public Note createNote(UUID userId, CreateNoteCommand command) {
@@ -71,8 +91,11 @@ public class NoteApplicationService {
 
         log.info("Note created successfully. Note id: {}, user id: {}", savedNote.getId(), userId);
 
-        // Index note for search (async, in separate transaction)
-        indexingService.indexNoteAsync(savedNote);
+        if (asyncIndexing) {
+            indexingService.indexNoteAsync(savedNote);
+        } else {
+            indexingService.indexNoteSync(savedNote);
+        }
 
         return savedNote;
     }
@@ -107,8 +130,11 @@ public class NoteApplicationService {
 
         log.info("Note updated successfully. Note id: {}", noteId);
 
-        // Reindex note for search (async, in separate transaction)
-        indexingService.reindexNoteAsync(updatedNote);
+        if (asyncIndexing) {
+            indexingService.reindexNoteAsync(updatedNote);
+        } else {
+            indexingService.reindexNoteSync(updatedNote);
+        }
 
         return updatedNote;
     }
@@ -135,7 +161,10 @@ public class NoteApplicationService {
 
         log.info("Note deleted successfully. Note id: {}", noteId);
 
-        // Remove from search index (async, in separate transaction)
-        indexingService.removeNoteFromIndexAsync(noteId);
+        if (asyncIndexing) {
+            indexingService.removeNoteFromIndexAsync(noteId);
+        } else {
+            indexingService.removeNoteFromIndexSync(noteId);
+        }
     }
 }

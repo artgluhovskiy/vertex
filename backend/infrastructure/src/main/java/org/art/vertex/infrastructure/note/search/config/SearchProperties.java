@@ -35,7 +35,6 @@ import java.util.Map;
  *     max-results: 100
  * </pre>
  *
- * @see EmbeddingProviderProperties
  * @see IndexingProperties
  * @see VectorSearchProperties
  */
@@ -112,6 +111,12 @@ public class SearchProperties {
      */
     @Data
     public static class IndexingProperties {
+
+        /**
+         * Whether to perform indexing asynchronously.
+         * Set to false in tests to avoid deadlocks during table truncation.
+         */
+        private boolean async = true;
 
         /**
          * Default indexing strategy to use (BASIC, ENHANCED).

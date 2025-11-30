@@ -12,6 +12,7 @@ import org.art.vertex.domain.note.NoteRepository;
 import org.art.vertex.domain.note.search.VectorSearchService;
 import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.shared.uuid.UuidGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -21,7 +22,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class NoteApplicationConfig {
 
     @Bean
-    public NoteIndexingApplicationService noteIndexingService(VectorSearchService vectorSearchService) {
+    public NoteIndexingApplicationService noteIndexingService(
+        VectorSearchService vectorSearchService
+    ) {
         return new NoteIndexingApplicationService(vectorSearchService);
     }
 
@@ -33,7 +36,8 @@ public class NoteApplicationConfig {
         DirectoryApplicationService directoryApplicationService,
         NoteIndexingApplicationService indexingService,
         UuidGenerator uuidGenerator,
-        Clock clock
+        Clock clock,
+        @Value("${search.indexing.async:true}") boolean asyncIndexing
     ) {
         return new NoteApplicationService(
             userApplicationService,
@@ -42,7 +46,8 @@ public class NoteApplicationConfig {
             noteRepository,
             indexingService,
             uuidGenerator,
-            clock
+            clock,
+            asyncIndexing
         );
     }
 

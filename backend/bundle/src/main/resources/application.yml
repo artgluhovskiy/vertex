@@ -52,6 +52,8 @@ search:
       #   api-key: ${OPENAI_API_KEY}
 
   indexing:
+    # Enable asynchronous indexing for better performance
+    async: true
     # Default indexing strategy (BASIC, ENHANCED)
     strategy: BASIC
     # Enable enhanced indexing with higher field weights

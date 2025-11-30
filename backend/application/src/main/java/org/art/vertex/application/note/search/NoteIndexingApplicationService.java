@@ -26,11 +26,10 @@ public class NoteIndexingApplicationService {
         } catch (Exception e) {
             log.error("Failed to index note: {}. Note is saved but not searchable.",
                 note.getId(), e);
-            // The note can be reindexed later via a batch job
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void indexNoteSync(Note note) {
         log.debug("Indexing note synchronously: {}", note.getId());
         vectorSearchService.index(note);
@@ -49,6 +48,13 @@ public class NoteIndexingApplicationService {
         }
     }
 
+    @Transactional
+    public void reindexNoteSync(Note note) {
+        log.debug("Reindexing note synchronously: {}", note.getId());
+        vectorSearchService.reindex(note);
+        log.info("Successfully reindexed note: {}", note.getId());
+    }
+
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void removeNoteFromIndexAsync(UUID noteId) {
@@ -59,5 +65,12 @@ public class NoteIndexingApplicationService {
         } catch (Exception e) {
             log.error("Failed to remove note from index: {}", noteId, e);
         }
+    }
+
+    @Transactional
+    public void removeNoteFromIndexSync(UUID noteId) {
+        log.debug("Removing note from index synchronously: {}", noteId);
+        vectorSearchService.remove(noteId);
+        log.info("Successfully removed note from index: {}", noteId);
     }
 }
