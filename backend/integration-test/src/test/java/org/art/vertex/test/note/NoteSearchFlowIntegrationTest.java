@@ -26,9 +26,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             dirId
         );
 
-        // Wait for async indexing to complete
-        Thread.sleep(3000);
-
         // WHEN - User searches for "artificial intelligence"
         var searchResult = searchSteps.search(token, "artificial intelligence", SearchType.SEMANTIC, 10);
 
@@ -72,9 +69,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             "Convolutional Neural Networks (CNNs) are specialized for processing grid-like data such as images. Recurrent Neural Networks (RNNs) are designed for sequential data like text or time series.",
             dirId
         );
-
-        // Wait for async indexing to complete
-        Thread.sleep(3000);
 
         // WHEN - User searches for "neural networks"
         var searchResult = searchSteps.search(token, "neural networks", SearchType.SEMANTIC, 10);
@@ -129,9 +123,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             dir2.id()
         );
 
-        // Wait for async indexing to complete
-        Thread.sleep(3000);
-
         // WHEN - Each user searches for "programming language"
         var searchResult1 = searchSteps.search(token1, "programming language", SearchType.SEMANTIC, 10);
         var searchResult2 = searchSteps.search(token2, "programming language", SearchType.SEMANTIC, 10);
@@ -160,9 +151,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             "Mix flour, sugar, cocoa powder, eggs, and milk. Bake at 180°C for 30 minutes. Let cool and frost with chocolate frosting.",
             dirId
         );
-
-        // Wait for async indexing to complete
-        Thread.sleep(3000);
 
         // WHEN - User searches for completely unrelated topic
         var searchResult = searchSteps.search(token, "quantum physics relativity", SearchType.SEMANTIC, 10);
@@ -197,9 +185,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             dirId
         );
 
-        // Wait for async indexing to complete
-        Thread.sleep(3000);
-
         // WHEN - User searches using synonym (car instead of automobile)
         var searchResult = searchSteps.search(token, "vehicle transportation car", SearchType.SEMANTIC, 10);
 
@@ -228,9 +213,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             );
         }
 
-        // Wait for async indexing to complete
-        Thread.sleep(3000);
-
         // WHEN - User searches with limit of 3
         var searchResult = searchSteps.search(token, "artificial intelligence", SearchType.SEMANTIC, 3);
 
@@ -257,9 +239,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             dirId
         );
 
-        // Wait for async indexing
-        Thread.sleep(3000);
-
         // WHEN - Search finds the Python note
         var searchBefore = searchSteps.search(token, "machine learning", SearchType.SEMANTIC, 10);
         assertThat(searchBefore.totalHits()).isEqualTo(0); // No ML content yet
@@ -272,9 +251,6 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             "Python is the most popular programming language for machine learning and data science. Libraries like TensorFlow and PyTorch make building neural networks easy.",
             dirId
         );
-
-        // Wait for async reindexing
-        Thread.sleep(3000);
 
         // THEN - Search should now find the updated note
         var searchAfter = searchSteps.search(token, "machine learning", SearchType.SEMANTIC, 10);
@@ -299,18 +275,12 @@ class NoteSearchFlowIntegrationTest extends BaseIntegrationTest {
             dirId
         );
 
-        // Wait for async indexing
-        Thread.sleep(3000);
-
         // WHEN - Verify note is searchable
         var searchBefore = searchSteps.search(token, "artificial intelligence", SearchType.SEMANTIC, 10);
         assertThat(searchBefore.totalHits()).isEqualTo(1);
 
         // WHEN - Delete the note
         noteSteps.deleteNote(token, note.id());
-
-        // Wait for async index removal
-        Thread.sleep(3000);
 
         // THEN - Note should no longer appear in search results
         var searchAfter = searchSteps.search(token, "artificial intelligence", SearchType.SEMANTIC, 10);

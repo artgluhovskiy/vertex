@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.domain.note.NoteLinkRepository;
 import org.art.vertex.domain.note.exception.NoteLinkNotFoundException;
+import org.art.vertex.domain.note.model.LinkType;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.note.model.NoteLink;
 import org.art.vertex.domain.user.model.User;
@@ -92,6 +93,17 @@ public class DefaultNoteLinkRepository implements NoteLinkRepository {
         return noteLinkJpaRepository.existsBetweenNotes(
             sourceNote.getId(),
             targetNote.getId(),
+            sourceNote.getUserId()
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsBetweenNotes(Note sourceNote, Note targetNote, LinkType linkType) {
+        return noteLinkJpaRepository.existsBetweenNotesWithType(
+            sourceNote.getId(),
+            targetNote.getId(),
+            linkType,
             sourceNote.getUserId()
         );
     }

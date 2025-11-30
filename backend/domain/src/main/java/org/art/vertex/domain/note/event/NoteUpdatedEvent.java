@@ -1,6 +1,7 @@
 package org.art.vertex.domain.note.event;
 
 import lombok.Value;
+import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.shared.event.DomainEvent;
 
 import java.time.LocalDateTime;
@@ -9,16 +10,17 @@ import java.util.UUID;
 @Value
 public class NoteUpdatedEvent implements DomainEvent {
 
-    UUID noteId;
+    Note note;
+
     String previousTitle;
-    String newTitle;
+
     String previousContent;
-    String newContent;
+
     LocalDateTime occurredAt;
 
     @Override
     public UUID getAggregateId() {
-        return noteId;
+        return note.getId();
     }
 
     @Override

@@ -17,8 +17,9 @@ spring:
 
 search:
   indexing:
-    # Use synchronous indexing in tests to avoid deadlocks during table truncation
-    async: false
+    # Use async event-driven indexing (handled by @Async event listeners)
+    # Tests use SyncTaskExecutor to make async execution synchronous
+    async: true
 
 logging:
   level:

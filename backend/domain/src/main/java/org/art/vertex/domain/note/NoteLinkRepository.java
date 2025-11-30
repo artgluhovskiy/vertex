@@ -1,5 +1,6 @@
 package org.art.vertex.domain.note;
 
+import org.art.vertex.domain.note.model.LinkType;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.note.model.NoteLink;
 import org.art.vertex.domain.user.model.User;
@@ -43,13 +44,23 @@ public interface NoteLinkRepository {
     List<NoteLink> findAllByUser(User user);
 
     /**
-     * Check if link exists between two notes.
+     * Check if link exists between two notes (regardless of type).
      *
      * @param sourceNote source note
      * @param targetNote target note
      * @return true if any link exists between the notes
      */
     boolean existsBetweenNotes(Note sourceNote, Note targetNote);
+
+    /**
+     * Check if a specific link exists between two notes with the given type.
+     *
+     * @param sourceNote source note
+     * @param targetNote target note
+     * @param linkType link type
+     * @return true if a link with this specific type exists between the notes
+     */
+    boolean existsBetweenNotes(Note sourceNote, Note targetNote, LinkType linkType);
 
     void deleteById(UUID id);
 

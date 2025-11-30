@@ -305,6 +305,7 @@ public class ObsidianMigrationApplicationService {
 
         int successCount = 0;
         int failCount = 0;
+        int skippedCount = 0;
 
         for (Map.Entry<UUID, List<UUID>> entry : resolvedLinks.entrySet()) {
             UUID sourceId = entry.getKey();
@@ -317,6 +318,13 @@ public class ObsidianMigrationApplicationService {
                         .targetNoteId(targetId)
                         .build();
 
+                    // Check if link already exists before creating
+                    if (noteLinkService.linkExists(sourceId, targetId, command.getType(), userId)) {
+                        log.debug("Skipping duplicate link from {} to {} (type: {})", sourceId, targetId, command.getType());
+                        skippedCount++;
+                        continue;
+                    }
+
                     noteLinkService.createLink(userId, command);
                     successCount++;
                     resultBuilder.linksCreated++;
@@ -328,8 +336,8 @@ public class ObsidianMigrationApplicationService {
             }
         }
 
-        log.info("Created {} note links ({} succeeded, {} failed)",
-            successCount + failCount, successCount, failCount);
+        log.info("Created {} note links ({} succeeded, {} skipped, {} failed)",
+            successCount + skippedCount + failCount, successCount, skippedCount, failCount);
     }
 
     private static class MigrationResultBuilder {

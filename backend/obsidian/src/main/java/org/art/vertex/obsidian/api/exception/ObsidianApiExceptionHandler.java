@@ -28,7 +28,7 @@ public class ObsidianApiExceptionHandler {
         return ErrorResponse.builder()
             .error("OBSIDIAN_FILE_READ_ERROR")
             .message(e.getMessage())
-            .timestamp(Instant.from(clock.now()))
+            .timestamp(clock.instant())
             .build();
     }
 
@@ -39,7 +39,7 @@ public class ObsidianApiExceptionHandler {
         return ErrorResponse.builder()
             .error("INVALID_REQUEST")
             .message(e.getMessage())
-            .timestamp(Instant.from(clock.now()))
+            .timestamp(clock.instant())
             .build();
     }
 
@@ -50,7 +50,7 @@ public class ObsidianApiExceptionHandler {
         return ErrorResponse.builder()
             .error("MIGRATION_ERROR")
             .message("An unexpected error occurred during migration. Please try again or contact support.")
-            .timestamp(Instant.from(clock.now()))
+            .timestamp(clock.instant())
             .build();
     }
 }

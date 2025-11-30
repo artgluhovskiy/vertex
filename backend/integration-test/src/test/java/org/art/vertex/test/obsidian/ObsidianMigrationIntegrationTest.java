@@ -100,20 +100,20 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Verify specific directories exist
         Integer projectsWorkCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND name = ?",
-            Integer.class,
-            userId, "Work");
+            new Object[]{userId, "Work"},
+            Integer.class);
         assertThat(projectsWorkCount).isEqualTo(1);
 
         Integer dailyCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND name = ?",
-            Integer.class,
-            userId, "Daily");
+            new Object[]{userId, "Daily"},
+            Integer.class);
         assertThat(dailyCount).isEqualTo(1);
 
         Integer archiveCount = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND name = ?",
-            Integer.class,
-            userId, "Archive");
+            new Object[]{userId, "Archive"},
+            Integer.class);
         assertThat(archiveCount).isEqualTo(1);
 
         // Verify parent relationships
@@ -126,15 +126,15 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Get root directory ID
         UUID rootId = jdbcTemplate.queryForObject(
             "SELECT id FROM directories WHERE user_id = ? AND name = ? AND parent_id IS NULL",
-            UUID.class,
-            userId, "Root");
+            new Object[]{userId, "Root"},
+            UUID.class);
         assertThat(rootId).as("Root directory should exist").isNotNull();
 
         // Verify top-level directories have Root as parent
         Integer topLevelDirsWithRootParent = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM directories WHERE user_id = ? AND parent_id = ? AND name IN ('Archive', 'Daily', 'Projects')",
-            Integer.class,
-            userId, rootId);
+            new Object[]{userId, rootId},
+            Integer.class);
         assertThat(topLevelDirsWithRootParent)
             .as("Archive, Daily, and Projects should have Root as parent")
             .isEqualTo(3);
@@ -142,13 +142,13 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Verify Work directory has Projects as parent
         UUID projectsId = jdbcTemplate.queryForObject(
             "SELECT id FROM directories WHERE user_id = ? AND name = ?",
-            UUID.class,
-            userId, "Projects");
+            new Object[]{userId, "Projects"},
+            UUID.class);
 
         UUID workParentId = jdbcTemplate.queryForObject(
             "SELECT parent_id FROM directories WHERE user_id = ? AND name = ?",
-            UUID.class,
-            userId, "Work");
+            new Object[]{userId, "Work"},
+            UUID.class);
         assertThat(workParentId)
             .as("Work directory should have Projects as parent")
             .isEqualTo(projectsId);
@@ -181,8 +181,8 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
     private void assertNoteExists(UUID userId, String title) {
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM notes WHERE user_id = ? AND title = ?",
-            Integer.class,
-            userId, title);
+            new Object[]{userId, title},
+            Integer.class);
         assertThat(count)
             .as("Note '%s' should exist", title)
             .isEqualTo(1);
@@ -226,8 +226,8 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Verify note with frontmatter
         String welcomeContent = jdbcTemplate.queryForObject(
             "SELECT content FROM notes WHERE user_id = ? AND title = ?",
-            String.class,
-            userId, "Welcome to Test Vault");
+            new Object[]{userId, "Welcome to Test Vault"},
+            String.class);
         assertThat(welcomeContent)
             .as("Welcome note content should not contain frontmatter")
             .doesNotContain("---")
@@ -237,8 +237,8 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Verify note without frontmatter
         String noFrontmatterContent = jdbcTemplate.queryForObject(
             "SELECT content FROM notes WHERE user_id = ? AND title = ?",
-            String.class,
-            userId, "No Frontmatter");
+            new Object[]{userId, "No Frontmatter"},
+            String.class);
         assertThat(noFrontmatterContent)
             .as("No frontmatter note should have correct content")
             .contains("Simple note without any YAML frontmatter");
@@ -246,8 +246,8 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
         // Verify note in nested directory
         String projectAlphaContent = jdbcTemplate.queryForObject(
             "SELECT content FROM notes WHERE user_id = ? AND title = ?",
-            String.class,
-            userId, "Project Alpha");
+            new Object[]{userId, "Project Alpha"},
+            String.class);
         assertThat(projectAlphaContent)
             .as("Project Alpha should have correct content")
             .contains("Project Alpha is our main initiative")
@@ -277,18 +277,18 @@ class ObsidianMigrationIntegrationTest extends BaseIntegrationTest {
 
         UUID welcomeNoteId = jdbcTemplate.queryForObject(
             "SELECT id FROM notes WHERE user_id = ? AND title = ?",
-            UUID.class,
-            userId, welcomeTitle);
+            new Object[]{userId, welcomeTitle},
+            UUID.class);
 
         UUID projectAlphaNoteId = jdbcTemplate.queryForObject(
             "SELECT id FROM notes WHERE user_id = ? AND title = ?",
-            UUID.class,
-            userId, projectAlphaTitle);
+            new Object[]{userId, projectAlphaTitle},
+            UUID.class);
 
         Integer welcomeToAlphaLinks = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM note_links WHERE source_note_id = ? AND target_note_id = ?",
-            Integer.class,
-            welcomeNoteId, projectAlphaNoteId);
+            new Object[]{welcomeNoteId, projectAlphaNoteId},
+            Integer.class);
 
         assertThat(welcomeToAlphaLinks)
             .as("Link from Welcome to Project Alpha should exist")

@@ -12,7 +12,7 @@ CREATE TABLE note_links (
     CONSTRAINT fk_note_links_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_note_links_source FOREIGN KEY (source_note_id) REFERENCES notes(id) ON DELETE CASCADE,
     CONSTRAINT fk_note_links_target FOREIGN KEY (target_note_id) REFERENCES notes(id) ON DELETE CASCADE,
-    CONSTRAINT unique_note_link UNIQUE (source_note_id, target_note_id)
+    CONSTRAINT unique_note_link UNIQUE (source_note_id, target_note_id, type)
 );
 
 CREATE INDEX idx_note_links_user_id ON note_links(user_id);

@@ -24,6 +24,20 @@ public interface NoteLinkJpaRepository extends JpaRepository<NoteLinkEntity, UUI
         @Param("userId") UUID userId
     );
 
+    @Query("""
+        SELECT COUNT(nl) > 0 FROM NoteLinkEntity nl
+        WHERE nl.sourceNoteId = :sourceNoteId
+        AND nl.targetNoteId = :targetNoteId
+        AND nl.type = :type
+        AND nl.userId = :userId
+        """)
+    boolean existsBetweenNotesWithType(
+        @Param("sourceNoteId") UUID sourceNoteId,
+        @Param("targetNoteId") UUID targetNoteId,
+        @Param("type") org.art.vertex.domain.note.model.LinkType type,
+        @Param("userId") UUID userId
+    );
+
     List<NoteLinkEntity> findAllByUserId(UUID userId);
 
     List<NoteLinkEntity> findAllBySourceNoteId(UUID sourceNoteId);

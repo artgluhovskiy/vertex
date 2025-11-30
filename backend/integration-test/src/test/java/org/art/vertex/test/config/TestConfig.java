@@ -7,8 +7,10 @@ import org.art.vertex.test.step.SearchSteps;
 import org.art.vertex.test.step.UserSteps;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 @TestConfiguration
+@Import(TestAsyncConfig.class)
 public class TestConfig {
 
     @Bean

@@ -43,10 +43,11 @@ public class NoteLinkApplicationService {
         Note sourceNote = noteApplicationService.getNote(command.getSourceNoteId(), userId);
         Note targetNote = noteApplicationService.getNote(command.getTargetNoteId(), userId);
 
-        // Check if link already exists
-        if (noteLinkRepository.existsBetweenNotes(sourceNote, targetNote)) {
-            log.warn("Link already exists between notes {} and {}", command.getSourceNoteId(), command.getTargetNoteId());
-            throw new IllegalStateException("Link already exists between these notes");
+        // Check if link with this specific type already exists
+        if (noteLinkRepository.existsBetweenNotes(sourceNote, targetNote, command.getType())) {
+            log.warn("Link with type {} already exists between notes {} and {}",
+                command.getType(), command.getSourceNoteId(), command.getTargetNoteId());
+            throw new IllegalStateException("Link with this type already exists between these notes");
         }
 
         LocalDateTime now = clock.now();
@@ -135,6 +136,26 @@ public class NoteLinkApplicationService {
         noteLinkRepository.deleteById(linkId);
 
         log.info("Note link deleted successfully. Link id: {}", linkId);
+    }
+
+    /**
+     * Check if a link with the given type already exists between two notes.
+     *
+     * @param sourceNoteId source note ID
+     * @param targetNoteId target note ID
+     * @param linkType link type
+     * @param userId user ID
+     * @return true if link exists, false otherwise
+     */
+    @Transactional(readOnly = true)
+    public boolean linkExists(UUID sourceNoteId, UUID targetNoteId, org.art.vertex.domain.note.model.LinkType linkType, UUID userId) {
+        log.debug("Checking link existence. Source: {}, target: {}, type: {}, user: {}",
+            sourceNoteId, targetNoteId, linkType, userId);
+
+        Note sourceNote = noteApplicationService.getNote(sourceNoteId, userId);
+        Note targetNote = noteApplicationService.getNote(targetNoteId, userId);
+
+        return noteLinkRepository.existsBetweenNotes(sourceNote, targetNote, linkType);
     }
 
     /**

@@ -4,16 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
 import org.art.vertex.application.note.command.UpdateNoteCommand;
-import org.art.vertex.application.note.search.NoteIndexingApplicationService;
 import org.art.vertex.application.tag.TagApplicationService;
 import org.art.vertex.application.tag.command.UpsertTagCommand;
 import org.art.vertex.application.user.UserApplicationService;
 import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.note.NoteRepository;
+import org.art.vertex.domain.note.event.NoteCreatedEvent;
+import org.art.vertex.domain.note.event.NoteDeletedEvent;
+import org.art.vertex.domain.note.event.NoteUpdatedEvent;
 import org.art.vertex.domain.note.model.Note;
 import org.art.vertex.domain.shared.time.Clock;
 import org.art.vertex.domain.shared.uuid.UuidGenerator;
 import org.art.vertex.domain.tag.model.Tag;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -33,32 +36,28 @@ public class NoteApplicationService {
 
     private final NoteRepository noteRepository;
 
-    private final NoteIndexingApplicationService indexingService;
-
     private final UuidGenerator uuidGenerator;
 
     private final Clock clock;
 
-    private final boolean asyncIndexing;
+    private final ApplicationEventPublisher eventPublisher;
 
     public NoteApplicationService(
         UserApplicationService userService,
         DirectoryApplicationService directoryService,
         TagApplicationService tagService,
         NoteRepository noteRepository,
-        NoteIndexingApplicationService indexingService,
         UuidGenerator uuidGenerator,
         Clock clock,
-        boolean asyncIndexing
+        ApplicationEventPublisher eventPublisher
     ) {
         this.userService = userService;
         this.directoryService = directoryService;
         this.tagService = tagService;
         this.noteRepository = noteRepository;
-        this.indexingService = indexingService;
         this.uuidGenerator = uuidGenerator;
         this.clock = clock;
-        this.asyncIndexing = asyncIndexing;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -91,11 +90,10 @@ public class NoteApplicationService {
 
         log.info("Note created successfully. Note id: {}, user id: {}", savedNote.getId(), userId);
 
-        if (asyncIndexing) {
-            indexingService.indexNoteAsync(savedNote);
-        } else {
-            indexingService.indexNoteSync(savedNote);
-        }
+        eventPublisher.publishEvent(new NoteCreatedEvent(
+            savedNote,
+            now
+        ));
 
         return savedNote;
     }
@@ -126,15 +124,19 @@ public class NoteApplicationService {
             now
         );
 
+        String previousTitle = existingNote.getTitle();
+        String previousContent = existingNote.getContent();
+
         updatedNote = noteRepository.update(updatedNote);
 
         log.info("Note updated successfully. Note id: {}", noteId);
 
-        if (asyncIndexing) {
-            indexingService.reindexNoteAsync(updatedNote);
-        } else {
-            indexingService.reindexNoteSync(updatedNote);
-        }
+        eventPublisher.publishEvent(new NoteUpdatedEvent(
+            updatedNote,
+            previousTitle,
+            previousContent,
+            now
+        ));
 
         return updatedNote;
     }
@@ -161,10 +163,10 @@ public class NoteApplicationService {
 
         log.info("Note deleted successfully. Note id: {}", noteId);
 
-        if (asyncIndexing) {
-            indexingService.removeNoteFromIndexAsync(noteId);
-        } else {
-            indexingService.removeNoteFromIndexSync(noteId);
-        }
+        eventPublisher.publishEvent(new NoteDeletedEvent(
+            noteId,
+            userId,
+            clock.now()
+        ));
     }
 }
