@@ -36,6 +36,20 @@ public class DefaultNoteRepository implements NoteRepository {
 
     @Override
     @Transactional
+    public List<Note> saveAll(List<Note> notes) {
+        List<NoteEntity> entities = notes.stream()
+            .map(noteMapper::toEntity)
+            .toList();
+
+        List<NoteEntity> savedEntities = noteJpaRepository.saveAll(entities);
+
+        return savedEntities.stream()
+            .map(noteMapper::toDomain)
+            .toList();
+    }
+
+    @Override
+    @Transactional
     public Note update(Note updatedNote) {
         NoteEntity existingNote = noteJpaRepository.findById(updatedNote.getId())
             .orElseThrow(() ->

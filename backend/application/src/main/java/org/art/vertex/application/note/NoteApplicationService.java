@@ -3,6 +3,7 @@ package org.art.vertex.application.note;
 import lombok.extern.slf4j.Slf4j;
 import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
+import org.art.vertex.application.note.command.CreateNotesCommand;
 import org.art.vertex.application.note.command.UpdateNoteCommand;
 import org.art.vertex.application.tag.TagApplicationService;
 import org.art.vertex.application.tag.command.UpsertTagCommand;
@@ -20,6 +21,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -64,38 +66,61 @@ public class NoteApplicationService {
     public Note createNote(UUID userId, CreateNoteCommand command) {
         log.debug("Creating note. User id: {}, title: {}", userId, command.getTitle());
 
-        LocalDateTime now = clock.now();
+        CreateNotesCommand batchCommand = CreateNotesCommand.builder()
+            .notes(List.of(command))
+            .build();
 
-        Directory dir = directoryService.getByDirId(command.getDirId());
+        List<Note> createdNotes = createNotes(userId, batchCommand);
 
-        Set<Tag> tags = tagService.upsertTags(userId,
-            command.getTags().stream()
-                .map(tagName -> UpsertTagCommand.builder()
-                    .name(tagName)
-                    .build())
-                .collect(Collectors.toSet())
-        );
-
-        Note newNote = Note.create(
-            uuidGenerator.generate(),
-            userId,
-            command.getTitle(),
-            command.getContent(),
-            dir,
-            tags,
-            now
-        );
-
-        Note savedNote = noteRepository.save(newNote);
-
+        Note savedNote = createdNotes.get(0);
         log.info("Note created successfully. Note id: {}, user id: {}", savedNote.getId(), userId);
 
-        eventPublisher.publishEvent(new NoteCreatedEvent(
-            savedNote,
-            now
-        ));
-
         return savedNote;
+    }
+
+    @Transactional
+    public List<Note> createNotes(UUID userId, CreateNotesCommand command) {
+        log.debug("Creating notes in batch. User id: {}, count: {}", userId, command.getNotes().size());
+
+        LocalDateTime now = clock.now();
+        List<Note> notesToSave = new ArrayList<>();
+
+        for (CreateNoteCommand noteCommand : command.getNotes()) {
+            Directory dir = directoryService.getByDirId(noteCommand.getDirId());
+
+            Set<Tag> tags = tagService.upsertTags(userId,
+                noteCommand.getTags().stream()
+                    .map(tagName -> UpsertTagCommand.builder()
+                        .name(tagName)
+                        .build())
+                    .collect(Collectors.toSet())
+            );
+
+            Note newNote = Note.create(
+                uuidGenerator.generate(),
+                userId,
+                noteCommand.getTitle(),
+                noteCommand.getContent(),
+                dir,
+                tags,
+                now
+            );
+
+            notesToSave.add(newNote);
+        }
+
+        List<Note> savedNotes = noteRepository.saveAll(notesToSave);
+
+        for (Note savedNote : savedNotes) {
+            eventPublisher.publishEvent(new NoteCreatedEvent(
+                savedNote,
+                now
+            ));
+            log.debug("Note created successfully in batch. Note id: {}", savedNote.getId());
+        }
+
+        log.info("Batch note creation completed. User id: {}, created: {}", userId, savedNotes.size());
+        return savedNotes;
     }
 
     @Transactional

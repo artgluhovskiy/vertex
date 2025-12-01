@@ -6,6 +6,7 @@ import org.art.vertex.application.directory.DirectoryApplicationService;
 import org.art.vertex.application.directory.command.CreateDirectoryCommand;
 import org.art.vertex.application.note.NoteApplicationService;
 import org.art.vertex.application.note.command.CreateNoteCommand;
+import org.art.vertex.application.note.command.CreateNotesCommand;
 import org.art.vertex.application.note.link.NoteLinkApplicationService;
 import org.art.vertex.application.note.link.command.CreateNoteLinkCommand;
 import org.art.vertex.application.tag.TagApplicationService;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,9 +184,10 @@ public class ObsidianMigrationApplicationService {
         Map<String, Directory> directoryMap,
         MigrationResultBuilder resultBuilder
     ) {
-        log.info("Phase 4: Creating notes...");
+        log.info("Phase 4: Creating notes in batch...");
 
         Map<Path, Note> createdNotes = new HashMap<>();
+        Map<Path, CreateNoteCommand> noteCommands = new HashMap<>();
 
         for (Map.Entry<Path, ObsidianNote> entry : parsedNotes.entrySet()) {
             try {
@@ -201,16 +204,33 @@ public class ObsidianMigrationApplicationService {
                     .tags(obsidianNote.getTags())
                     .build();
 
-                Note note = noteService.createNote(userId, command);
-                createdNotes.put(entry.getKey(), note);
-                resultBuilder.notesCreated++;
+                noteCommands.put(entry.getKey(), command);
             } catch (Exception e) {
-                log.error("Failed to create note: {}", entry.getKey(), e);
-                resultBuilder.addError(entry.getKey().toString(), "Creation error: " + e.getMessage());
+                log.error("Failed to prepare note for batch creation: {}", entry.getKey(), e);
+                resultBuilder.addError(entry.getKey().toString(), "Preparation error: " + e.getMessage());
             }
         }
 
-        log.info("Created {} notes", resultBuilder.notesCreated);
+        if (!noteCommands.isEmpty()) {
+            try {
+                CreateNotesCommand batchCommand = CreateNotesCommand.builder()
+                    .notes(new ArrayList<>(noteCommands.values()))
+                    .build();
+
+                List<Note> batchCreatedNotes = noteService.createNotes(userId, batchCommand);
+
+                List<Path> paths = new ArrayList<>(noteCommands.keySet());
+                for (int i = 0; i < batchCreatedNotes.size(); i++) {
+                    createdNotes.put(paths.get(i), batchCreatedNotes.get(i));
+                    resultBuilder.notesCreated++;
+                }
+            } catch (Exception e) {
+                log.error("Failed to create notes in batch", e);
+                resultBuilder.addError("Batch creation", "Batch creation error: " + e.getMessage());
+            }
+        }
+
+        log.info("Created {} notes in batch", resultBuilder.notesCreated);
         return createdNotes;
     }
 

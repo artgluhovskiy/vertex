@@ -2,7 +2,6 @@ package org.art.vertex.domain.note;
 
 import org.art.vertex.domain.directory.model.Directory;
 import org.art.vertex.domain.note.model.Note;
-import org.art.vertex.domain.user.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +10,8 @@ import java.util.UUID;
 public interface NoteRepository {
 
     Note save(Note note);
+
+    List<Note> saveAll(List<Note> notes);
 
     Note update(Note note);
 
