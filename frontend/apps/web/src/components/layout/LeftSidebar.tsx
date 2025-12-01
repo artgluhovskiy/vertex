@@ -1,4 +1,5 @@
 import { NotesSection, FoldersSection, SmartShelvesSection } from '../sidebar';
+import { SearchBar } from '../search';
 import { useResizable } from '@/hooks/useResizable';
 
 interface LeftSidebarProps {
@@ -16,7 +17,6 @@ export function LeftSidebar({
   minWidth = 200,
   maxWidth = 500,
 }: LeftSidebarProps) {
-  // TODO: Add search bar
   // TODO: Add "New Note" button
   // TODO: Add sort/filter buttons
 
@@ -30,6 +30,25 @@ export function LeftSidebar({
     maxWidth,
   });
 
+  const handleSearchChange = (query: string) => {
+    // Called immediately on every keystroke
+    // Useful for showing typing feedback, updating UI state, etc.
+    console.log('[Immediate] Search query changed:', query);
+  };
+
+  const handleSearch = (query: string) => {
+    // Called after user stops typing (debounced)
+    // This is where you would perform the actual search API call
+    console.log('[Debounced] Performing search for:', query);
+    // TODO: Implement search API call here
+  };
+
+  const handleSearchSubmit = (query: string) => {
+    // Called when user presses Enter
+    console.log('[Submit] Search submitted:', query);
+    // TODO: Implement immediate search on Enter
+  };
+
   return (
     <aside
       className="flex-shrink-0 border-r border-light-border-primary dark:border-dark-border-primary bg-light-bg-primary dark:bg-dark-bg-secondary relative"
@@ -37,9 +56,16 @@ export function LeftSidebar({
     >
       <div className="h-full flex flex-col p-4 overflow-y-auto">
         <div className="text-light-text-primary dark:text-dark-text-primary">
-          <h3 className="font-semibold mb-4">Left Sidebar</h3>
+          {/* Search Bar */}
+          <SearchBar
+            placeholder="Search ..."
+            onChange={handleSearchChange}
+            onSearch={handleSearch}
+            onSubmit={handleSearchSubmit}
+            debounceDelay={500}
+            className="mb-4"
+          />
 
-          {/* TODO: Search Bar */}
           {/* TODO: New Note Button */}
           {/* TODO: Sort & Filter */}
 

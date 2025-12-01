@@ -1,26 +1,45 @@
-export interface SearchQuery {
+import type { Note } from './Note';
+
+/**
+ * Search request payload matching backend SearchRequest
+ * Endpoint: POST /api/v1/notes/search
+ */
+export interface SearchRequest {
+  /** Search query string (required) */
   query: string;
+
+  /** Search type (optional, defaults to SEMANTIC in backend) */
   type?: SearchType;
-  directoryId?: string;
-  tags?: string[];
-  limit?: number;
-  offset?: number;
+
+  /** Maximum number of results to return (optional, must be positive) */
+  maxResults?: number;
 }
 
-export type SearchType = 'full_text' | 'semantic' | 'hybrid';
+/**
+ * Search type enum matching backend SearchType
+ * Currently only SEMANTIC is supported
+ */
+export type SearchType = 'SEMANTIC';
+// Future types: 'FULL_TEXT' | 'GRAPH' | 'HYBRID'
 
+/**
+ * Search result response matching backend SearchResultDto
+ */
 export interface SearchResult {
+  /** List of search hits */
   hits: SearchHit[];
+
+  /** Total number of hits found */
   totalHits: number;
-  searchTimeMs: number;
-  type: SearchType;
 }
 
+/**
+ * Individual search hit matching backend SearchHitDto
+ */
 export interface SearchHit {
-  noteId: string;
-  title: string;
-  content: string;
+  /** The matched note */
+  note: Note;
+
+  /** Relevance score for this hit */
   score: number;
-  matchType: SearchType;
-  highlights: string[];
 }
