@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { mockDirectories } from './data/directories';
 import { mockNotes } from './data/notes';
+import type { SearchRequest } from '@synapse/types/domain';
 
 // API base URL - must match the axios client baseURL
 // When mocking is enabled, axios uses relative URLs, so we need to match that
@@ -268,6 +269,63 @@ export const handlers = [
     return HttpResponse.json(
       { message: 'Note deleted successfully' },
       { status: 200 }
+    );
+  }),
+
+  // POST /api/v1/notes/search - Search notes
+  http.post(`${API_BASE_URL}/notes/search`, async ({ request }) => {
+    const body = (await request.json()) as SearchRequest;
+    const query = body.query.toLowerCase().trim();
+
+    if (!query) {
+      return HttpResponse.json(
+        { hits: [], totalHits: 0 },
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    }
+
+    // Simple mock search: filter notes by title or content containing query
+    const matchingNotes = mockNotes
+      .map((note) => {
+        const titleMatch = note.title.toLowerCase().includes(query);
+        const contentMatch = note.content.toLowerCase().includes(query);
+
+        if (titleMatch || contentMatch) {
+          // Calculate a simple relevance score
+          const titleScore = titleMatch ? 0.8 : 0;
+          const contentScore = contentMatch ? 0.5 : 0;
+          const score = Math.max(titleScore, contentScore);
+
+          return {
+            note,
+            score,
+          };
+        }
+        return null;
+      })
+      .filter((hit) => hit !== null)
+      .sort((a, b) => b.score - a.score); // Sort by score descending
+
+    // Limit results based on maxResults parameter
+    const maxResults = body.maxResults ?? 20;
+    const limitedResults = matchingNotes.slice(0, maxResults);
+
+    return HttpResponse.json(
+      {
+        hits: limitedResults,
+        totalHits: matchingNotes.length,
+      },
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
     );
   }),
 ];

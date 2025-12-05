@@ -1,6 +1,8 @@
+import { useState, useCallback } from 'react';
 import { NotesSection, FoldersSection, SmartShelvesSection } from '../sidebar';
-import { SearchBar } from '../search';
+import { SearchBarWithResults } from '../search';
 import { useResizable } from '@/hooks/useResizable';
+import { useSearch } from '@synapse/api/hooks';
 
 interface LeftSidebarProps {
   onNoteSelect?: (noteId: string) => void;
@@ -20,6 +22,8 @@ export function LeftSidebar({
   // TODO: Add "New Note" button
   // TODO: Add sort/filter buttons
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const {
     width,
     isResizing,
@@ -30,24 +34,31 @@ export function LeftSidebar({
     maxWidth,
   });
 
-  const handleSearchChange = (query: string) => {
+  // Search hook - automatically fetches results when query changes
+  const { results, isLoading, error } = useSearch({
+    query: searchQuery,
+    maxResults: 10,
+  });
+
+  const handleSearchChange = useCallback((query: string) => {
     // Called immediately on every keystroke
-    // Useful for showing typing feedback, updating UI state, etc.
     console.log('[Immediate] Search query changed:', query);
-  };
+  }, []);
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     // Called after user stops typing (debounced)
-    // This is where you would perform the actual search API call
+    // Update the search query state to trigger the API call
     console.log('[Debounced] Performing search for:', query);
-    // TODO: Implement search API call here
-  };
+    setSearchQuery(query);
+  }, []);
 
-  const handleSearchSubmit = (query: string) => {
-    // Called when user presses Enter
-    console.log('[Submit] Search submitted:', query);
-    // TODO: Implement immediate search on Enter
-  };
+  const handleResultSelect = useCallback(
+    (noteId: string) => {
+      console.log('[Result Selected] Note ID:', noteId);
+      onNoteSelect?.(noteId);
+    },
+    [onNoteSelect]
+  );
 
   return (
     <aside
@@ -56,12 +67,15 @@ export function LeftSidebar({
     >
       <div className="h-full flex flex-col p-4 overflow-y-auto">
         <div className="text-light-text-primary dark:text-dark-text-primary">
-          {/* Search Bar */}
-          <SearchBar
+          {/* Search Bar with Results */}
+          <SearchBarWithResults
             placeholder="Search ..."
+            results={results}
+            isLoading={isLoading}
+            error={error}
             onChange={handleSearchChange}
             onSearch={handleSearch}
-            onSubmit={handleSearchSubmit}
+            onResultSelect={handleResultSelect}
             debounceDelay={500}
             className="mb-4"
           />
